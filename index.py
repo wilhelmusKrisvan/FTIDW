@@ -5,7 +5,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
-app = dash.Dash(__name__,suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.CERULEAN])
+app = dash.Dash(__name__,suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.COSMO])
 server = app.server
 
 import dash_core_components as dcc
@@ -13,9 +13,9 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
-icon = 'https://amigogroup.co.id/wp-content/uploads/2021/04/Pin-1.png'
+icon = 'https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png'
 #icon = 'https://amigogroup.co.id/wp-content/uploads/2020/06/AmigoHeader-e1593098882452.png'
-icnBrand = 'https://amigogroup.co.id/wp-content/uploads/2020/06/AmigoHeader-e1593098882452.png'
+icnBrand = 'https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png'
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -24,7 +24,7 @@ app.layout = html.Div([
             html.A(
                 dbc.Row([
                     dbc.Col(html.Img(src=icon, height="35px")),
-                    dbc.Col(dbc.NavbarBrand('XYZ Group'))
+                    dbc.Col(dbc.NavbarBrand('DATA WAREHOUSE'))
                 ],
                     align="center"),
                 href='/'
@@ -49,7 +49,21 @@ app.layout = html.Div([
 
 home = html.Div([
         dbc.Container([
-            
+            html.Img(src=icnBrand),
+            dbc.Card([
+                dbc.CardBody([
+                    html.Div([
+                        html.Label('Username',htmlFor='floatingInput'),
+                        dcc.Input(type='text', className='form-control'),
+                    ],className='form-floating'),
+                    html.Div([
+                        html.Label('Password',htmlFor='floatingInput'),
+                        dcc.Input(type='password',className='form-control',),
+                    ],className='form-floating'),
+                    html.Button('SUBMIT',n_clicks=0,className='btn btn-lg btn-primary',style={'margin-top':'25px','width':'100%'})
+                ],className='form-group'),
+            ],style={'width':'25%'},className='card border-primary mb-3')
+
             # dbc.Row([
             #     dbc.Col([
             #         dbc.CardLink([
@@ -63,7 +77,7 @@ home = html.Div([
             #         ], href='apps/app1')
             #     ], width=12),
             # ], style={'width': '100%'})
-        ], style={'height': '100vh', 'align-items': 'center', 'display': 'flex', 'justify-content':'center'}, fluid=True)
+        ], style={'width':'100%','height': '90vh', 'align-items': 'center', 'display': 'flex', 'justify-content':'center'}, fluid=True)
     ], style={'width': '100%', 'position': 'sticky', 'top': '0', 'zIndex': '3'}),
 
 
