@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
-connect='mysql+pymysql://root:@localhost/sembako'
+connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/operasional'
 engine = create_engine(connect)
 
 class User(db.Model):
@@ -14,6 +14,7 @@ class User(db.Model):
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
+    role = db.Column(db.String(50))
 
 # def create_users_table():
 #     User.metadata.create_all(engine)

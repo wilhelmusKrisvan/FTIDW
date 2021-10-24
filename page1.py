@@ -6,13 +6,19 @@ from dash.dependencies import Input, Output
 from appConfig import app
 from flask_login import logout_user, current_user
 
-
-icon = 'https://amigogroup.co.id/wp-content/uploads/2020/06/AmigoHeader-e1593098882452.png'
 icnBrand = 'https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png'
 
-layout = dbc.Container([
+layoutAdmin = dbc.Container([
 
-        html.H2('Page 1 Layout'),
+        html.H2('Page 1 Layout Admin'),
+        html.Hr(),
+
+
+], className="mt-4")
+
+layoutUser =dbc.Container([
+
+        html.H2('Page 1 Layout User'),
         html.Hr(),
 
 

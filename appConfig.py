@@ -14,7 +14,7 @@ import configparser
 from model.user import User
 
 warnings.filterwarnings("ignore")
-connect='mysql+pymysql://root:@localhost/sembako'
+connect=connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/operasional'
 
 db = SQLAlchemy()
 config = configparser.ConfigParser()

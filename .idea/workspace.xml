@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2322ccfe-5ba9-49ec-b5bb-c3063a8a5547" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/FTIDW.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FTIDW.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/app.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/appConfig.py" beforeDir="false" afterPath="$PROJECT_DIR$/appConfig.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.py" beforeDir="false" afterPath="$PROJECT_DIR$/index.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/page1.py" beforeDir="false" afterPath="$PROJECT_DIR$/page1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,10 +39,12 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mariadb" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project_Script/DashPengadaan" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager">
@@ -81,7 +84,11 @@
       <workItem from="1634643976206" duration="597000" />
       <workItem from="1634645805667" duration="13601000" />
       <workItem from="1634660774142" duration="815000" />
-      <workItem from="1634693746826" duration="5521000" />
+      <workItem from="1634693746826" duration="5531000" />
+      <workItem from="1634809043758" duration="2841000" />
+      <workItem from="1634964024540" duration="2082000" />
+      <workItem from="1635007165835" duration="3923000" />
+      <workItem from="1635082130612" duration="4478000" />
     </task>
     <servers />
   </component>
@@ -89,6 +96,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/FTIDW$index.coverage" NAME="index Coverage Results" MODIFIED="1634697974101" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FTIDW$index.coverage" NAME="index Coverage Results" MODIFIED="1635086922492" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
