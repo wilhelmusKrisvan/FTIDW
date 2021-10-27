@@ -1,7 +1,8 @@
 # Dash app initialization
 import dash
 import dash_bootstrap_components as dbc
-
+import paramiko
+from sqlalchemy import create_engine
 # DB User
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,9 +13,13 @@ from flask_login import login_user, logout_user, current_user, LoginManager, Use
 # from model.user import User as base
 import configparser
 from model.user import User
+from sshtunnel import SSHTunnelForwarder
+import pymysql.cursors
+
 
 warnings.filterwarnings("ignore")
-connect=connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/operasional'
+connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@127.0.0.1:3333/operasional'
+
 
 db = SQLAlchemy()
 config = configparser.ConfigParser()
@@ -22,7 +27,6 @@ config = configparser.ConfigParser()
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.COSMO])
 server = app.server
 app.config.suppress_callback_exceptions = True
-
 
 # config
 server.config.update(

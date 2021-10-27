@@ -1,9 +1,13 @@
+import paramiko
 from flask_login import UserMixin
 from sqlalchemy import create_engine
 from sqlalchemy import Table
 from sqlalchemy.sql import select
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
+from sshtunnel import SSHTunnelForwarder
+import pymysql.cursors
+from paramiko import SSHClient
 
 db = SQLAlchemy()
 connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/operasional'
@@ -31,7 +35,7 @@ def add_user(username, password, email, admin):
     hashed_password = generate_password_hash(password, method='sha256')
 
     insert_stmt = userTable.insert().values(
-        username=username, email=email, password=hashed_password, admin=admin
+        username=username, email=email, password=hashed_password, role=admin
     )
 
     conn = engine.connect()
@@ -41,7 +45,6 @@ def add_user(username, password, email, admin):
 
 def update_password(username, password):
     hashed_password = generate_password_hash(password, method='sha256')
-
     update = userTable.update().\
         values(password=hashed_password).\
         where(userTable.c.username==username)
@@ -50,12 +53,41 @@ def update_password(username, password):
     conn.execute(update)
     conn.close()
 
+def update_role(username, role):
+    update = userTable.update().\
+        values(role=role).\
+        where(userTable.c.username==username)
+
+    conn = engine.connect()
+    conn.execute(update)
+    conn.close()
+
+def delete_user(username):
+    update = userTable.delete.where(userTable.c.username==username)
+
+    conn = engine.connect()
+    conn.execute(update)
+    conn.close()
+
+def show_role():
+    select_stmt = select([userTable.c.username,userTable.c.role])
+    conn=engine.connect()
+    results = conn.execute(select_stmt)
+    users=[]
+    for result in results:
+        users.append({
+            'username':result[0],
+            'role': result[1],
+        })
+    conn.close()
+
+    return users
 
 def show_users():
     select_stmt = select([userTable.c.id,
                         userTable.c.username,
                         userTable.c.email,
-                        userTable.c.admin])
+                        userTable.c.role])
 
     conn = engine.connect()
     results = conn.execute(select_stmt)
@@ -64,10 +96,9 @@ def show_users():
 
     for result in results:
         users.append({
-            'id' : result[0],
             'username' : result[1],
             'email' : result[2],
-            'admin' : str(result[3])
+            'role' : result[3]
         })
 
     conn.close()

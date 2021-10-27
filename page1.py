@@ -16,7 +16,7 @@ layoutAdmin = dbc.Container([
 
 ], className="mt-4")
 
-layoutUser =dbc.Container([
+layout =dbc.Container([
 
         html.H2('Page 1 Layout User'),
         html.Hr(),

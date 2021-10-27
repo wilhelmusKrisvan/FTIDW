@@ -2,11 +2,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-
 from appConfig import app, server
 from flask_login import logout_user, current_user
-import login, page1
-
+import login, page1, profile, admin
 
 navBar = dbc.Navbar(
         children=[
@@ -45,6 +43,21 @@ def displayPage(pathname):
     if pathname == '/page1':
         if current_user.is_authenticated:
             return page1.layout
+        else:
+            return login.layout
+
+    if pathname == '/profile':
+        if current_user.is_authenticated:
+            return profile.layout
+        else:
+            return login.layout
+
+    if pathname == '/admin':
+        if current_user.is_authenticated:
+            if current_user.role=='admin':
+                return admin.layout
+            else:
+                return login.layout
         else:
             return login.layout
 

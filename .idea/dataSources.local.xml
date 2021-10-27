@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal">
-    <data-source name="dw@fti" uuid="0df6ff5e-2d31-4b9f-b2e2-5d56096634f8">
-      <database-info product="MariaDB" version="10.5.11-MariaDB" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="2.7.3" dbms="MARIADB" exact-version="10.5.11" exact-driver-version="2.7">
+    <data-source name="dw@fti" uuid="086f2af8-7dc0-4be6-a439-87233ff150f5">
+      <database-info product="MariaDB" version="10.5.11-MariaDB" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="2.6.0" dbms="MARIADB" exact-version="10.5.11" exact-driver-version="2.6">
         <extra-name-characters>#@</extra-name-characters>
         <identifier-quote-string>`</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
-      <secret-storage>master_key</secret-storage>
       <user-name>wilhelmus</user-name>
       <schema-mapping>
         <introspection-scope>
-          <node kind="schema">
-            <name qname="@" />
-            <name qname="datawarehouse" />
-            <name qname="operasional" />
-          </node>
+          <node kind="schema" qname="@" />
         </introspection-scope>
       </schema-mapping>
       <ssh-properties>
         <enabled>true</enabled>
-        <ssh-config-id>8f1a7bf1-3647-407d-aa39-50d73dd2618d</ssh-config-id>
+        <ssh-config-id>e3d06cb7-fbd1-4f32-a547-7901abbaa854</ssh-config-id>
       </ssh-properties>
     </data-source>
   </component>
