@@ -5,6 +5,8 @@ import dash_bootstrap_components as dbc
 from appConfig import app, server
 from flask_login import logout_user, current_user
 import login, page1, profile, admin
+from apps import alumni
+import login, home
 
 navBar = dbc.Navbar(
         children=[
@@ -29,7 +31,7 @@ app.layout = html.Div([
 def displayPage(pathname):
     if pathname == '/':
         if current_user.is_authenticated:
-            return page1.layout
+            return home.layout
         else:
             return login.layout
 
@@ -40,11 +42,16 @@ def displayPage(pathname):
         else:
             return login.layout
 
-    if pathname == '/page1':
+    if pathname == '/home':
         if current_user.is_authenticated:
-            return page1.layout
+            return home.layout
         else:
             return login.layout
+    if pathname == '/dashboard/alumni':
+        if current_user.is_authenticated:
+            return alumni.layout
+        else:
+            return alumni.layout
 
     if pathname == '/profile':
         if current_user.is_authenticated:
@@ -79,7 +86,7 @@ def navBarPage(input1):
                         ], align="center", ),
                         href='/'
                     ),
-                    dbc.NavLink('Page 1', href='/page1'),
+                    dbc.NavLink('Page 1', href='/home'),
                 ], className='navbar-nav mr-auto'),
                 dbc.DropdownMenu(
                     right=True,
@@ -89,7 +96,7 @@ def navBarPage(input1):
                         dbc.DropdownMenuItem('Admin', href='/admin'),
                         dbc.DropdownMenuItem(divider=True),
                         dbc.DropdownMenuItem('Logout', href='/logout'),
-                    ], color='rgb(0, 65, 160)',
+                    ], color='rgb(39, 128, 227)',
                 ),
             ], className='collapse navbar-collapse')
         ], className='container-fluid')
@@ -108,7 +115,7 @@ def navBarPage(input1):
                         ], align="center", ),
                         href='/'
                     ),
-                    dbc.NavLink('Page 1', href='/page1'),
+                    dbc.NavLink('Home', href='/home'),
                 ], className='navbar-nav mr-auto'),
                 dbc.DropdownMenu(
                     right=True,
@@ -117,7 +124,7 @@ def navBarPage(input1):
                         dbc.DropdownMenuItem('Profile', href='/profile'),
                         dbc.DropdownMenuItem(divider=True),
                         dbc.DropdownMenuItem('Logout', href='/logout'),
-                    ], color='rgb(0, 65, 160)',style={'border-radius': '200px'}
+                    ], color='rgb(39, 128, 227)',style={'border-radius': '200px'}
                 ),
             ], className='collapse navbar-collapse')
         ], className='container-fluid')

@@ -10,7 +10,7 @@ import pymysql.cursors
 from paramiko import SSHClient
 
 db = SQLAlchemy()
-connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/operasional'
+connect='mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/operasional'
 engine = create_engine(connect)
 
 class User(db.Model):

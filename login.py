@@ -2,7 +2,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
-
 from appConfig import app, User
 from flask_login import login_user
 from werkzeug.security import check_password_hash
@@ -31,7 +30,7 @@ layout = html.Div([
     ], style={'width': '100%', 'position': 'sticky', 'top': '0', 'zIndex': '3'})
 
 
-# REDIRECT TO PAGE1 IF LOGIN DETAILS ARE CORRECT
+# REDIRECT TO HOME IF LOGIN DETAILS ARE CORRECT
 @app.callback(Output('urlLogin', 'pathname'),
               [Input('loginButton', 'n_clicks'),
               Input('usernameBox', 'n_submit'),
@@ -43,7 +42,7 @@ def sucess(n_clicks, usernameSubmit, passwordSubmit, username, password):
     if user:
         if check_password_hash(user.password, password):
             login_user(user)
-            return '/page1'
+            return '/home'
         else:
             pass
     else:

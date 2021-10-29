@@ -18,7 +18,7 @@ import pymysql.cursors
 
 
 warnings.filterwarnings("ignore")
-connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@127.0.0.1:3333/operasional'
+connect=connect='mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/operasional'
 
 
 db = SQLAlchemy()
