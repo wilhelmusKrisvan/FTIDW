@@ -1,7 +1,6 @@
 # Dash app initialization
 import dash
 import dash_bootstrap_components as dbc
-import paramiko
 from sqlalchemy import create_engine
 # DB User
 from flask_sqlalchemy import SQLAlchemy
@@ -49,5 +48,8 @@ class User(UserMixin, User):
 # callback to reload the user object
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    user = User.query.get(int(user_id))
+    db.session.remove()
+    return user
+
 

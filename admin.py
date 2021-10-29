@@ -5,8 +5,9 @@ import dash_table as dt
 from appConfig import app, User
 from model.user import add_user, show_role, show_users, update_role, delete_user
 from dash.dependencies import Input, Output, State
-from flask_login import current_user
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 users = show_users()
 uname = users
 options = [
@@ -27,7 +28,7 @@ layout = dbc.Container([
                     className='form-control',
                     n_submit=0,
                     style={
-                        'width': '90%'
+                        'width': '90%','border-radius':'10px'
                     },
                 ),
                 html.Br(),
@@ -38,7 +39,7 @@ layout = dbc.Container([
                     className='form-control',
                     n_submit=0,
                     style={
-                        'width': '90%'
+                        'width': '90%','border-radius':'10px'
                     },
                 ),
                 html.Br(),
@@ -49,7 +50,7 @@ layout = dbc.Container([
                     className='form-control',
                     n_submit=0,
                     style={
-                        'width': '90%'
+                        'width': '90%','border-radius':'10px'
                     },
                 ),
                 html.Br(),
@@ -63,7 +64,7 @@ layout = dbc.Container([
                     className='form-control',
                     n_submit=0,
                     style={
-                        'width': '90%'
+                        'width': '100%','border-radius':'10px'
                     },
                 ),
                 html.Br(),
@@ -71,7 +72,7 @@ layout = dbc.Container([
                 dcc.Dropdown(
                     id='admin',
                     style={
-                        'width': '90%'
+                        'width': '100%','border-radius':'10px'
                     },
                     options=[
                         {'label': 'Admin', 'value': 'admin'},
@@ -88,7 +89,8 @@ layout = dbc.Container([
                     id='createUserButton',
                     n_clicks=0,
                     type='submit',
-                    className='btn btn-primary btn-lg'
+                    style={'margin-top': '8px','border-radius':'10px'},
+                    className='btn btn-primary btn-block'
                 ),
                 html.Br(),
                 html.Div(id='createUserSuccess')
@@ -97,7 +99,7 @@ layout = dbc.Container([
 
             ], md=4)
         ]),
-    ], className='jumbotron'),
+    ], className='jumbotron',style={'border-radius':'10px'}),
 
     dbc.Container([
         html.H3('Manage Users'),
@@ -117,7 +119,7 @@ layout = dbc.Container([
         dbc.Row([
             dbc.Col([
                 dbc.Label('Username: '),
-                dcc.Dropdown(options=[{'label': i['username'], 'value': i['username']} for i in uname], id='uname')
+                dcc.Dropdown(options=[{'label': i['username'], 'value': i['username']} for i in uname], id='uname',style={'border-radius':'10px'})
             ], width=4),
             dbc.Col([
                 dbc.Label('Role: '),
@@ -126,7 +128,7 @@ layout = dbc.Container([
                         {'label': 'Admin', 'value': 'admin'},
                         {'label': 'Dekanat', 'value': 'dekanat'},
                         {'label': 'Dosen', 'value': 'dosen'}
-                    ], id='fillRole', )
+                    ], id='fillRole', style={'border-radius':'10px'})
             ], width=4),
             dbc.Col([
                 html.Br(),
@@ -134,8 +136,10 @@ layout = dbc.Container([
                     children='UPDATE',
                     id='updateUserBtn',
                     n_clicks=0,
+                    disabled=True,
                     type='submit',
-                    className='btn btn-primary btn-lg'
+                    style={'margin-top': '8px','border-radius':'10px'},
+                    className='btn btn-primary btn-block'
                 ),
                 html.Div(id='updateUserSuccess'),
             ], width=2),
@@ -145,13 +149,15 @@ layout = dbc.Container([
                     children='DELETE',
                     id='deleteUserBtn',
                     n_clicks=0,
+                    disabled=True,
                     type='submit',
-                    className='btn btn-danger btn-lg'
+                    style={'margin-top': '8px','border-radius':'10px'},
+                    className='btn btn-danger btn-block'
                 ),
                 html.Div(id='deleteUserSuccess')
             ], width=2),
         ]),
-    ], className='jumbotron')
+    ], className='jumbotron',style={'border-radius':'10px'})
 ], style={'margin-top': '25px'})
 
 
@@ -261,6 +267,7 @@ def updateUser(n_clicks, Username, Role):
     if (n_clicks > 0):
         if Username and Role != '':
             user = User.query.filter_by(username=Username).first()
+            db.session.close()
             if Role != user.role:
                 try:
                     update_role(Username, Role)
@@ -272,17 +279,31 @@ def updateUser(n_clicks, Username, Role):
         else:
             return html.Div(children=['Invalid details submitted'], className='text-danger')
 
+
 # DELETE BUTTON CLICK / FORM SUBMIT - DELETE USER
-# @app.callback(Output('deleteUserSuccess', 'children'),
-#               [Input('deleteUserBtn', 'n_clicks')],
-#               [State('uname', 'value'), ])
-# def deleteUser(n_clicks, Username):
-#     if (n_clicks > 0):
-#         if Username != '' or Username != None:
-#             try:
-#                 delete_user(Username)
-#                 return html.Div(children=['User deleted'], className='text-success')
-#             except Exception as e:
-#                 return html.Div(children=['User not deleted: {e}'.format(e=e)], className='text-danger')
-#         else:
-#             return html.Div(children=['Invalid details submitted'], className='text-danger')
+@app.callback(Output('deleteUserSuccess', 'children'),
+              [Input('deleteUserBtn', 'n_clicks')],
+              [State('uname', 'value'), ])
+def deleteUser(n_clicks, Username):
+    if (n_clicks > 0):
+        if Username != '' or Username != None:
+            try:
+                delete_user(Username)
+                return html.Div(children=['User deleted'], className='text-success')
+            except Exception as e:
+                return html.Div(children=['User not deleted: {e}'.format(e=e)], className='text-danger')
+        else:
+            return html.Div(children=['Invalid details submitted'], className='text-danger')
+
+
+# Switch Button
+@app.callback(Output('updateUserBtn', 'disabled'),
+              Output('deleteUserBtn', 'disabled'),
+              Input('uname', 'value'), Input('fillRole', 'value'))
+def switchButton(Fillusername, Fillrole):
+    if Fillusername != None and Fillrole != None:
+        return False, False
+    elif Fillusername != None and Fillrole == None:
+        return True, False
+    else:
+        return True, True

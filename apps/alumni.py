@@ -4,12 +4,7 @@ import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
-import plotly.express as px
 from sqlalchemy import create_engine
-from plotly.subplots import make_subplots
-from dash.dependencies import Input, Output
-from appConfig import app
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
@@ -337,13 +332,15 @@ kemampuan = dbc.CardGroup([
     ])
 ], style={'margin-top': '20px', 'justify-content': 'center'})
 
-layout = html.Div([
-    html.Div(html.H1('Analisis Lulusan dan Tracer Study Prodi Informatika',
-                      style={'margin-top':'30px'}
-                     )
-             ),
+layout = dbc.Container([
+    html.Div(
+        html.H1(
+            'Analisis Lulusan dan Tracer Study Prodi Informatika',
+            style={'margin-top':'30px','text-align': 'center'}
+        )
+    ),
     html.Div([masatunggu]),
     html.Div([bidangkerja]),
     html.Div([tempatkerja]),
     html.Div([kemampuan])
-], style={'justify-content': 'center'})
+], fluid=True)

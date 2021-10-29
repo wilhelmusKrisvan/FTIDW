@@ -15,7 +15,7 @@ menu = dbc.CardGroup([
                        style={'color': 'black', 'textAlign': 'center'})
             ], href='/dashboard/pmb')
             , outline=True
-            , style={'padding': '10px', 'margin': '10px', 'width': '360px'}
+            , style={'border-radius':'10px','padding': '10px', 'margin': '10px', 'width': '360px'}
             , className='card bg-light mb-3'
         ),
         dbc.Card(
@@ -26,7 +26,7 @@ menu = dbc.CardGroup([
                        style={'color': 'black', 'textAlign': 'center'})
             ], href='/dashboard/kp-skripsi-yudisium')
             , outline=True
-            , style={'padding': '10px', 'margin': '10px', 'width': '360px'}
+            , style={'border-radius':'10px','padding': '10px', 'margin': '10px', 'width': '360px'}
             , className='card bg-light mb-3'
         ),
         dbc.Card(
@@ -37,7 +37,7 @@ menu = dbc.CardGroup([
                        style={'color': 'black', 'textAlign': 'center'})
             ], href='/dashboard/alumni')
             , outline=True
-            , style={'padding': '10px', 'margin': '10px', 'width': '360px'}
+            , style={'border-radius':'10px','padding': '10px', 'margin': '10px', 'width': '360px'}
             , className='card bg-light mb-3'
         )
     ]),
@@ -50,7 +50,7 @@ menu = dbc.CardGroup([
                        style={'color': 'black', 'textAlign': 'center'})
             ], href='/dashboard/registrasi')
             , outline=True
-            , style={'padding': '10px', 'margin': '10px', 'width': '360px'}
+            , style={'border-radius':'10px','padding': '10px', 'margin': '10px', 'width': '360px'}
             , className='card bg-light mb-3'
         ),
         dbc.Card(
@@ -61,7 +61,7 @@ menu = dbc.CardGroup([
                        style={'color': 'black', 'textAlign': 'center'})
             ], href='/dashboard/kegiatan-kerjasama')
             , outline=True
-            , style={'padding': '10px', 'margin': '10px', 'width': '360px'}
+            , style={'border-radius':'10px','padding': '10px', 'margin': '10px', 'width': '360px'}
             , className='card bg-light mb-3'
         ),
         dbc.Card(
@@ -72,13 +72,13 @@ menu = dbc.CardGroup([
                        style={'color': 'black', 'textAlign': 'center'})
             ], href='/dashboard/ppp')
             , outline=True
-            , style={'padding': '10px', 'margin': '10px', 'width': '360px'}
+            , style={'border-radius':'10px','padding': '10px', 'margin': '10px', 'width': '360px'}
             , className='card bg-light mb-3'
         )
     ])
-], style={'margin-top': '50px', 'justify-content': 'center'}
+], style={'justify-content': 'center'}
 )
 
 layout = html.Div([
     menu
-])
+],style={'height': '75vh', 'align-items': 'center', 'display': 'flex', 'justify-content':'center'})

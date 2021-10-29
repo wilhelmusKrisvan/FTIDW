@@ -4,13 +4,12 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from appConfig import app, server
 from flask_login import logout_user, current_user
-import login, page1, profile, admin
+import login, profile, admin
 from apps import alumni
 import login, home
 
 navBar = dbc.Navbar(
         children=[
-
         ],
         id='navBar',
         color='#375a7f',
@@ -23,7 +22,6 @@ app.layout = html.Div([
     navBar,
     html.Div(id='pageContent')
 ], id='table-wrapper')
-
 
 # HANDLE PAGE ROUTING - IF USER NOT LOGGED IN, ALWAYS RETURN TO LOGIN SCREEN
 @app.callback(Output('pageContent', 'children'),
@@ -101,7 +99,6 @@ def navBarPage(input1):
             ], className='collapse navbar-collapse')
         ], className='container-fluid')
             return navBarContents
-
         else:
             navBarContents = html.Div([
             html.Div([
@@ -129,7 +126,6 @@ def navBarPage(input1):
             ], className='collapse navbar-collapse')
         ], className='container-fluid')
             return navBarContents
-
     else:
         return html.Div([
             html.Div([

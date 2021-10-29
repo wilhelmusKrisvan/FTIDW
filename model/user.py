@@ -1,13 +1,8 @@
-import paramiko
-from flask_login import UserMixin
 from sqlalchemy import create_engine
 from sqlalchemy import Table
 from sqlalchemy.sql import select
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
-from sshtunnel import SSHTunnelForwarder
-import pymysql.cursors
-from paramiko import SSHClient
 
 db = SQLAlchemy()
 connect='mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/operasional'
@@ -20,16 +15,11 @@ class User(db.Model):
     password = db.Column(db.String(80))
     role = db.Column(db.String(50))
 
-# def create_users_table():
-#     User.metadata.create_all(engine)
-#
-# create_users_table()
-userTable = Table('user', User.metadata)
-
-
-def create_user_table():
+def create_users_table():
     User.metadata.create_all(engine)
 
+create_users_table()
+userTable = Table('user', User.metadata)
 
 def add_user(username, password, email, admin):
     hashed_password = generate_password_hash(password, method='sha256')
@@ -37,21 +27,20 @@ def add_user(username, password, email, admin):
     insert_stmt = userTable.insert().values(
         username=username, email=email, password=hashed_password, role=admin
     )
-
     conn = engine.connect()
     conn.execute(insert_stmt)
     conn.close()
-
+    engine.dispose()
 
 def update_password(username, password):
     hashed_password = generate_password_hash(password, method='sha256')
     update = userTable.update().\
         values(password=hashed_password).\
         where(userTable.c.username==username)
-
     conn = engine.connect()
     conn.execute(update)
     conn.close()
+    engine.dispose()
 
 def update_role(username, role):
     update = userTable.update().\
@@ -61,6 +50,7 @@ def update_role(username, role):
     conn = engine.connect()
     conn.execute(update)
     conn.close()
+    engine.dispose()
 
 def delete_user(username):
     update = userTable.delete.where(userTable.c.username==username)
@@ -68,6 +58,7 @@ def delete_user(username):
     conn = engine.connect()
     conn.execute(update)
     conn.close()
+    engine.dispose()
 
 def show_role():
     select_stmt = select([userTable.c.username,userTable.c.role])
@@ -80,7 +71,7 @@ def show_role():
             'role': result[1],
         })
     conn.close()
-
+    engine.dispose()
     return users
 
 def show_users():
@@ -102,5 +93,5 @@ def show_users():
         })
 
     conn.close()
-
+    engine.dispose()
     return users

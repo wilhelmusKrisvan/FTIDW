@@ -34,7 +34,7 @@ layout = dbc.Container([
                     placeholder='old password',
                     n_submit=0,
                     style={
-                        'width' : '40%'
+                        'width' : '40%','border-radius':'10px'
                     },
                 ),
                 html.Br(),
@@ -46,7 +46,7 @@ layout = dbc.Container([
                     placeholder='new password',
                     n_submit=0,
                     style={
-                        'width' : '40%'
+                        'width' : '40%','border-radius':'10px'
                     },
                 ),
                 dbc.Label('Retype New Password: '),
@@ -57,7 +57,7 @@ layout = dbc.Container([
                     placeholder='retype new password',
                     n_submit=0,
                     style={
-                        'width' : '40%'
+                        'width' : '40%','border-radius':'10px'
                     },
                 ),
                 html.Br(),
@@ -66,13 +66,14 @@ layout = dbc.Container([
                     id='updatePasswordButton',
                     n_clicks=0,
                     type='submit',
-                    className='btn btn-primary btn-lg'
+                    className='btn btn-primary btn-lg',
+                    style={'border-radius':'10px'}
                 ),
                 html.Br(),
                 html.Div(id='updateSuccess')
             ], md=6),
         ]),
-    ], className='jumbotron')
+    ], className='jumbotron',style={'border-radius':'10px'})
 ])
 
 @app.callback(
