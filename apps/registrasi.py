@@ -4,6 +4,7 @@ import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import plotly.express as px
 from dash.dependencies import Input, Output, State
 from dask.array.tests.test_array_core import test_blockwise_1_in_shape_I
 from sqlalchemy import create_engine
@@ -87,11 +88,13 @@ bebanDosen = html.Div([
         ], width=12),
         dbc.Col([
             dbc.Card([
+                html.H3('Rata-rata Beban Mengajar Dosen'),
                 dcc.Graph(id='grf_bebanDosen'),
             ], style={'justify-content': 'center'})
         ], width=6),
         dbc.Col([
             dbc.Card([
+                html.H3('IPK Dosen'),
                 dcc.Graph(id='grf_ipkDosen'),
             ], style={'justify-content': 'center'})
         ], width=6)
@@ -234,12 +237,13 @@ mahasiswa = html.Div([
                         page_size=10,
                     )
                 ])
-            ], style={'height': '450px'}),
+            ], style={'height': '500px'}),
         ], width=6),
         dbc.Col([
             dbc.Card([
-                dcc.Graph(id='grf_mahasiswaAktif',style={'height': '450px',}),
-            ], style={ 'justify-content': 'center'})
+                html.H3('Jumlah Mahasiswa Aktif'),
+                dcc.Graph(id='grf_mahasiswaAktif',),
+            ], style={'height': '500px','justify-content': 'center'})
         ], width=6),
     ]),
     dbc.Row([
@@ -262,12 +266,13 @@ mahasiswa = html.Div([
                         page_size=10,
                     )
                 ])
-            ], style={'height': '300px'}),
+            ], style={'height': '500px'}),
         ], width=6),
         dbc.Col([
             dbc.Card([
-                dcc.Graph(id='grf_mahasiswaAsing',style={'height': '300px',}),
-            ], style={ 'justify-content': 'center'})
+                html.H3('Jumlah Mahasiswa Asing'),
+                dcc.Graph(id='grf_mahasiswaAsing', ),
+            ], style={'height': '500px', 'justify-content': 'center'})
         ], width=6),
     ])
 ], style={'margin-top': '50px', 'width': '100%'})
@@ -283,7 +288,8 @@ ipkMahasiswa = html.Div([
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dcc.Graph(id='grf_bebanDosen'),
+                html.H3('Rata-rata IPK Mahasiswa Aktif Tiap Semester'),
+                dcc.Graph(id='grf_ipkMahasiswa'),
             ], style={'justify-content': 'center'})
         ], width=12),
     ])
@@ -359,7 +365,6 @@ layout = html.Div([
             ], id='cardContentRegistrasi'),
         ], style={'margin': '25px'})
     ], fluid=True),
-    # html.Div([tempatkerja]),
     html.Div([]),
     html.Div([])
 ], style={'width': '100%'})
@@ -373,3 +378,58 @@ def tab_contentRegistrasi(active_tab):
         return tab_dosen
     if active_tab == 'mahasiswa':
         return tab_mahasiswa
+
+
+@app.callback(
+    Output("grf_ipkDosen", 'figure'), Input('grf_ipkDosen', 'id')
+)
+def FillIpkDosen(id):
+    df = pd.read_sql('''select ds.tahun_ajaran, ds.semester_nama, round(avg(fid.ipk),2) as "Rata-Rata"
+from fact_ipk_dosen fid
+inner join dim_dosen ddo on ddo.id_dosen = fid.id_dosen
+inner join dim_semester ds on ds.id_semester = fid.id_semester
+group by ds.tahun_ajaran, ds.semester_nama
+order by ds.tahun_ajaran, ds.semester_nama''', con)
+    fig = px.bar(df, x=df['tahun_ajaran'], y=df['Rata-Rata'], color=df['semester_nama'])
+    fig.update_layout(barmode='group')
+    return fig
+
+@app.callback(
+    Output("grf_ipkMahasiswa", 'figure'), Input('grf_ipkMahasiswa', 'id')
+)
+def FillIpkMahasiswa(id):
+    df = pd.read_sql('''select ds.tahun_ajaran, ds.semester, avg(ipk) as "Rata-Rata"
+from fact_mahasiswa_status fms 
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where ds.tahun_ajaran in ('2015/2016','2016/2017','2017/2018','2018/2019','2019/2020') and fms.status = 'AK'
+group by ds.tahun_ajaran, ds.semester
+order by ds.tahun_ajaran, ds.semester''', con)
+    fig = px.bar(df, x=df['tahun_ajaran'], y=df['Rata-Rata'], color=df['semester'])
+    fig.update_layout(barmode='group')
+    return fig
+
+@app.callback(
+    Output("grf_mahasiswaAktif", 'figure'), Input('grf_mahasiswaAktif', 'id')
+)
+def FillAktif(id):
+    df = pd.read_sql('''select ds.tahun_ajaran, ds.semester_nama, count(*) as jumlah_mahasiswa_aktif from fact_mahasiswa_status fms
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where fms.status = 'AK' and ds.tahun_ajaran in ('2015/2016','2016/2017','2017/2018','2018/2019','2019/2020')
+group by ds.tahun_ajaran, ds.semester_nama
+order by ds.tahun_ajaran, ds.semester_nama
+''', con)
+    fig = px.bar(df, x=df['tahun_ajaran'], y=df['jumlah_mahasiswa_aktif'], color=df['semester_nama'])
+    fig.update_layout(barmode='group')
+    return fig
+
+
+@app.callback(
+    Output("grf_mahasiswaAsing", 'figure'), Input('grf_mahasiswaAsing', 'id')
+)
+def FillAsing(id):
+    df = pd.read_sql('''select tahun_angkatan, count(*) as jumlah_mahasiswa_asing from dim_mahasiswa 
+where warga_negara ='WNA' and tahun_angkatan >= 2015
+group by tahun_angkatan
+order by tahun_angkatan''', con)
+    fig = px.bar(df, x=df['tahun_angkatan'], y=df['jumlah_mahasiswa_asing'])
+    return fig
