@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from appConfig import app, server
 from flask_login import logout_user, current_user
 import login, profile, admin
-from apps import alumni
+from apps import alumni,registrasi,kegiatan_kerjasama
 import login, home
 
 navBar = dbc.Navbar(
@@ -49,7 +49,19 @@ def displayPage(pathname):
         if current_user.is_authenticated:
             return alumni.layout
         else:
-            return alumni.layout
+            return login.layout
+
+    if pathname == '/dashboard/registrasi':
+        if current_user.is_authenticated:
+            return registrasi.layout
+        else:
+            return login.layout
+
+    if pathname == '/dashboard/kegiatan-kerjasama':
+        if current_user.is_authenticated:
+            return kegiatan_kerjasama.layout
+        else:
+            return kegiatan_kerjasama.layout
 
     if pathname == '/profile':
         if current_user.is_authenticated:
