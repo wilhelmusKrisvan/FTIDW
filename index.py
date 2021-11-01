@@ -5,6 +5,7 @@ import dash_bootstrap_components as dbc
 from appConfig import app, server
 from flask_login import logout_user, current_user
 import login, profile, admin
+from apps import alumni, pmb, tgsakhir
 from apps import alumni,registrasi,kegiatan_kerjasama
 import login, home
 
@@ -45,6 +46,7 @@ def displayPage(pathname):
             return home.layout
         else:
             return login.layout
+
     if pathname == '/dashboard/alumni':
         if current_user.is_authenticated:
             return alumni.layout
@@ -62,6 +64,18 @@ def displayPage(pathname):
             return kegiatan_kerjasama.layout
         else:
             return kegiatan_kerjasama.layout
+
+    if pathname == '/dashboard/pmb':
+        if current_user.is_authenticated:
+            return pmb.layout
+        else:
+            return pmb.layout
+
+    if pathname == '/dashboard/kp-skripsi-yudisium':
+        if current_user.is_authenticated:
+            return tgsakhir.layout
+        else:
+            return tgsakhir.layout
 
     if pathname == '/profile':
         if current_user.is_authenticated:

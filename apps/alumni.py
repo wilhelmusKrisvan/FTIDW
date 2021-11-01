@@ -39,8 +39,11 @@ left join(
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
 order by tahun_lulus;''', con)
 
-tbl_bidangkerja=pd.read_sql('''
- select data2.*, lulusan.jumlah as "Jumlah Lulusan", terlacak.jumlah as "Jumlah Lulusan Terlacak" from
+tbl_bidangkerja = pd.read_sql('''
+ select data2.tahun_lulus as "Tahun Lulus", 
+        TINGGI as 'Tinggi', SEDANG as 'Sedang', RENDAH as 'Rendah', LAINNYA as 'Lainnya',
+        lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" 
+ from
  (
     select tahun_lulus,
         SUM(IF( tingkat_kesesuaian_bidang_kerja = "TINGGI", data.jumlah, 0)) AS "TINGGI",
@@ -69,10 +72,10 @@ left join(
     group by tahun_lulus
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
 order by data2.tahun_lulus
-''',con)
+''', con)
 
-tbl_tempatkerja=pd.read_sql('''
- select data2.tahun_lulus as 'Tahun Lulus', Lokal+Regional as 'Lokal/Regional', Nasional, Internasional, lulusan.jumlah as "Jumlah Lulusan", terlacak.jumlah as "Jumlah Lulusan Terlacak" from
+tbl_tempatkerja = pd.read_sql('''
+ select data2.tahun_lulus as 'Tahun Lulus', Lokal+Regional as 'Lokal/Regional', Nasional, Internasional, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
  (
     select tahun_lulus,
     SUM(IF( wilayah = 1, data.jumlah, 0)) AS "Lokal",
@@ -101,14 +104,15 @@ left join(
     group by tahun_lulus
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
 order by terlacak.tahun_lulus
-''',con)
+''', con)
 
-tbl_skill=pd.read_sql('''
-select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah, 
-    concat(round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "SANGAT BAIK",
-    concat(round(BAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "BAIK",
-    concat(round(CUKUP/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "CUKUP",
-    concat(round(KURANG/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "KURANG"
+tbl_skill = pd.read_sql('''
+select kriteria as Kriteria, 
+    SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as Jumlah, 
+    concat(round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Sangat Baik",
+    concat(round(BAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Baik",
+    concat(round(CUKUP/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Cukup",
+    concat(round(KURANG/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Kurang"
     
     from (
     select "1" as nomor, "INTEGRITAS" as kriteria, 
@@ -123,9 +127,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by integritas
     ) as data
-    
     union all
-    
     select  "2" as nomor, "KEAHLIAN BIDANG ILMU" as keahlian_bidang_ilmu, 
     sum(case when keahlian_bidang_ilmu = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
     sum(case when keahlian_bidang_ilmu = "BAIK" then jumlah end) as "BAIK",
@@ -138,9 +140,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by keahlian_bidang_ilmu
     ) as data
-    
     union all
-    
     select  "3" as nomor, "KEMAMPUAN BAHASA ASING" as Kriteria, 
     sum(case when kemampuan_bahasa_asing = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
     sum(case when kemampuan_bahasa_asing = "BAIK" then jumlah end) as "BAIK",
@@ -153,9 +153,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by kemampuan_bahasa_asing
     ) as data
-    
     union all
-    
     select  "4" as nomor,  "PENGGUNAAN TEKNOLOGI INFORMASI" as Kriteria, 
     sum(case when penggunaan_teknologi = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
     sum(case when penggunaan_teknologi = "BAIK" then jumlah end) as "BAIK",
@@ -168,9 +166,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by penggunaan_teknologi
     ) as data
-    
     union all
-    
     select  "5" as nomor,  "KOMUNIKASI" as komunikasi, 
     sum(case when komunikasi = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
     sum(case when komunikasi = "BAIK" then jumlah end) as "BAIK",
@@ -183,9 +179,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by komunikasi
     ) as data
-    
     union all
-    
     select  "6" as nomor, "KERJASAMA TIM" as kerjasama_tim, 
     sum(case when kerjasama_tim = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
     sum(case when kerjasama_tim = "BAIK" then jumlah end) as "BAIK",
@@ -198,9 +192,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by kerjasama_tim
     ) as data
-    
     union all
-    
     select "7" as nomor, "PENGEMBANGAN DIRI" as Kriteria, 
     sum(case when pengembangan_diri = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
     sum(case when pengembangan_diri = "BAIK" then jumlah end) as "BAIK",
@@ -215,7 +207,7 @@ select nomor, kriteria, SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as jumlah,
     ) as data
 ) dataJumlah
 order by nomor
-''',con)
+''', con)
 
 masatunggu = dbc.CardGroup([
     dbc.Row(
@@ -241,7 +233,7 @@ masatunggu = dbc.CardGroup([
                 sort_action='native',
                 sort_mode='multi',
                 style_table={'width': '600px', 'padding': '10px'},
-                style_header={'border': 'none', 'font-size': '80%'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
             ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
         ),
@@ -268,7 +260,7 @@ bidangkerja = dbc.CardGroup([
                 sort_action='native',
                 sort_mode='multi',
                 style_table={'width': '600px', 'padding': '10px'},
-                style_header={'border': 'none', 'font-size': '80%'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
             ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
         ),
@@ -295,7 +287,7 @@ tempatkerja = dbc.CardGroup([
                 sort_action='native',
                 sort_mode='multi',
                 style_table={'width': '600px', 'padding': '10px'},
-                style_header={'border': 'none', 'font-size': '80%'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
             ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
         ),
@@ -322,25 +314,23 @@ kemampuan = dbc.CardGroup([
                 sort_action='native',
                 sort_mode='multi',
                 style_table={'width': '600px', 'padding': '10px'},
-                style_header={'border': 'none', 'font-size': '80%'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
             ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
         ),
         dbc.Card(dcc.Graph(id='grf_skill', style={'width': '70vh', 'height': '90vh'}),
-            style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
-        )
+                 style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
+                 )
     ])
 ], style={'margin-top': '20px', 'justify-content': 'center'})
 
-layout = dbc.Container([
-    html.Div(
-        html.H1(
-            'Analisis Lulusan dan Tracer Study Prodi Informatika',
-            style={'margin-top':'30px','text-align': 'center'}
-        )
-    ),
+layout = html.Div([
+    html.Div(html.H1('Analisis Lulusan dan Tracer Study Prodi Informatika',
+                     style={'margin-top': '30px', 'textAlign': 'center'}
+                     )
+             ),
     html.Div([masatunggu]),
     html.Div([bidangkerja]),
     html.Div([tempatkerja]),
-    html.Div([kemampuan])
-], fluid=True)
+    html.Div([kemampuan], style={'margin-bottom': '50px'})
+], style={'justify-content': 'center'})
