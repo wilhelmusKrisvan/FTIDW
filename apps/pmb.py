@@ -8,12 +8,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 from sqlalchemy import create_engine
 from plotly.subplots import make_subplots
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from appConfig import app
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
-tbl_seleksi = pd.read_sql('''select 
+dfseleksi = pd.read_sql('''select 
 dataMahasiswa.tahun_aka as 'Tahun Akademik', dy_tampung as 'Daya Tampung',jml_pendaftar as 'Pendaftar', 
 lolos as 'Lolos Seleksi', baru as 'Baru Reguler', Barutransfer as 'Baru Transfer', 
 aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
@@ -33,15 +33,13 @@ aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
     order by id_semester asc
 )dataMahasiswa
 left join (
-
 select count(*) as jmlaktif, tahun_ajaran from fact_mahasiswa_status
 left join dim_semester on fact_mahasiswa_status.id_semester = dim_semester.id_semester
 where status = 'AK' 
 group by tahun_ajaran
-
 )aktif on aktif.tahun_ajaran = tahun_aka ''', con)
 
-tbl_mhsasing = pd.read_sql('''
+dfmhsasing = pd.read_sql('''
 select data.*, (jumlah - parttime) as fulltime
 from (
 select dim_prodi.nama_prodi, concat(tahun_angkatan, '/', cast(tahun_angkatan+1 as char(4))) as tahun_semster, count(*) as jumlah,
@@ -55,73 +53,306 @@ inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND se
 order by nama_prodi, tahun_semster desc
 ''', con)
 
-seleksi = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('2.a Seleksi Mahasiswa Baru',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row(
+dfmhsrasio = pd.read_sql('''
+select tahun_ajaran as 'Tahun Semester', jumlah, pendaftar_regis,
+concat(round(jumlah/jumlah,0) ,' : ', round(pendaftar_regis/jumlah,2)) as 'Rasio Daya Tampung : Pendaftar Registrasi'
+from(
+    SELECT ds.tahun_ajaran,ds.kode_semester,dt.jumlah,
+        sum(case when id_tanggal_registrasi is not null and id_prodi_diterima = 9 then 1 else 0 end) as pendaftar_regis
+    FROM fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    inner join dim_daya_tampung dt on ds.id_semester = dt.id_semester and dt.id_prodi = 9
+    group by ds.kode_semester, ds.tahun_ajaran,dt.jumlah
+    order by ds.tahun_ajaran
+) as DataMentah
+''', con)
+
+dfmhssmasmk = pd.read_sql('''
+select
+       (case
+           when tipe_sekolah_asal=1 then "NEGERI"
+           WHEN tipe_sekolah_asal=2 THEN "SWASTA"
+           when tipe_sekolah_asal=3 then "N/A"
+       END)
+           as 'Tipe Sekolah Asal', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+group by ds.tahun_ajaran,'Tipe Sekolah Asal'
+order by ds.tahun_ajaran
+''', con)
+
+dfmhsprovinsi = pd.read_sql('''
+select
+    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+group by ds.tahun_ajaran, dl.provinsi
+order by ds.tahun_ajaran
+''', con)
+
+mhsseleksi = dbc.Container([
+    dbc.Card([
+        html.H5('2.a Seleksi Mahasiswa',
+                style={'textAlign': 'center','padding':'10px'}),
+        dbc.CardLink(
+            dcc.Graph(id='grf_mhsseleksi'),
+            id='cll_grfseleksi',
+            n_clicks=0
+        ),
+    ]),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_seleksi',
-                columns=[{"name": i, "id": i} for i in tbl_seleksi.columns],
-                data=tbl_seleksi.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dfseleksi.columns],
+                data=dfseleksi.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '1200px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                page_size=10
             )
-        )
-    ),
-    dbc.Row(
-        dbc.Card(
-            dcc.Graph(id='grf_seleksi')
-            , style={'width': '1200px'}
-        )
+        ),
+        id='cll_tblseleksi',
+        is_open=False
     )
 ], style={'margin-top': '50px', 'justify-content': 'center'})
 
-mhsasing = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('2.b Mahasiswa Asing',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row(
+mhsasing = dbc.Container([
+    dbc.Card([
+        html.H5('2.b Mahasiswa Asing',
+                style={'textAlign': 'center','padding':'10px'}),
+        dbc.CardLink([
+            dcc.Graph(id='grf_mhsasing'),
+            # dcc.Graph(id='grf_mhsasinginf'),
+            # dcc.Graph(id='grf_mhsasingsi')
+        ], id='cll_grfasing',
+            n_clicks=0)
+    ]),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_mhsasing',
-                columns=[{"name": i, "id": i} for i in tbl_mhsasing.columns],
-                data=tbl_mhsasing.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dfmhsasing.columns],
+                data=dfmhsasing.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '1200px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
             )
-        )
-    ),
-    dbc.Row([
-        dbc.Card(
-            dcc.Graph(id='grf_mhsasinginf')
-            , style={'width': '600px'}
         ),
-        dbc.Card(
-            dcc.Graph(id='grf_mhsasingsi')
-            , style={'width': '600px'}
-        )
-    ])
+        id='cll_tblasing',
+        is_open=False
+    )
 ], style={'margin-top': '20px', 'justify-content': 'center'})
+
+mhsrasio = dbc.Container([
+    dbc.Card([
+        html.H5('Rasio Daya Tampung : Pendaftar Registrasi Mahasiswa',
+                style={'textAlign': 'center','padding':'10px'}),
+        dbc.CardLink([
+            dcc.Graph(id='grf_mhsrasio')
+        ], id='cll_grfrasio',
+            n_clicks=0)
+    ]),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_mhsrasio',
+                columns=[{"name": i, "id": i} for i in dfmhsrasio.columns],
+                data=dfmhsrasio.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
+            )
+        ),
+        id='cll_tblrasio',
+        is_open=False
+    )
+], style={'margin-top': '20px', 'justify-content': 'center'})
+
+mhsasmasmk = dbc.Container([
+    dbc.Card([
+        html.H5('Asal Sekolah Mahasiswa Pendaftar',
+                style={'textAlign': 'center','padding':'10px'}),
+        dbc.CardLink([
+            dcc.Graph(id='grf_mhssmasmk')
+        ], id='cll_grfsmasmk',
+            n_clicks=0)
+    ]),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_mhssmasmk',
+                columns=[{"name": i, "id": i} for i in dfmhssmasmk.columns],
+                data=dfmhssmasmk.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
+            )
+        ),
+        id='cll_tblsmasmk',
+        is_open=False
+    )
+], style={'margin-top': '20px', 'justify-content': 'center'})
+
+mhsaprovinsi = dbc.Container([
+    dbc.Card([
+        html.H5('Lokasi Asal Mahasiswa Pendaftar',
+                style={'textAlign': 'center','padding':'10px'}),
+        dbc.CardLink([
+            dcc.Graph(id='grf_mhsprovinsi')
+        ], id='cll_grfprovinsi',
+            n_clicks=0)
+    ]),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_mhsprovinsi',
+                columns=[{"name": i, "id": i} for i in dfmhsprovinsi.columns],
+                data=dfmhsprovinsi.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
+            )
+        ),
+        id='cll_tblprovinsi',
+        is_open=False
+    )
+], style = {'margin-top': '20px', 'justify-content': 'center'})
+
+@app.callback(
+Output("cll_tblseleksi", "is_open"),
+[Input("cll_grfseleksi", "n_clicks")],
+[State("cll_tblseleksi", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblasing", "is_open"),
+    [Input("cll_grfasing", "n_clicks")],
+    [State("cll_tblasing", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblrasio", "is_open"),
+    [Input("cll_grfrasio", "n_clicks")],
+    [State("cll_tblrasio", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblsmasmk", "is_open"),
+    [Input("cll_grfsmasmk", "n_clicks")],
+    [State("cll_tblsmasmk", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblprovinsi", "is_open"),
+    [Input("cll_grfprovinsi", "n_clicks")],
+    [State("cll_tblprovinsi", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
 
 layout = html.Div([
     html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
-    html.Div([seleksi]),
-    html.Div([mhsasing], style={'margin-bottom': '50px'})
+    html.Div([mhsseleksi]),
+    html.Div([mhsasing]),
+    html.Div([mhsrasio]),
+    html.Div([mhsasmasmk]),
+    html.Div([mhsaprovinsi],
+             style={'margin-bottom': '50px'}
+             )
 ], style={'justify-content': 'center'})
+
+@app.callback(
+    Output('grf_mhsseleksi','figure'),
+    Input('grf_mhsseleksi','id')
+)
+def graphSeleksi(id):
+    df=dfseleksi
+    fig=px.line(df,x=df['Tahun Akademik'],y=df['Daya Tampung'])
+    fig.add_scatter(x=df['Tahun Akademik'],y=df['Pendaftar'],mode='lines')
+    fig.add_scatter(x=df['Tahun Akademik'], y=df['Lolos Seleksi'], mode='lines')
+    fig.add_scatter(x=df['Tahun Akademik'], y=df['Baru Reguler'], mode='lines')
+    fig.add_scatter(x=df['Tahun Akademik'], y=df['Baru Transfer'], mode='lines')
+    fig.add_scatter(x=df['Tahun Akademik'], y=df['Aktif Reguler'], mode='lines')
+    fig.add_scatter(x=df['Tahun Akademik'], y=df['Aktif Transfer'], mode='lines')
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsrasio','figure'),
+    Input('grf_mhsrasio','id')
+)
+def graphRasioDTPR(id):
+    df_dayaTampung=pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', ddt.jumlah as "Jumlah Daya Tampung" from dim_daya_tampung ddt
+inner join dim_semester ds on ddt.id_semester = ds.id_semester
+where id_prodi = 9 and ds.tahun_ajaran in ('2015/2016',
+'2016/2017','2017/2018','2018/2019')''',con)
+    df_pendaftarRegistrasi = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
+inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
+where fpmb.id_tanggal_registrasi is not null and fpmb.id_prodi_diterima = 9
+group by ds.tahun_ajaran''', con)
+    fig=px.bar(df_dayaTampung,x=df_dayaTampung['Tahun Ajaran'],y=df_dayaTampung['Jumlah Daya Tampung'])
+    fig.add_bar(df_pendaftarRegistrasi,x=df_pendaftarRegistrasi['Tahun Ajaran'],y=df_pendaftarRegistrasi['Jumlah Pendaftar'])
+    #fig.update_layout(barmode='group')
+    return fig
+
+@app.callback(
+    Output('grf_mhssmasmk','figure'),
+    Input('grf_mhssmasmk','id')
+)
+def graphAsalSekolah(id):
+    df=dfmhssmasmk
+    fig=px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'],color=df['Tipe Sekolah Asal'])
+    fig.update_layout(barmode='group')
+    return fig
+
+@app.callback(
+    Output('grf_mhsprovinsi','figure'),
+    Input('grf_mhsprovinsi','id')
+)
+def graphProvince(id):
+    df=dfmhsprovinsi
+    fig=px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'],color=df['Tahun Ajaran'])
+    fig.update_layout(barmode='group')
+    return fig

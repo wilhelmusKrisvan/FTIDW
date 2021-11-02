@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from appConfig import app, server
 from flask_login import logout_user, current_user
 import login, profile, admin
-from apps import alumni, pmb, tgsakhir
+from apps import pmb,registrasi,kegiatan_kerjasama,tgsakhir,alumni
 from apps import alumni,registrasi,kegiatan_kerjasama
 import login, home
 
