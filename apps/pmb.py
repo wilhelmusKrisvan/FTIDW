@@ -177,38 +177,25 @@ mhsasing = dbc.Container([
         html.H5('2.b Mahasiswa Asing',
                 style={'textAlign': 'center', 'padding': '10px'}),
         dcc.Tabs([
-            dcc.Tab(label='FTI',
+            dcc.Tab(label='FTI', value='all',
                     children=[
                         dbc.CardLink([dcc.Graph(id='grf_mhsasing')], id='cll_grfasing', n_clicks=0)
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='INF',
+            dcc.Tab(label='INF', value='INF',
                     children=[
-                        dbc.CardLink([dcc.Graph(id='grf_mhsasingINF')], id='cll_grfasing', n_clicks=0)
+                        dbc.CardLink([dcc.Graph(id='grf_mhsasingINF')], id='cll_grfasingINF', n_clicks=0)
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='SI',
+            dcc.Tab(label='SI', value='SI',
                     children=[
-                        dbc.CardLink([dcc.Graph(id='grf_mhsasingSI')], id='cll_grfasing', n_clicks=0)
+                        dbc.CardLink([dcc.Graph(id='grf_mhsasingSI')], id='cll_grfasingSI', n_clicks=0)
                     ],
                     style=tab_style, selected_style=selected_style)
-        ])
+        ], id='tab_mhsasing', value='all')
     ], style={'padding': '10px'}),
     dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_mhsasing',
-                columns=[{"name": i, "id": i} for i in dfmhsasing.columns],
-                data=dfmhsasing.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_cell={'width': 70},
-                page_size=10
-            )
-        ),
+
         id='cll_tblasing',
         is_open=False
     )
@@ -312,7 +299,6 @@ mhsprovinsi = dbc.Container([
 
 
 @app.callback(
-
     Output("cll_tblseleksi", "is_open"),
     [Input("cll_grfseleksi", "n_clicks")],
     [State("cll_tblseleksi", "is_open")])
@@ -324,12 +310,34 @@ def toggle_collapse(n, is_open):
 
 @app.callback(
     Output("cll_tblasing", "is_open"),
-    [Input("cll_grfasing", "n_clicks")],
+    Output("cll_tblasing", "children"),
+    [Input("cll_grfasing", "n_clicks"),
+     Input("cll_grfasingINF", "n_clicks"),
+     Input("cll_grfasingSI", "n_clicks"),
+     Input('tab_mhsasing', 'value')],
     [State("cll_tblasing", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+def toggle_collapse(nall, ninf, nsi, mhs, is_open):
+    isiMhsAsing = dbc.Card(
+        dt.DataTable(
+            id='tbl_mhsasing',
+            columns=[{"name": i, "id": i} for i in dfmhsasing.columns],
+            data=dfmhsasing.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 70},
+            page_size=10
+        )
+    )
+    if nall and mhs == 'all':
+        return not is_open,isiMhsAsing
+    if ninf and mhs == 'INF':
+        return not is_open,isiMhsAsing
+    if nsi and mhs == 'SI':
+        return not is_open,isiMhsAsing
+    return is_open,None
 
 
 @app.callback(
@@ -360,7 +368,7 @@ def toggle_collapse(n, is_open):
      Input("cll_grfmhsprovregis", "n_clicks"),
      Input("tab_mhsprov", "value")],
     [State("cll_tblmhsprov", "is_open")])
-def toggle_collapse(ndaftar, nlolos,nregis, prov, is_open):
+def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
     isiDaftar = dbc.Card(
         dt.DataTable(
             id='tbl_mhsprovdaftar',
@@ -389,7 +397,7 @@ def toggle_collapse(ndaftar, nlolos,nregis, prov, is_open):
             page_size=10
         )
     ),
-    isiRegis=dbc.Card(
+    isiRegis = dbc.Card(
         dt.DataTable(
             id='tbl_mhsprovregis',
             columns=[{"name": i, "id": i} for i in dfmhsprovregis.columns],
@@ -410,6 +418,7 @@ def toggle_collapse(ndaftar, nlolos,nregis, prov, is_open):
     if nregis and prov == 'regis':
         return not is_open, isiRegis
     return is_open, None
+
 
 layout = html.Div([
     html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
