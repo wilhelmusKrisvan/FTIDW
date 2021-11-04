@@ -4,10 +4,11 @@ import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
 import plotly.express as px
+import plotly.graph_objects as go
 from sqlalchemy import create_engine
 from plotly.subplots import make_subplots
+
 from dash.dependencies import Input, Output, State
 from appConfig import app
 
@@ -110,7 +111,7 @@ from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
 inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
 where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
-group by ds.tahun_ajaran, dl.provinsi, dl.id_lokasi
+group by ds.tahun_ajaran, dl.provinsi
 order by ds.tahun_ajaran, dl.provinsi
 ''', con)
 
@@ -175,20 +176,23 @@ mhsasing = dbc.Container([
     dbc.Card([
         html.H5('2.b Mahasiswa Asing',
                 style={'textAlign': 'center', 'padding': '10px'}),
-        dbc.CardLink(
-            dcc.Tabs([
-                dcc.Tab(label='FTI',
-                        children=[dcc.Graph(id='grf_mhsasing')],
-                        style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='INF',
-                        children=[dcc.Graph(id='grf_mhsasingINF')],
-                        style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='SI',
-                        children=[dcc.Graph(id='grf_mhsasingSI')],
-                        style=tab_style, selected_style=selected_style)
-            ]
-            ), id='cll_grfasing', n_clicks=0
-        )
+        dcc.Tabs([
+            dcc.Tab(label='FTI',
+                    children=[
+                        dbc.CardLink([dcc.Graph(id='grf_mhsasing')], id='cll_grfasing', n_clicks=0)
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='INF',
+                    children=[
+                        dbc.CardLink([dcc.Graph(id='grf_mhsasingINF')], id='cll_grfasing', n_clicks=0)
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='SI',
+                    children=[
+                        dbc.CardLink([dcc.Graph(id='grf_mhsasingSI')], id='cll_grfasing', n_clicks=0)
+                    ],
+                    style=tab_style, selected_style=selected_style)
+        ])
     ], style={'padding': '10px'}),
     dbc.Collapse(
         dbc.Card(
@@ -398,15 +402,15 @@ def toggle_collapse(n, is_open):
 
 
 # @app.callback(
-#     [Output("cll_tblmhsprovdaftar", "is_open"),
-#      Output("cll_tblmhsprovlolos", "is_open"),
-#      Output("cll_tblmhsprovregis", "is_open")],
-#     [Input("cll_grfmhsprovdaftar", "n_clicks"),
-#      Input("cll_grfmhsprovdaftar", "id"),
-#      Input("cll_grfmhsprovlolos", "n_clicks"),
-#      Input("cll_grfmhsprovlolos", "id"),
-#      Input("cll_grfmhsprovregis", "n_clicks"),
-#      Input("cll_grfmhsprovregis", "id")],
+#     Output("cll_tblmhsprovdaftar", "is_open"),
+#     Output("cll_tblmhsprovlolos", "is_open"),
+#     Output("cll_tblmhsprovregis", "is_open"),
+#     Input("cll_grfmhsprovdaftar", "n_clicks"),
+#     Input("cll_grfmhsprovdaftar", "id"),
+#     Input("cll_grfmhsprovlolos", "n_clicks"),
+#     Input("cll_grfmhsprovlolos", "id"),
+#     Input("cll_grfmhsprovregis", "n_clicks"),
+#     Input("cll_grfmhsprovregis", "id"),
 #     [State("cll_tblmhsprovdaftar", "is_open")])
 # def toggle_collapse(ndaftar, iddaftar, nlolos, idlolos, nregis, idregis, is_open):
 #     if ndaftar and iddaftar == 'cll_grfmhsprovdaftar':
@@ -429,56 +433,184 @@ layout = html.Div([
     html.Div([mhsprovinsi], style={'margin-bottom': '50px'})
 ], style={'justify-content': 'center'})
 
-# @app.callback(
-#     Output('grf_mhsseleksi','figure'),
-#     Input('grf_mhsseleksi','id')
-# )
-# def graphSeleksi(id):
-#     df=dfseleksi
-#     fig=px.line(df,x=df['Tahun Akademik'],y=df['Daya Tampung'])
-#     fig.add_scatter(x=df['Tahun Akademik'],y=df['Pendaftar'],mode='lines')
-#     fig.add_scatter(x=df['Tahun Akademik'], y=df['Lolos Seleksi'], mode='lines')
-#     fig.add_scatter(x=df['Tahun Akademik'], y=df['Baru Reguler'], mode='lines')
-#     fig.add_scatter(x=df['Tahun Akademik'], y=df['Baru Transfer'], mode='lines')
-#     fig.add_scatter(x=df['Tahun Akademik'], y=df['Aktif Reguler'], mode='lines')
-#     fig.add_scatter(x=df['Tahun Akademik'], y=df['Aktif Transfer'], mode='lines')
-#     return fig
-#
-#
-# @app.callback(
-#     Output('grf_mhsrasio','figure'),
-#     Input('grf_mhsrasio','id')
-# )
-# def graphRasioDTPR(id):
-#     df_dayaTampung=pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', ddt.jumlah as "Jumlah Daya Tampung" from dim_daya_tampung ddt
-# inner join dim_semester ds on ddt.id_semester = ds.id_semester
-# where id_prodi = 9 and ds.tahun_ajaran in ('2015/2016',
-# '2016/2017','2017/2018','2018/2019')''',con)
-#     df_pendaftarRegistrasi = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
-# inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
-# where fpmb.id_tanggal_registrasi is not null and fpmb.id_prodi_diterima = 9
-# group by ds.tahun_ajaran''', con)
-#     fig=px.bar(df_dayaTampung,x=df_dayaTampung['Tahun Ajaran'],y=df_dayaTampung['Jumlah Daya Tampung'])
-#     fig.add_bar(df_pendaftarRegistrasi,x=df_pendaftarRegistrasi['Tahun Ajaran'],y=df_pendaftarRegistrasi['Jumlah Pendaftar'])
-#     #fig.update_layout(barmode='group')
-#     return fig
-#
-# @app.callback(
-#     Output('grf_mhssmasmk','figure'),
-#     Input('grf_mhssmasmk','id')
-# )
-# def graphAsalSekolah(id):
-#     df=dfmhssmasmk
-#     fig=px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'],color=df['Tipe Sekolah Asal'])
-#     fig.update_layout(barmode='group')
-#     return fig
-#
-# @app.callback(
-#     Output('grf_mhsprovinsi','figure'),
-#     Input('grf_mhsprovinsi','id')
-# )
-# def graphProvince(id):
-#     df=dfmhsprovinsi
-#     fig=px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'],color=df['Tahun Ajaran'])
-#     fig.update_layout(barmode='group')
-#     return fig
+
+@app.callback(
+    Output('grf_mhsseleksi', 'figure'),
+    Input('grf_mhsseleksi', 'id')
+)
+def graphSeleksi(id):
+    df = dfseleksi
+    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Daya Tampung'], color=px.Constant('Daya Tampung'),
+                 labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
+    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',
+                    hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Lolos Seleksi'], name='Lolos Seleksi',
+                    line=dict(color='rgb(228, 245, 0)'),
+                    hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Reguler'], name='Baru Reguler',
+                    line=dict(color='rgb(0, 143, 245)'),
+                    hovertemplate="Jenis Pendaftar=Baru Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Transfer'], name='Baru Transfer',
+                    line=dict(color='rgb(35, 68, 145)'),
+                    hovertemplate="Jenis Pendaftar=Baru Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Reguler'], name='Aktif Reguler',
+                    line=dict(color='rgb(54, 235, 54)'),
+                    hovertemplate="Jenis Pendaftar=Aktif Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Transfer'], name='Aktif Transfer',
+                    line=dict(color='rgb(35, 145, 35)'),
+                    hovertemplate="Jenis Pendaftar=Aktif Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsasing', 'figure'),
+    Input('grf_mhsasing', 'id')
+)
+def graphMhsAsing(id):
+    df = pd.read_sql('''select tahun_semster as "Tahun Semester", Jumlah, parttime,(Jumlah - parttime) as fulltime
+from (
+select concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, count(*) as Jumlah,
+SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
+from dim_mahasiswa
+inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_prodi.id_prodi = 9||10)
+where warga_negara = 'WNA'
+group by tahun_semster, tahun_angkatan
+) data
+inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
+order by tahun_semster asc''', con)
+    fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
+                 labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+    fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                    hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+    fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+                    hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsasingINF', 'figure'),
+    Input('grf_mhsasingINF', 'id')
+)
+def graphMhsAsingINF(id):
+    df = pd.read_sql('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
+from (
+select dim_prodi.nama_prodi, concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, count(*) as jumlah,
+SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
+from dim_mahasiswa
+inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_prodi.id_prodi = 9)
+where warga_negara = 'WNA'
+group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
+) data
+inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
+order by nama_prodi, tahun_semster asc''', con)
+    fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
+                 labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+    fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                    hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+    fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+                    hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsasingSI', 'figure'),
+    Input('grf_mhsasingSI', 'id')
+)
+def graphMhsAsingSI(id):
+    df = pd.read_sql('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
+from (
+select dim_prodi.nama_prodi, concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, count(*) as jumlah,
+SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
+from dim_mahasiswa
+inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_prodi.id_prodi = 10)
+where warga_negara = 'WNA'
+group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
+) data
+inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
+order by nama_prodi, tahun_semster asc''', con)
+    fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
+                 labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+    fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                    hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+    fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+                    hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsrasio', 'figure'),
+    Input('grf_mhsrasio', 'id')
+)
+def graphRasioDTPR(id):
+    df_dayaTampung = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', ddt.jumlah as "Jumlah Daya Tampung" from dim_daya_tampung ddt
+inner join dim_semester ds on ddt.id_semester = ds.id_semester
+where id_prodi = 9 and ds.tahun_ajaran in ('2015/2016',
+'2016/2017','2017/2018','2018/2019')''', con)
+    df_pendaftarRegistrasi = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
+inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
+where fpmb.id_tanggal_registrasi is not null and fpmb.id_prodi_diterima = 9
+group by ds.tahun_ajaran
+order by ds.tahun_ajaran''', con)
+    df_lolosSeleksi = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar' from fact_pmb fpmb
+inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
+where fpmb.id_tanggal_lolos_seleksi is not null and fpmb.id_prodi_diterima = 9
+group by ds.tahun_ajaran
+order by ds.tahun_ajaran''', con)
+    df_pendaftar = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
+inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
+group by ds.tahun_ajaran 
+order by ds.tahun_ajaran''', con)
+    fig = px.bar(df_dayaTampung, x=df_dayaTampung['Tahun Ajaran'], y=df_dayaTampung['Jumlah Daya Tampung'],
+                 color=px.Constant('Daya Tampung'), labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
+    fig.add_scatter(x=df_pendaftarRegistrasi['Tahun Ajaran'], y=df_pendaftarRegistrasi['Jumlah Pendaftar'],
+                    name='Teregistrasi',
+                    hovertemplate="Jenis Pendaftar=Teregistrasi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
+    fig.add_scatter(x=df_lolosSeleksi['Tahun Ajaran'], y=df_lolosSeleksi['Jumlah Pendaftar'], name='Lolos Seleksi',
+                    hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
+    fig.add_scatter(x=df_pendaftar['Tahun Ajaran'], y=df_pendaftar['Jumlah Pendaftar'], name='Pendaftar',
+                    hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
+    return fig
+
+
+@app.callback(
+    Output('grf_mhssmasmk', 'figure'),
+    Input('grf_mhssmasmk', 'id')
+)
+def graphAsalSekolah(id):
+    df = dfmhssmasmk
+    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'], color=df['Tipe Sekolah Asal'])
+    fig.update_layout(barmode='group')
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsprovdaftar', 'figure'),
+    Input('grf_mhsprovdaftar', 'id')
+)
+def graphProvincePendaftar(id):
+    df = dfmhsprovdaftar
+    fig = px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'], color=df['Tahun Ajaran'])
+    fig.update_layout(barmode='group')
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsprovlolos', 'figure'),
+    Input('grf_mhsprovlolos', 'id')
+)
+def graphProvinceSeleksi(id):
+    df = dfmhsprovlolos
+    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Lolos Seleksi'], color=df['Tahun Ajaran'])
+    fig.update_layout(barmode='group')
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsprovregis', 'figure'),
+    Input('grf_mhsprovregis', 'id')
+)
+def graphProvinceRegis(id):
+    df = dfmhsprovregis
+    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Registrasi Ulang'], color=df['Tahun Ajaran'])
+    fig.update_layout(barmode='group')
+    return fig
