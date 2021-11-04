@@ -278,85 +278,36 @@ mhsprovinsi = dbc.Container([
                 style={'textAlign': 'center', 'padding': '10px'}),
         html.Div(
             dcc.Tabs([
-                dcc.Tab(label='Pendaftar',
+                dcc.Tab(label='Pendaftar', value='daftar',
                         children=[
                             dbc.CardLink(
                                 dcc.Graph(id='grf_mhsprovdaftar'),
                                 id='cll_grfmhsprovdaftar', n_clicks=0
                             )
                         ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Lolos Seleksi',
+                dcc.Tab(label='Lolos Seleksi', value='lolos',
                         children=[
                             dbc.CardLink(
                                 dcc.Graph(id='grf_mhsprovlolos'),
                                 id='cll_grfmhsprovlolos', n_clicks=0
                             )
                         ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Registrasi Ulang',
+                dcc.Tab(label='Registrasi Ulang', value='regis',
                         children=[
                             dbc.CardLink(
                                 dcc.Graph(id='grf_mhsprovregis'),
                                 id='cll_grfmhsprovregis', n_clicks=0
                             )
                         ], style=tab_style, selected_style=selected_style)
-            ], style=tabs_styles
+            ], style=tabs_styles, id='tab_mhsprov', value='daftar'
             )
         )
     ], style={'padding': '10px'}),
     dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_mhsprovdaftar',
-                columns=[{"name": i, "id": i} for i in dfmhsprovdaftar.columns],
-                data=dfmhsprovdaftar.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_cell={'width': 70},
-                page_size=10
-            )
-        ),
-        id='cll_tblmhsprovdaftar',
+
+        id='cll_tblmhsprov',
         is_open=False
     ),
-    dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_mhsprovlolos',
-                columns=[{"name": i, "id": i} for i in dfmhsprovlolos.columns],
-                data=dfmhsprovlolos.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_cell={'width': 70},
-                page_size=10
-            )
-        ),
-        id='cll_tblmhsprovlolos',
-        is_open=False
-    ),
-    dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_mhsprovregis',
-                columns=[{"name": i, "id": i} for i in dfmhsprovregis.columns],
-                data=dfmhsprovregis.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_cell={'width': 70},
-                page_size=10
-            )
-        ),
-        id='cll_tblmhsprovregis',
-        is_open=False
-    )
 ], style={'margin-top': '20px', 'justify-content': 'center'})
 
 
@@ -401,25 +352,64 @@ def toggle_collapse(n, is_open):
     return is_open
 
 
-# @app.callback(
-#     Output("cll_tblmhsprovdaftar", "is_open"),
-#     Output("cll_tblmhsprovlolos", "is_open"),
-#     Output("cll_tblmhsprovregis", "is_open"),
-#     Input("cll_grfmhsprovdaftar", "n_clicks"),
-#     Input("cll_grfmhsprovdaftar", "id"),
-#     Input("cll_grfmhsprovlolos", "n_clicks"),
-#     Input("cll_grfmhsprovlolos", "id"),
-#     Input("cll_grfmhsprovregis", "n_clicks"),
-#     Input("cll_grfmhsprovregis", "id"),
-#     [State("cll_tblmhsprovdaftar", "is_open")])
-# def toggle_collapse(ndaftar, iddaftar, nlolos, idlolos, nregis, idregis, is_open):
-#     if ndaftar and iddaftar == 'cll_grfmhsprovdaftar':
-#         return True, False, False
-#     if nlolos and idlolos == 'cll_grfmhsprovlolos':
-#         return False, True, False
-#     if nregis and idregis == 'cll_grfmhsprovregis':
-#         return False, False, True
-
+@app.callback(
+    Output("cll_tblmhsprov", "is_open"),
+    Output("cll_tblmhsprov", "children"),
+    [Input("cll_grfmhsprovdaftar", "n_clicks"),
+     Input("cll_grfmhsprovlolos", "n_clicks"),
+     Input("cll_grfmhsprovregis", "n_clicks"),
+     Input("tab_mhsprov", "value")],
+    [State("cll_tblmhsprov", "is_open")])
+def toggle_collapse(ndaftar, nlolos,nregis, prov, is_open):
+    isiDaftar = dbc.Card(
+        dt.DataTable(
+            id='tbl_mhsprovdaftar',
+            columns=[{"name": i, "id": i} for i in dfmhsprovdaftar.columns],
+            data=dfmhsprovdaftar.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 70},
+            page_size=10
+        )
+    ),
+    isiLolos = dbc.Card(
+        dt.DataTable(
+            id='tbl_mhsprovlolos',
+            columns=[{"name": i, "id": i} for i in dfmhsprovlolos.columns],
+            data=dfmhsprovlolos.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 70},
+            page_size=10
+        )
+    ),
+    isiRegis=dbc.Card(
+        dt.DataTable(
+            id='tbl_mhsprovregis',
+            columns=[{"name": i, "id": i} for i in dfmhsprovregis.columns],
+            data=dfmhsprovregis.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 70},
+            page_size=10
+        )
+    ),
+    if ndaftar and prov == 'daftar':
+        return not is_open, isiDaftar
+    if nlolos and prov == 'lolos':
+        return not is_open, isiLolos
+    if nregis and prov == 'regis':
+        return not is_open, isiRegis
+    return is_open, None
 
 layout = html.Div([
     html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
