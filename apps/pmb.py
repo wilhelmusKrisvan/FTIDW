@@ -117,15 +117,17 @@ order by ds.tahun_ajaran, dl.provinsi
 
 tabs_styles = {
     'background': '#FFFFFF',
+    'color': '#b0b0b0',
     'border': 'white'
 }
 
 tab_style = {
-    "background": "#FFFFFF",
+    'background': "#FFFFFF",
     'border-bottom-color': '#ededed',
     'border-top-color': 'white',
     'border-left-color': 'white',
     'border-right-color': 'white',
+    'color': '#b0b0b0',
     'align-items': 'center',
     'justify-content': 'center'
 }
@@ -133,18 +135,36 @@ tab_style = {
 selected_style = {
     "background": "#FFFFFF",
     'align-items': 'center',
-    'border-bottom': '3px solid',
+    'border-bottom': '2px solid',
     'border-top-color': 'white',
     'border-bottom-color': '#2780e3',
     'border-left-color': 'white',
     'border-right-color': 'white'
+}
 
+cont_style = {
+    'padding': '10px',
+    'justify-content': 'center',
+    'margin-top': '25px'
+}
+
+cardgrf_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
+ttlgrf_style={
+    'textAlign':'center',
+    'padding':'10px',
+    'color':'black'
 }
 
 mhsseleksi = dbc.Container([
     dbc.Card([
         html.H5('2.a Seleksi Mahasiswa',
-                style={'textAlign': 'center', 'padding': '10px'}),
+                style=ttlgrf_style),
         dbc.CardLink(
             dbc.CardBody(
                 dcc.Graph(id='grf_mhsseleksi')
@@ -152,7 +172,7 @@ mhsseleksi = dbc.Container([
             id='cll_grfseleksi',
             n_clicks=0
         ),
-    ]),
+    ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
             dt.DataTable(
@@ -165,17 +185,17 @@ mhsseleksi = dbc.Container([
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 page_size=10
-            )
+            ), style=cardgrf_style
         ),
         id='cll_tblseleksi',
         is_open=False
     )
-], style={'margin-top': '50px', 'justify-content': 'center'})
+], style=cont_style)
 
 mhsasing = dbc.Container([
     dbc.Card([
         html.H5('2.b Mahasiswa Asing',
-                style={'textAlign': 'center', 'padding': '10px'}),
+                style=ttlgrf_style),
         dcc.Tabs([
             dcc.Tab(label='FTI', value='all',
                     children=[
@@ -193,23 +213,23 @@ mhsasing = dbc.Container([
                     ],
                     style=tab_style, selected_style=selected_style)
         ], id='tab_mhsasing', value='all')
-    ], style={'padding': '10px'}),
+    ], style=cardgrf_style),
     dbc.Collapse(
-
         id='cll_tblasing',
-        is_open=False
+        is_open=False,
+
     )
-], style={'margin-top': '20px', 'justify-content': 'center'})
+], style=cont_style)
 
 mhsrasio = dbc.Container([
     dbc.Card([
         html.H5('Rasio Daya Tampung : Pendaftar Registrasi Mahasiswa',
-                style={'textAlign': 'center', 'padding': '10px'}),
+                style=ttlgrf_style),
         dbc.CardLink([
             dcc.Graph(id='grf_mhsrasio')
         ], id='cll_grfrasio',
             n_clicks=0)
-    ]),
+    ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
             dt.DataTable(
@@ -223,22 +243,22 @@ mhsrasio = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
                 page_size=10
-            )
+            ), style=cardgrf_style
         ),
         id='cll_tblrasio',
         is_open=False
     )
-], style={'margin-top': '20px', 'justify-content': 'center'})
+], style=cont_style)
 
 mhsasmasmk = dbc.Container([
     dbc.Card([
         html.H5('Asal Sekolah Mahasiswa Pendaftar',
-                style={'textAlign': 'center', 'padding': '10px'}),
+                style=ttlgrf_style),
         dbc.CardLink([
             dcc.Graph(id='grf_mhssmasmk')
         ], id='cll_grfsmasmk',
             n_clicks=0)
-    ]),
+    ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
             dt.DataTable(
@@ -252,17 +272,17 @@ mhsasmasmk = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
                 page_size=10
-            )
+            ), style=cardgrf_style
         ),
         id='cll_tblsmasmk',
         is_open=False
     )
-], style={'margin-top': '20px', 'justify-content': 'center'})
+], style=cont_style)
 
 mhsprovinsi = dbc.Container([
     dbc.Card([
         html.H5('Lokasi Asal Mahasiswa Pendaftar',
-                style={'textAlign': 'center', 'padding': '10px'}),
+                style=ttlgrf_style),
         html.Div(
             dcc.Tabs([
                 dcc.Tab(label='Pendaftar', value='daftar',
@@ -289,13 +309,13 @@ mhsprovinsi = dbc.Container([
             ], style=tabs_styles, id='tab_mhsprov', value='daftar'
             )
         )
-    ], style={'padding': '10px'}),
+    ], style=cardgrf_style),
     dbc.Collapse(
 
         id='cll_tblmhsprov',
         is_open=False
     ),
-], style={'margin-top': '20px', 'justify-content': 'center'})
+], style=cont_style)
 
 
 @app.callback(
@@ -329,7 +349,7 @@ def toggle_collapse(nall, ninf, nsi, mhs, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        )
+        ), style=cardgrf_style
     )
     if nall and mhs == 'all':
         return not is_open,isiMhsAsing
@@ -381,7 +401,7 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        )
+        ), style=cardgrf_style
     ),
     isiLolos = dbc.Card(
         dt.DataTable(
@@ -395,7 +415,7 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        )
+        ), style=cardgrf_style
     ),
     isiRegis = dbc.Card(
         dt.DataTable(
@@ -409,7 +429,7 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        )
+        ), style=cardgrf_style
     ),
     if ndaftar and prov == 'daftar':
         return not is_open, isiDaftar
@@ -588,10 +608,9 @@ def graphAsalSekolah(id):
 )
 def graphProvincePendaftar(id):
     df = dfmhsprovdaftar
-    fig = px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'], color=df['Tahun Ajaran'])
-    fig.update_layout(barmode='group')
+    fig = px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'], color=df['Tahun Ajaran'],barmode='group')
+    fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
     return fig
-
 
 @app.callback(
     Output('grf_mhsprovlolos', 'figure'),
@@ -599,8 +618,8 @@ def graphProvincePendaftar(id):
 )
 def graphProvinceSeleksi(id):
     df = dfmhsprovlolos
-    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Lolos Seleksi'], color=df['Tahun Ajaran'])
-    fig.update_layout(barmode='group')
+    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Lolos Seleksi'], color=df['Tahun Ajaran'],barmode='group')
+    fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
     return fig
 
 
@@ -610,6 +629,6 @@ def graphProvinceSeleksi(id):
 )
 def graphProvinceRegis(id):
     df = dfmhsprovregis
-    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Registrasi Ulang'], color=df['Tahun Ajaran'])
-    fig.update_layout(barmode='group')
+    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Registrasi Ulang'], color=df['Tahun Ajaran'],barmode='group')
+    fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
     return fig
