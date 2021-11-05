@@ -1,6 +1,4 @@
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import html
 import dash_bootstrap_components as dbc
 
 icnBrand = 'https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png'

@@ -1,0 +1,19 @@
+#tbl_seleksi button.export,#tbl_mhsrasio button.export,
+#tbl_mhssmasmk button.export, #tbl_mhsasing button.export,
+#tbl_mhsprovdaftar button.export, #tbl_mhsprovlolos button.export, #tbl_mhsprovregis button.export{
+    width: 120px;
+    height: 30px;
+    border-radius: 10px;
+    box-shadow: 5px 10px 20px  #ebedeb;
+    border: 1px solid #fafafa;
+    color:white;
+    background-color: #2780e3;
+    margin-right: 20px;
+    position: absolute;
+    right: 0;
+}
+
+
+
+
+

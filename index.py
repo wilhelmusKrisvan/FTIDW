@@ -1,11 +1,11 @@
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from appConfig import app, server
 from flask_login import logout_user, current_user
 import login, profile, admin
-from apps import pmb,registrasi,kegiatan_kerjasama,tgsakhir,alumni
+from apps import pmb,registrasi,kegiatan_kerjasama,tgsakhir,alumni,ppp
 from apps import alumni,registrasi,kegiatan_kerjasama
 import login, home
 
@@ -57,13 +57,19 @@ def displayPage(pathname):
         if current_user.is_authenticated:
             return registrasi.layout
         else:
-            return login.layout
+            return registrasi.layout
 
     if pathname == '/dashboard/kegiatan-kerjasama':
         if current_user.is_authenticated:
             return kegiatan_kerjasama.layout
         else:
             return kegiatan_kerjasama.layout
+
+    if pathname == '/dashboard/ppp':
+        if current_user.is_authenticated:
+            return ppp.layout
+        else:
+            return ppp.layout
 
     if pathname == '/dashboard/pmb':
         if current_user.is_authenticated:
@@ -170,4 +176,4 @@ def navBarPage(input1):
         ], className='container-fluid')
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

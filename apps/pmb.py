@@ -1,8 +1,7 @@
 import dash
 import pandas as pd
 import dash_table as dt
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
@@ -13,7 +12,6 @@ from dash.dependencies import Input, Output, State
 from appConfig import app
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-
 dfseleksi = pd.read_sql('''select 
 dataMahasiswa.tahun_aka as 'Tahun Ajaran', dy_tampung as 'Daya Tampung',jml_pendaftar as 'Pendaftar', 
 lolos as 'Lolos Seleksi', baru as 'Baru Reguler', Barutransfer as 'Baru Transfer', 
@@ -155,10 +153,10 @@ cardgrf_style = {
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
-ttlgrf_style={
-    'textAlign':'center',
-    'padding':'10px',
-    'color':'black'
+ttlgrf_style = {
+    'textAlign': 'center',
+    'padding': '10px',
+    'color': 'black'
 }
 
 mhsseleksi = dbc.Container([
@@ -181,10 +179,11 @@ mhsseleksi = dbc.Container([
                 data=dfseleksi.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                page_size=10
+                page_size=10,
+                export_format='xlsx'
             ), style=cardgrf_style
         ),
         id='cll_tblseleksi',
@@ -238,7 +237,8 @@ mhsrasio = dbc.Container([
                 data=dfmhsrasio.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                export_format='xlsx',
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
@@ -267,7 +267,8 @@ mhsasmasmk = dbc.Container([
                 data=dfmhssmasmk.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                export_format='xlsx',
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
@@ -344,7 +345,8 @@ def toggle_collapse(nall, ninf, nsi, mhs, is_open):
             data=dfmhsasing.to_dict('records'),
             sort_action='native',
             sort_mode='multi',
-            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto'},
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            export_format='xlsx',
             style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
@@ -352,12 +354,12 @@ def toggle_collapse(nall, ninf, nsi, mhs, is_open):
         ), style=cardgrf_style
     )
     if nall and mhs == 'all':
-        return not is_open,isiMhsAsing
+        return not is_open, isiMhsAsing
     if ninf and mhs == 'INF':
-        return not is_open,isiMhsAsing
+        return not is_open, isiMhsAsing
     if nsi and mhs == 'SI':
-        return not is_open,isiMhsAsing
-    return is_open,None
+        return not is_open, isiMhsAsing
+    return is_open, None
 
 
 @app.callback(
@@ -396,7 +398,8 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             data=dfmhsprovdaftar.to_dict('records'),
             sort_action='native',
             sort_mode='multi',
-            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            export_format='xlsx',
             style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
@@ -410,7 +413,8 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             data=dfmhsprovlolos.to_dict('records'),
             sort_action='native',
             sort_mode='multi',
-            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            export_format='xlsx',
             style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
@@ -424,7 +428,8 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             data=dfmhsprovregis.to_dict('records'),
             sort_action='native',
             sort_mode='multi',
-            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'overflowX': 'auto'},
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            export_format='xlsx',
             style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
@@ -608,9 +613,10 @@ def graphAsalSekolah(id):
 )
 def graphProvincePendaftar(id):
     df = dfmhsprovdaftar
-    fig = px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'], color=df['Tahun Ajaran'],barmode='group')
+    fig = px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'], color=df['Tahun Ajaran'], barmode='group')
     fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
     return fig
+
 
 @app.callback(
     Output('grf_mhsprovlolos', 'figure'),
@@ -618,7 +624,7 @@ def graphProvincePendaftar(id):
 )
 def graphProvinceSeleksi(id):
     df = dfmhsprovlolos
-    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Lolos Seleksi'], color=df['Tahun Ajaran'],barmode='group')
+    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Lolos Seleksi'], color=df['Tahun Ajaran'], barmode='group')
     fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
     return fig
 
@@ -629,6 +635,6 @@ def graphProvinceSeleksi(id):
 )
 def graphProvinceRegis(id):
     df = dfmhsprovregis
-    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Registrasi Ulang'], color=df['Tahun Ajaran'],barmode='group')
+    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Registrasi Ulang'], color=df['Tahun Ajaran'], barmode='group')
     fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
     return fig
