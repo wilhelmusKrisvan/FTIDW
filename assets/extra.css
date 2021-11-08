@@ -1,3 +1,5 @@
+#tbl_lulusan button.export,
+#tbl_dosbing button.export,
 #tbl_seleksi button.export,#tbl_mhsrasio button.export,
 #tbl_mhssmasmk button.export, #tbl_mhsasing button.export,
 #tbl_mhsprovdaftar button.export, #tbl_mhsprovlolos button.export, #tbl_mhsprovregis button.export{
@@ -12,8 +14,3 @@
     position: absolute;
     right: 0;
 }
-
-
-
-
-

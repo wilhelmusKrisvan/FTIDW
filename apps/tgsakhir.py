@@ -7,12 +7,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 from sqlalchemy import create_engine
 from plotly.subplots import make_subplots
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from appConfig import app
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
-tbl_dosbing = pd.read_sql('''
+dfdosbing = pd.read_sql('''
 select 
 nama, -- max(IF(tahun_ajaran = "2019/2020", JumlahSkripsi, 0)) AS "2019/2020",
 max(IF(tahun_ajaran = "2018/2019", JumlahSkripsi, 0)) AS "2018/2019",
@@ -45,14 +45,19 @@ group by nama
 order by nama
 ''', con)
 
-tbl_ipklulusan=pd.read_sql('''
+dflulusan = pd.read_sql('''select tahun_ajaran_yudisium as 'Tahun Lulus', count(id_mahasiswa) "Jumlah Lulusan",  min(ipk) "Min. IPK", avg(ipk) as 'Rata-rata IPK' ,  max(ipk) "Max. IPK"
+from fact_yudisium
+group by tahun_ajaran_yudisium
+order by tahun_ajaran_yudisium''', con)
+
+tbl_ipklulusan = pd.read_sql('''
 select tahun_ajaran_yudisium as 'Tahun Lulus', count(id_mahasiswa) "Jumlah Lulusan",  min(ipk) "Min. IPK", avg(ipk) as 'Rata-rata IPK' ,  max(ipk) "Max. IPK"
 from fact_yudisium
 group by tahun_ajaran_yudisium
 order by tahun_ajaran_yudisium
-''',con)
+''', con)
 
-tbl_masastudilulusan=pd.read_sql('''
+tbl_masastudilulusan = pd.read_sql('''
 select * from 
 (select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as TahunMAsuk,
 SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
@@ -70,9 +75,9 @@ left join (
     group by tahun_ajaran
     order by tahun_ajaran
 ) mhsditerima on mhsditerima.tahun_ajaran = TahunMAsuk
-''',con)
+''', con)
 
-tbl_masastudilulusan=pd.read_sql('''
+tbl_masastudilulusan = pd.read_sql('''
 select * from 
 (select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as TahunMAsuk,
 SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
@@ -90,30 +95,120 @@ left join (
     group by tahun_ajaran
     order by tahun_ajaran
 ) mhsditerima on mhsditerima.tahun_ajaran = TahunMAsuk
-''',con)
+''', con)
 
-dosbing = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('3.b Dosen Tetap Pembimbing Tugas Akhir / Skripsi Mahasiswa',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row(
+Fillsemester = pd.read_sql('select tahun_ajaran from dim_semester', con)
+semester = Fillsemester['tahun_ajaran'].dropna().unique()
+
+tabs_styles = {
+    'background': '#FFFFFF',
+    'color': '#b0b0b0',
+    'border': 'white'
+}
+
+tab_style = {
+    'background': "#FFFFFF",
+    'border-bottom-color': '#ededed',
+    'border-top-color': 'white',
+    'border-left-color': 'white',
+    'border-right-color': 'white',
+    'color': '#b0b0b0',
+    'align-items': 'center',
+    'justify-content': 'center'
+}
+
+selected_style = {
+    "background": "#FFFFFF",
+    'align-items': 'center',
+    'border-bottom': '2px solid',
+    'border-top-color': 'white',
+    'border-bottom-color': '#2780e3',
+    'border-left-color': 'white',
+    'border-right-color': 'white'
+}
+
+cont_style = {
+    'padding': '10px',
+    'justify-content': 'center',
+    'margin-top': '25px'
+}
+
+cardgrf_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
+ttlgrf_style = {
+    'textAlign': 'center',
+    'padding': '10px',
+    'color': 'black'
+}
+
+dosbing = dbc.Container([
+    dbc.Card([
+        html.H5('3.b. Dosen Pembimbing Tugas Akhir',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody([
+                dcc.Dropdown(
+                    id='drpdwn_TA',
+                    options=[{'label': i, 'value': i} for i in semester],
+                    value='2015/2016',
+                    style={'width': '100%', 'color': 'black', 'margin': '0px'},
+                    className='card-body',
+                    clearable=False
+                ),
+                dcc.Graph(id='grf_dosbing')
+            ]),
+            id='cll_grfdosbing',
+            n_clicks=0
+        ),
+    ], style=cardgrf_style),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_dosbing',
-                columns=[{"name": i, "id": i} for i in tbl_dosbing.columns],
-                data=tbl_dosbing.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dfdosbing.columns],
+                data=dfdosbing.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '1200px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-            )
-        )
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardgrf_style
+        ),
+        id='cll_tbldosbing',
+        is_open=False
     )
-], style={'margin-top': '50px', 'justify-content': 'center'})
+], style=cont_style)
+
+lulusan = dbc.Container([
+    dbc.Card([
+        html.H5('8.a. IPK Lulusan',
+                style=ttlgrf_style),
+        dcc.Tabs([
+            dcc.Tab(label='Nilai IPK lulusan', value='ipk',
+                    children=[
+                        dbc.CardLink([dcc.Graph(id='grf_ipklulusan')], id='cll_grfipklulusan', n_clicks=0)
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Jumlah Lulusan Per Tahun Ajaran', value='jml',
+                    children=[
+                        dbc.CardLink([dcc.Graph(id='grf_jmllulusan')], id='cll_grfjmllulusan', n_clicks=0)
+                    ],
+                    style=tab_style, selected_style=selected_style),
+        ], id='tab_lulusan', value='ipk')
+    ], style=cardgrf_style),
+    dbc.Collapse(
+
+        id='cll_tbllulusan',
+        is_open=False,
+    )
+], style=cont_style)
 
 tridharma = dbc.CardGroup([
     dbc.Row(
@@ -134,7 +229,7 @@ tridharma = dbc.CardGroup([
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
             )
-        ], style={'textAlign':'center','padding-top':'10px'}),
+        ], style={'textAlign': 'center', 'padding-top': '10px'}),
         dbc.Card([
             '8.c.4. Masa Studi Lulusan Program Sarjana',
             dt.DataTable(
@@ -148,9 +243,49 @@ tridharma = dbc.CardGroup([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
 
             )
-        ], style={'textAlign':'center','padding-top':'10px'})
+        ], style={'textAlign': 'center', 'padding-top': '10px'})
     ])
 ], style={'margin-top': '20px', 'justify-content': 'center'})
+
+
+@app.callback(
+    Output("cll_tbldosbing", "is_open"),
+    [Input("cll_grfdosbing", "n_clicks")],
+    [State("cll_tbldosbing", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tbllulusan", "is_open"),
+    Output("cll_tbllulusan", "children"),
+    [Input("cll_grfipklulusan", "n_clicks"),
+     Input("cll_grfjmllulusan", "n_clicks"),
+     Input('tab_lulusan', 'value')],
+    [State("cll_tbllulusan", "is_open")])
+def toggle_collapse(nipk, njml, llsan, is_open):
+    isiLulusan= dbc.Card(
+        dt.DataTable(
+            id='tbl_lulusan',
+            columns=[{"name": i, "id": i} for i in dflulusan.columns],
+            data=dflulusan.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardgrf_style
+    ),
+    if nipk and llsan == 'ipk':
+        return not is_open, isiLulusan
+    if njml and llsan == 'jml':
+        return not is_open, isiLulusan
+    return is_open, None
+
 
 layout = html.Div([
     html.Div(html.H1('Analisis Skripsi, KP, dan Yudisium Prodi Informatika',
@@ -158,5 +293,76 @@ layout = html.Div([
                      )
              ),
     html.Div([dosbing]),
+    html.Div([lulusan]),
     html.Div([tridharma], style={'margin-bottom': '50px'})
 ], style={'justify-content': 'center'})
+
+
+@app.callback(
+    Output('grf_dosbing', 'figure'),
+    Input('grf_dosbing', 'id'),
+    Input('drpdwn_TA', 'value'),
+)
+def graphDosbing(id, value):
+    df = pd.read_sql('''select count(*) as "Jumlah Skripsi",dim_dosen.nama as "Nama Dosen", dim_semester.semester,
+CASE dim_semester.semester
+    WHEN 1 THEN "Ganjil"
+    WHEN 2 THEN "Genap"
+  END as "Semester Tahun Ajaran"
+from fact_skripsi
+inner join dim_dosen on fact_skripsi.id_dosen_pembimbing1 = dim_dosen.id_dosen and dim_dosen.id_prodi = 9
+inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester 
+where dim_semester.tahun_ajaran=%(tahun_ajaran)s
+group by dim_dosen.nama, dim_semester.semester,"Semester Tahun Ajaran"
+order by dim_dosen.nama, dim_semester.semester''', con, params={'tahun_ajaran': value})
+    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Skripsi'], color=df['Semester Tahun Ajaran'], barmode='group')
+    return fig
+
+
+@app.callback(
+    Output('grf_ipklulusan', 'figure'),
+    Input('grf_ipklulusan', 'id'),
+)
+def graphIPKLulusan(id):
+    dfavg = pd.read_sql('''select avg(ipk) as 'Rata-rata IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+from fact_yudisium
+group by tahun_ajaran_yudisium
+order by tahun_ajaran_yudisium''', con)
+    dfmax = pd.read_sql('''select max(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+from fact_yudisium
+group by tahun_ajaran_yudisium
+order by tahun_ajaran_yudisium''', con)
+    dfmin = pd.read_sql('''select min(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+    from fact_yudisium
+    group by tahun_ajaran_yudisium
+    order by tahun_ajaran_yudisium''', con)
+    fig = px.bar(dfavg, y=dfavg['Rata-rata IPK'], x=dfavg['Tahun Ajaran'],color=px.Constant('Rata-rata IPK'),
+                 labels=dict(x="Tahun Ajaran", y="IPK", color="IPK"))
+    fig.add_scatter(y=dfmax['IPK'], x=dfmax['Tahun Ajaran'],
+                    name='IPK Tertinggi',
+                    hovertemplate="IPK=Tertinggi <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
+    fig.add_scatter(y=dfmin['IPK'], x=dfmin['Tahun Ajaran'],
+                    name='IPK Terendah',
+                    hovertemplate="IPK=Terendah <br>IPK=%{y} </br> Tahun Ajaran= %{x}"
+                    )
+    return fig
+
+
+@app.callback(
+    Output('grf_jmllulusan', 'figure'),
+    Input('grf_jmllulusan', 'id'),
+)
+def graphJmlLulusan(id):
+    df = pd.read_sql('''select count(*) as "Jumlah Mahasiswa", dim_semester.tahun_ajaran as "Tahun Ajaran"
+from fact_skripsi
+inner join(
+select count(*) as jumlah, id_mahasiswa from fact_skripsi
+group by id_mahasiswa
+) data_skripsi on data_skripsi.id_mahasiswa = fact_skripsi.id_mahasiswa AND data_skripsi.jumlah=1
+inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester
+where id_dosen_penguji1 <>''
+group by dim_semester.tahun_ajaran
+order by dim_semester.tahun_ajaran''', con)
+    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'],color=px.Constant('Jumlah Mahasiswa'),
+                 labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
+    return fig
