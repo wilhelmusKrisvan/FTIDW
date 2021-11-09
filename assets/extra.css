@@ -6,7 +6,9 @@
 #tbl_mhsasing button.export,
 #tbl_mhsprovdaftar button.export,
 #tbl_mhsprovlolos button.export,
-#tbl_mhsprovregis button.export {
+#tbl_mhsprovregis button.export,
+#tbl_kpall button.export,
+#tbl_kppkm button.export{
     width: 120px;
     height: 30px;
     border-radius: 10px;

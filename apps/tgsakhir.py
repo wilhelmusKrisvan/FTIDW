@@ -14,7 +14,7 @@ con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawareh
 
 dfdosbing = pd.read_sql('''
 select 
-nama, -- max(IF(tahun_ajaran = "2019/2020", JumlahSkripsi, 0)) AS "2019/2020",
+nama as 'Nama Dosen', -- max(IF(tahun_ajaran = "2019/2020", JumlahSkripsi, 0)) AS "2019/2020",
 max(IF(tahun_ajaran = "2018/2019", JumlahSkripsi, 0)) AS "2018/2019",
 max(IF(tahun_ajaran = "2017/2018", JumlahSkripsi, 0)) AS "2017/2018",
 max(IF(tahun_ajaran = "2016/2017", JumlahSkripsi, 0)) AS "2016/2017",
@@ -58,7 +58,9 @@ order by tahun_ajaran_yudisium
 ''', con)
 
 dfavgmasa = pd.read_sql('''
-select concat(round((masa_studi-mods)/12,0) ," tahun ", mods, " bulan")  as "masa studi" , tahun_ajaran_yudisium 
+select 
+    concat(round((masa_studi-mods)/12,0) ," tahun ", mods, " bulan")  as "Masa Studi" , 
+    tahun_ajaran_yudisium as 'TA Yudisium'
 from (
 select  mod(masa_studi,12) as mods, masa_studi, tahun_ajaran_yudisium
 from (
@@ -69,13 +71,16 @@ order by tahun_ajaran_yudisium
 ''', con)
 
 dfallmasa = pd.read_sql('''
-select * from 
+select
+       TahunMAsuk as 'TA Masuk',
+       `< 3 Tahun`, `3 - 3.5 Tahun`, `3.5 - 4.5 Tahun`, `4.5 - 7 Tahun`, `> 7 Tahun`,
+       tahun_ajaran as 'TA' from
 (select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as TahunMAsuk,
 SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
 SUM(case when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan <42 then 1 else 0 end) as '3 - 3.5 Tahun',
 SUM(case when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan <54  then 1 else 0 end) as '3.5 - 4.5 Tahun',
 SUM(case when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <=84 then 1 else 0 end) as '4.5 - 7 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 tahun'
+SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 Tahun'
 from fact_yudisium
 inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa=fact_yudisium.id_mahasiswa
 group by TahunMAsuk
@@ -133,6 +138,26 @@ left join (
     group by tahun_ajaran
     order by tahun_ajaran
 ) mhsditerima on mhsditerima.tahun_ajaran = TahunMAsuk
+''', con)
+
+dfkpall = pd.read_sql('''
+select dim_semester.tahun_ajaran as 'Tahun Ajaran', count(*) as 'Jumlah KP'
+from fact_kp
+inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
+inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+where fact_kp.is_pen_pkm = 1
+group by dim_semester.tahun_ajaran
+order by dim_semester.tahun_ajaran
+''', con)
+
+dfkppkm = pd.read_sql('''
+select dim_semester.tahun_ajaran as 'Tahun Ajaran', count(*) as 'Jumlah KP' 
+from fact_kp
+inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
+inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+where fact_kp.is_pen_pkm = 1
+group by dim_semester.tahun_ajaran
+order by dim_semester.tahun_ajaran
 ''', con)
 
 Fillsemester = pd.read_sql('select tahun_ajaran from dim_semester', con)
@@ -194,8 +219,7 @@ dosbing = dbc.Container([
                     id='drpdwn_TA',
                     options=[{'label': i, 'value': i} for i in semester],
                     value='2015/2016',
-                    style={'width': '100%', 'color': 'black', 'margin': '0px'},
-                    className='card-body',
+                    style={'color': 'black'},
                     clearable=False
                 ),
                 dcc.Graph(id='grf_dosbing')
@@ -251,124 +275,98 @@ lulusan = dbc.Container([
 ], style=cont_style)
 
 masa_studi = dbc.Container([
+    dbc.CardLink(
+        dbc.Card([
+            html.H5('Grafik Lulusan Skripsi Tepat Waktu',
+                    style=ttlgrf_style),
+            dcc.Graph(
+                id='grf_masastudi',
+                style={'height': '100%'}
+            )],
+            style={'border': '1px solid #fafafa',
+                   'border-radius': '10px',
+                   'justify-content': 'center',
+                   'width': '100%',
+                   'box-shadow': '5px 10px 30px #ebedeb'}
+        )
+    ),
     dbc.Row([
         dbc.Col(
-            dbc.CardLink(
-                dbc.Card(
-                    dt.DataTable(
-                        id='tbl_avgmasa',
-                        columns=[{"name": i, "id": i} for i in dfavgmasa.columns],
-                        data=dfavgmasa.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-                        style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                        style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                        page_size=10
-                    ),
-                    style={'border': '1px solid #fafafa',
-                           'border-radius': '10px',
-                           'padding': '10px',
-                           'width':'570px',
-                           'height': '217.78px',
-                           'justify-content':'center',
-                           'box-shadow': '5px 10px 30px #ebedeb'}
-                ),
-                id='cll_tblavgmasa',
-                n_clicks=0
-            ), width=6
+            dbc.Card([
+                html.H5('Rata-rata Masa Studi Lulusan',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_avgmasa',
+                    columns=[{"name": i, "id": i} for i in dfavgmasa.columns],
+                    data=dfavgmasa.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                )],
+                style={'border': '1px solid #fafafa',
+                       'border-radius': '10px',
+                       'padding': '10px',
+                       'width': '100%',
+                       'height': '339px',
+                       'justify-content': 'right',
+                       'box-shadow': '5px 10px 30px #ebedeb'}
+            ), width=3
         ),
         dbc.Col(
-            dbc.CardLink(
-                dbc.Card(
-                    dcc.Graph(
-                        id='grf_masastudi',
-                        style={'height': '100%'}
-                    ),
-                    style={'border': '1px solid #fafafa',
-                           'border-radius': '10px',
-                           'padding': '10px',
-                           'height': '217.78px',
-                           'justify-content':'center',
-                           'box-shadow': '5px 10px 30px #ebedeb'},
-                ),
-                id='cll_tblallmasa',
-                n_clicks=0
-            ), width=6
+            dbc.Card([
+                html.H5('Masa Studi Lulusan Program Sarjana',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_allmasa',
+                    columns=[{"name": i, "id": i} for i in dfallmasa.columns],
+                    data=dfallmasa.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                )
+            ], style=cardgrf_style
+            ), width=9
         )
-    ]),
-    dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_allmasa',
-                columns=[{"name": i, "id": i} for i in dfallmasa.columns],
-                data=dfallmasa.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                page_size=10
-            ), style=cardgrf_style
-        ),
-        id='cll_tblallmasa',
-        is_open=False
-    )
+    ], style={'margin-top': '10px'})
 ], style=cont_style)
 
 kp_prodi = dbc.Container([
     dbc.Card([
         html.H5('KP Prodi Informatika',
                 style=ttlgrf_style),
-        dcc.Tabs([
-            dcc.Tab(label='All', value='all',
-                    children=[
-                        dbc.CardLink([dcc.Graph(id='grf_kpall')], id='cll_grfkpall', n_clicks=0)
-                    ], style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='PKM Dosen', value='PKMDosen',
-                    children=[
-                        dbc.CardLink([dcc.Graph(id='grf_kppkm')], id='cll_grfpkm', n_clicks=0)
-                    ], style=tab_style, selected_style=selected_style)
-        ], id='tab_kpall', value='all')
-    ], style=cardgrf_style)
+        html.Div([
+            dcc.Tabs([
+                dcc.Tab(label='All', value='all',
+                        children=[
+                            dbc.CardLink([
+                                dcc.Graph(id='grf_kpall')],
+                                id='cll_grfkpall', n_clicks=0
+                            )
+                        ], style=tab_style, selected_style=selected_style),
+                dcc.Tab(label='PKM Dosen', value='PKMDosen',
+                        children=[
+                            dbc.CardLink([
+                                dcc.Graph(id='grf_kppkm')],
+                                id='cll_grfkppkm', n_clicks=0
+                            )
+                        ], style=tab_style, selected_style=selected_style)
+            ], style=tab_style, id='tab_kpall', value='all'
+            )
+        ])
+    ], style=cardgrf_style
+    ),
+    dbc.Collapse(
+        id='cll_tblkp',
+        is_open=False
+    )
 ], style=cont_style)
-
-# tridharma = dbc.CardGroup([
-#     dbc.Row(
-#         dbc.Card('Luaran dan Capaian Tridharma Berkaitan Capaian Pembelajaran dan Pendidikan',
-#                  style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-#                  )
-#         , style={'z-index': '2'}),
-#     dbc.Row([
-#         dbc.Card([
-#             '8.a. IPK Lulusan',
-#             dt.DataTable(
-#                 id='tbl_ipklulusan',
-#                 columns=[{"name": i, "id": i} for i in tbl_ipklulusan.columns],
-#                 data=tbl_ipklulusan.to_dict('records'),
-#                 sort_action='native',
-#                 sort_mode='multi',
-#                 style_table={'width': '600px', 'padding': '10px'},
-#                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-#             )
-#         ], style={'textAlign': 'center', 'padding-top': '10px'}),
-#         dbc.Card([
-#             '8.c.4. Masa Studi Lulusan Program Sarjana',
-#             dt.DataTable(
-#                 id='tbl_masastudilulusan',
-#                 columns=[{"name": i, "id": i} for i in tbl_masastudilulusan.columns],
-#                 data=tbl_masastudilulusan.to_dict('records'),
-#                 sort_action='native',
-#                 sort_mode='multi',
-#                 style_table={'width': '600px', 'padding': '10px'},
-#                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-#
-#             )
-#         ], style={'textAlign': 'center', 'padding-top': '10px'})
-#     ])
-# ], style={'margin-top': '20px', 'justify-content': 'center'})
 
 layout = html.Div([
     html.Div(html.H1('Analisis Skripsi, KP, dan Yudisium Prodi Informatika',
@@ -501,3 +499,46 @@ order by dim_semester.tahun_ajaran''', con)
     fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=px.Constant('Jumlah Mahasiswa'),
                  labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
     return fig
+
+
+@app.callback(
+    Output('cll_tblkp', 'is_open'),
+    Output('cll_tblkp', 'children'),
+    [Input("cll_grfkpall", "n_clicks"),
+     Input("cll_grfkppkm", "n_clicks"),
+     Input("tab_kpall", "value")],
+    [State("cll_tblkp", "is_open")])
+def toggle_collapse(nall, npkm, kp, is_open):
+    isiAll = dbc.Card(
+        dt.DataTable(
+            id='tbl_kpall',
+            columns=[{"name": i, "id": i} for i in dfkpall.columns],
+            data=dfkpall.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardgrf_style
+    ),
+    isiPKM = dbc.Card(
+        dt.DataTable(
+            id='tbl_kppkm',
+            columns=[{"name": i, "id": i} for i in dfkppkm.columns],
+            data=dfkppkm.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardgrf_style
+    ),
+    if nall and kp == 'all':
+        return not is_open, isiAll
+    if npkm and kp == 'PKMDosen':
+        return not is_open, isiPKM
+    return is_open, None
