@@ -4,6 +4,7 @@ import dash_table as dt
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from sqlalchemy import create_engine
+from dash import html, dcc
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
@@ -323,13 +324,48 @@ kemampuan = dbc.CardGroup([
     ])
 ], style={'margin-top': '20px', 'justify-content': 'center'})
 
+tab_lulusanlkps = html.Div([
+    html.Div(
+        html.H1(
+            'Analisis Lulusan dan Tracer Study Prodi Informatika [LKPS]',
+            style={'margin-top': '30px', 'text-align': 'center'}
+        )
+    ),
+    masatunggu,
+    bidangkerja,
+    tempatkerja,
+    kemampuan
+])
+
+tab_lulusannon = html.Div([
+    html.Div(
+        html.H1(
+            'Analisis Lulusan dan Tracer Study Prodi Informatika',
+            style={'margin-top': '30px', 'text-align': 'center'}
+        )
+    ),
+])
+
+tab_alumni = html.Div([
+    html.Div(
+        html.H1(
+            'Kepuasan Fasilitas dan Layanan',
+            style={'margin-top': '30px', 'text-align': 'center'}
+        )
+    ),
+])
+
 layout = html.Div([
-    html.Div(html.H1('Analisis Lulusan dan Tracer Study Prodi Informatika',
-                     style={'margin-top': '30px', 'textAlign': 'center'}
-                     )
-             ),
-    html.Div([masatunggu]),
-    html.Div([bidangkerja]),
-    html.Div([tempatkerja]),
-    html.Div([kemampuan], style={'margin-bottom': '50px'})
+    dbc.Container([
+        html.Div(html.H1('Analisis Lulusan, Tracer Study, Kepuasan Fasilitas dan Layanan',
+                         style={'margin-top': '30px', 'textAlign': 'center'}
+                         )
+                 ),
+        dbc.Tabs([
+            dbc.Tab(label='Alumni [LKPS]', tab_id='lulusanLKPS'),
+            dbc.Tab(label='Alumni', tab_id='alumni'),
+            dbc.Tab(label='Fasilitas & Layanan', tab_id='fasilitas')
+        ], active_tab='lulusanLKPS', id='cardTabsAlumni'),
+        html.Div([], id='cardContentRegistrasi')
+    ], fluid=True, style={'margin-bottom': '50px'}),
 ], style={'justify-content': 'center'})

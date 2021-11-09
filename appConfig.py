@@ -12,8 +12,6 @@ from flask_login import login_user, logout_user, current_user, LoginManager, Use
 # from model.user import User as base
 import configparser
 from model.user import User
-from sshtunnel import SSHTunnelForwarder
-import pymysql.cursors
 
 
 warnings.filterwarnings("ignore")

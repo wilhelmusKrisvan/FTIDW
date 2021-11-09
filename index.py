@@ -1,28 +1,33 @@
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from appConfig import app, server
+from dash.dependencies import Input, Output
 from flask_login import logout_user, current_user
-import login, profile, admin
-from apps import pmb,registrasi,kegiatan_kerjasama,tgsakhir,alumni,ppp
-from apps import alumni,registrasi,kegiatan_kerjasama
-import login, home
+import login, profile, admin, home
+from apps import pmb, registrasi, kegiatan_kerjasama, tgsakhir, alumni, ppp
 
 navBar = dbc.Navbar(
-        children=[
-        ],
-        id='navBar',
-        color='#375a7f',
-        className='navbar navbar-expand-lg navbar-dark bg-primary',
-        style={'width': '100%', 'position': 'sticky', 'top': '0', 'zIndex': '3'}
-    )
+    children=[
+    ],
+    id='navBar',
+    color='#375a7f',
+    className='navbar navbar-expand-lg navbar-dark bg-primary',
+    style={
+        'position': 'sticky',
+        'width': '100%',
+        'top': '0',
+        'zIndex': '3',
+        'font-size': '20px'
+    }
+)
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     navBar,
     html.Div(id='pageContent')
 ], id='table-wrapper')
+
 
 # HANDLE PAGE ROUTING - IF USER NOT LOGGED IN, ALWAYS RETURN TO LOGIN SCREEN
 @app.callback(Output('pageContent', 'children'),
@@ -91,12 +96,13 @@ def displayPage(pathname):
 
     if pathname == '/admin':
         if current_user.is_authenticated:
-            if current_user.role=='admin':
+            if current_user.role == 'admin':
                 return admin.layout
             else:
                 return login.layout
         else:
             return login.layout
+
 
 @app.callback(
     Output('navBar', 'children'),
@@ -105,58 +111,58 @@ def navBarPage(input1):
     if current_user.is_authenticated:
         if current_user.role == 'admin':
             navBarContents = html.Div([
-            html.Div([
                 html.Div([
-                    html.A(
-                        dbc.Row([
-                            dbc.Col(
-                                html.Img(src='https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png',
-                                         height="35px")),
-                            dbc.Col(dbc.NavbarBrand('DASHBOARD'))
-                        ], align="center", ),
-                        href='/'
+                    html.Div([
+                        html.A(
+                            dbc.Row([
+                                dbc.Col(
+                                    html.Img(src='https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png',
+                                             height="35px")),
+                                dbc.Col(dbc.NavbarBrand('DASHBOARD'))
+                            ], align="center", ),
+                            href='/'
+                        ),
+                        dbc.NavLink('Page 1', href='/home'),
+                    ], className='navbar-nav mr-auto'),
+                    dbc.DropdownMenu(
+                        right=True,
+                        label=current_user.username,
+                        children=[
+                            dbc.DropdownMenuItem('Profile', href='/profile'),
+                            dbc.DropdownMenuItem('Admin', href='/admin'),
+                            dbc.DropdownMenuItem(divider=True),
+                            dbc.DropdownMenuItem('Logout', href='/logout'),
+                        ], className='btn btn-primary'
                     ),
-                    dbc.NavLink('Page 1', href='/home'),
-                ], className='navbar-nav mr-auto'),
-                dbc.DropdownMenu(
-                    right=True,
-                    label=current_user.username,
-                    children=[
-                        dbc.DropdownMenuItem('Profile', href='/profile'),
-                        dbc.DropdownMenuItem('Admin', href='/admin'),
-                        dbc.DropdownMenuItem(divider=True),
-                        dbc.DropdownMenuItem('Logout', href='/logout'),
-                    ], color='rgb(39, 128, 227)',
-                ),
-            ], className='collapse navbar-collapse')
-        ], className='container-fluid')
+                ], className='collapse navbar-collapse')
+            ], className='container-fluid')
             return navBarContents
         else:
             navBarContents = html.Div([
-            html.Div([
                 html.Div([
-                    html.A(
-                        dbc.Row([
-                            dbc.Col(
-                                html.Img(src='https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png',
-                                         height="35px")),
-                            dbc.Col(dbc.NavbarBrand('DASHBOARD'))
-                        ], align="center", ),
-                        href='/'
+                    html.Div([
+                        html.A(
+                            dbc.Row([
+                                dbc.Col(
+                                    html.Img(src='https://www.ukdw.ac.id/wp-content/uploads/2017/10/fti-ukdw.png',
+                                             height="35px")),
+                                dbc.Col(dbc.NavbarBrand('DASHBOARD'))
+                            ], align="center", ),
+                            href='/'
+                        ),
+                        dbc.NavLink('Home', href='/home'),
+                    ], className='navbar-nav mr-auto'),
+                    dbc.DropdownMenu(
+                        right=True,
+                        label=current_user.username,
+                        children=[
+                            dbc.DropdownMenuItem('Profile', href='/profile'),
+                            dbc.DropdownMenuItem(divider=True),
+                            dbc.DropdownMenuItem('Logout', href='/logout'),
+                        ], color='rgb(39, 128, 227)', style={'border-radius': '200px'}
                     ),
-                    dbc.NavLink('Home', href='/home'),
-                ], className='navbar-nav mr-auto'),
-                dbc.DropdownMenu(
-                    right=True,
-                    label=current_user.username,
-                    children=[
-                        dbc.DropdownMenuItem('Profile', href='/profile'),
-                        dbc.DropdownMenuItem(divider=True),
-                        dbc.DropdownMenuItem('Logout', href='/logout'),
-                    ], color='rgb(39, 128, 227)',style={'border-radius': '200px'}
-                ),
-            ], className='collapse navbar-collapse')
-        ], className='container-fluid')
+                ], className='collapse navbar-collapse')
+            ], className='container-fluid')
             return navBarContents
     else:
         return html.Div([
@@ -174,6 +180,7 @@ def navBarPage(input1):
                 ], className='navbar-nav mr-auto'),
             ], className='collapse navbar-collapse')
         ], className='container-fluid')
+
 
 if __name__ == '__main__':
     app.run_server(debug=False)

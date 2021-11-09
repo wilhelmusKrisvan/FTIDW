@@ -16,7 +16,7 @@ options = [
     {'label': 'Dosen', 'value': 'dosen'}]
 
 layout = dbc.Container([
-    dbc.Container([
+    dbc.Card([
         dcc.Location(id='urlUserAdmin', refresh=True),
         html.H3('Add New User'),
         html.Hr(),
@@ -101,7 +101,7 @@ layout = dbc.Container([
         ]),
     ], className='jumbotron',style={'border-radius':'10px'}),
 
-    dbc.Container([
+    dbc.Card([
         html.H3('Manage Users'),
         html.Hr(),
         dbc.Row([

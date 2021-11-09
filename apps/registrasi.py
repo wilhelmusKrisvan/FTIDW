@@ -363,9 +363,7 @@ layout = html.Div([
 
             ], id='cardContentRegistrasi'),
         ], style={'margin': '25px'})
-    ], fluid=True),
-    html.Div([]),
-    html.Div([])
+    ], fluid=True)
 ], style={'width': '100%'})
 
 

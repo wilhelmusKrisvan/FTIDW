@@ -1,16 +1,41 @@
 #tbl_lulusan button.export,
 #tbl_dosbing button.export,
-#tbl_seleksi button.export,#tbl_mhsrasio button.export,
-#tbl_mhssmasmk button.export, #tbl_mhsasing button.export,
-#tbl_mhsprovdaftar button.export, #tbl_mhsprovlolos button.export, #tbl_mhsprovregis button.export{
+#tbl_seleksi button.export,
+#tbl_mhsrasio button.export,
+#tbl_mhssmasmk button.export,
+#tbl_mhsasing button.export,
+#tbl_mhsprovdaftar button.export,
+#tbl_mhsprovlolos button.export,
+#tbl_mhsprovregis button.export {
     width: 120px;
     height: 30px;
     border-radius: 10px;
-    box-shadow: 5px 10px 20px  #ebedeb;
+    box-shadow: 5px 10px 20px #ebedeb;
     border: 1px solid #fafafa;
-    color:white;
+    color: white;
     background-color: #2780e3;
     margin-right: 20px;
     position: absolute;
     right: 0;
 }
+
+#card_menu {
+    transition: .3s transform cubic-bezier(.155, 1.105, .295, 1.12), .3s box-shadow, .3s -webkit-transform cubic-bezier(.155, 1.105, .295, 1.12);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, .08), 0 0 6px rgba(0, 0, 0, .05);
+    border: 1px solid #fafafa;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px;
+    margin: 10px;
+    width: 360px;
+}
+
+#card_menu:hover {
+    transform: scale(1.01);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .12), 0 4px 8px rgba(0, 0, 0, .06);
+}
+
+
+
+
+
