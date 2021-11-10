@@ -50,12 +50,10 @@ from fact_yudisium
 group by tahun_ajaran_yudisium
 order by tahun_ajaran_yudisium''', con)
 
-dfjmlskripsi = pd.read_sql('''
-select tahun_ajaran_yudisium as 'Tahun Lulus', count(id_mahasiswa) "Jumlah Lulusan",  min(ipk) "Min. IPK", avg(ipk) as 'Rata-rata IPK' ,  max(ipk) "Max. IPK"
+dfjmlskripsi = pd.read_sql('''select tahun_ajaran_yudisium as 'Tahun Lulus', count(id_mahasiswa) "Jumlah Lulusan",  min(ipk) "Min. IPK", avg(ipk) as 'Rata-rata IPK' ,  max(ipk) "Max. IPK"
 from fact_yudisium
 group by tahun_ajaran_yudisium
-order by tahun_ajaran_yudisium 
-''', con)
+order by tahun_ajaran_yudisium ''', con)
 
 dfavgmasa = pd.read_sql('''
 select 
@@ -100,25 +98,7 @@ group by tahun_ajaran_yudisium
 order by tahun_ajaran_yudisium
 ''', con)
 
-tbl_masastudilulusan = pd.read_sql('''
-select * from 
-(select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as TahunMAsuk,
-SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan <42 then 1 else 0 end) as '3 - 3.5 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan <54  then 1 else 0 end) as '3.5 - 4.5 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <=84 then 1 else 0 end) as '4.5 - 7 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 tahun'
-from fact_yudisium
-inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa=fact_yudisium.id_mahasiswa
-group by TahunMAsuk
-order by TahunMAsuk) lulusan
-left join (
-    select count(id_mahasiswa), tahun_ajaran from fact_pmb
-    inner join dim_semester on dim_semester.id_semester=fact_pmb.id_semester AND id_prodi_diterima = 9
-    group by tahun_ajaran
-    order by tahun_ajaran
-) mhsditerima on mhsditerima.tahun_ajaran = TahunMAsuk
-''', con)
+# dfmhsKP= pd.read_sql('''''',con)
 
 tbl_masastudilulusan = pd.read_sql('''
 select * from 
@@ -140,15 +120,43 @@ left join (
 ) mhsditerima on mhsditerima.tahun_ajaran = TahunMAsuk
 ''', con)
 
-dfkpall = pd.read_sql('''
-select dim_semester.tahun_ajaran as 'Tahun Ajaran', count(*) as 'Jumlah KP'
-from fact_kp
-inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
+tbl_masastudilulusan = pd.read_sql('''
+select * from 
+(select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as TahunMAsuk,
+SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
+SUM(case when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan <42 then 1 else 0 end) as '3 - 3.5 Tahun',
+SUM(case when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan <54  then 1 else 0 end) as '3.5 - 4.5 Tahun',
+SUM(case when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <=84 then 1 else 0 end) as '4.5 - 7 Tahun',
+SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 tahun'
+from fact_yudisium
+inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa=fact_yudisium.id_mahasiswa
+group by TahunMAsuk
+order by TahunMAsuk) lulusan
+left join (
+    select count(id_mahasiswa), tahun_ajaran from fact_pmb
+    inner join dim_semester on dim_semester.id_semester=fact_pmb.id_semester AND id_prodi_diterima = 9
+    group by tahun_ajaran
+    order by tahun_ajaran
+) mhsditerima on mhsditerima.tahun_ajaran = TahunMAsuk
+''', con)
+
+dfkpall = pd.read_sql('''select count(*) as 'Jumlah KP', dim_semester.tahun_ajaran as "Tahun Ajaran",x.gasal as "Gasal",y.genap as "Genap" from fact_kp
+inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
 inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
-where fact_kp.is_pen_pkm = 1
+inner join (select count(*) as gasal, dim_semester.tahun_ajaran from fact_kp
+inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
+inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+where dim_semester.semester = 1
 group by dim_semester.tahun_ajaran
-order by dim_semester.tahun_ajaran
-''', con)
+order by  dim_semester.tahun_ajaran)x on x.tahun_ajaran=dim_semester.tahun_ajaran
+inner join (select count(*) as genap, dim_semester.tahun_ajaran from fact_kp
+inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
+inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+where dim_semester.semester = 2
+group by dim_semester.tahun_ajaran
+order by  dim_semester.tahun_ajaran)y on y.tahun_ajaran=dim_semester.tahun_ajaran
+group by dim_semester.tahun_ajaran,x.gasal,y.genap
+order by  dim_semester.tahun_ajaran''', con)
 
 dfkppkm = pd.read_sql('''
 select dim_semester.tahun_ajaran as 'Tahun Ajaran', count(*) as 'Jumlah KP' 
@@ -410,6 +418,18 @@ def toggle_collapse(n, is_open):
     return is_open
 
 
+layout = html.Div([
+    html.Div(html.H1('Analisis Skripsi, KP, dan Yudisium Prodi Informatika',
+                     style={'margin-top': '30px', 'textAlign': 'center'}
+                     )
+             ),
+    html.Div([dosbing]),
+    html.Div([lulusan]),
+    html.Div([masa_studi]),
+    html.Div([kp_prodi], style={'margin-bottom': '50px'})
+], style={'justify-content': 'center'})
+
+
 @app.callback(
     Output('grf_dosbing', 'figure'),
     Input('grf_dosbing', 'id'),
@@ -428,27 +448,6 @@ where dim_semester.tahun_ajaran=%(tahun_ajaran)s
 group by dim_dosen.nama, dim_semester.semester,"Semester Tahun Ajaran"
 order by dim_dosen.nama, dim_semester.semester''', con, params={'tahun_ajaran': value})
     fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Skripsi'], color=df['Semester Tahun Ajaran'], barmode='group')
-    return fig
-
-
-@app.callback(
-    Output('grf_masastudi', 'figure'),
-    Input('grf_masastudi', 'id')
-)
-def graphLulusSkripsi(id):
-    df = pd.read_sql('''
-    select count(*) as 'Jumlah Mahasiswa', dim_semester.tahun_ajaran as 'Tahun Ajaran'
-from fact_skripsi
-inner join(
-select count(*) as jumlah, id_mahasiswa from fact_skripsi
-group by id_mahasiswa
-) data_skripsi on data_skripsi.id_mahasiswa = fact_skripsi.id_mahasiswa AND data_skripsi.jumlah=1
-inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester
-where id_dosen_penguji1 <>''
-group by dim_semester.tahun_ajaran
-order by dim_semester.tahun_ajaran
-    ''', con)
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], barmode='group')
     return fig
 
 
@@ -498,6 +497,49 @@ group by dim_semester.tahun_ajaran
 order by dim_semester.tahun_ajaran''', con)
     fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=px.Constant('Jumlah Mahasiswa'),
                  labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
+    return fig
+
+
+@app.callback(
+    Output('grf_masastudi', 'figure'),
+    Input('grf_masastudi', 'id'),
+)
+def graphMasaStudi(id):
+    df = pd.read_sql('''select count(*) as "Jumlah Mahasiswa", dim_semester.tahun_ajaran as "Tahun Ajaran"
+from fact_skripsi
+inner join(
+select count(*) as jumlah, id_mahasiswa from fact_skripsi
+group by id_mahasiswa
+) data_skripsi on data_skripsi.id_mahasiswa = fact_skripsi.id_mahasiswa AND data_skripsi.jumlah=1
+inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester
+where id_dosen_penguji1 <>''
+group by dim_semester.tahun_ajaran
+order by dim_semester.tahun_ajaran''', con)
+    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'])
+    return fig
+
+
+@app.callback(
+    Output('grf_kpall', 'figure'),
+    Input('grf_kpall', 'id'),
+)
+def graphJmlMhsKP(id):
+    df = pd.read_sql('''select count(*) as 'Jumlah KP', dim_semester.tahun_ajaran as "Tahun Ajaran",if(dim_semester.semester=1,"GASAL","GENAP") as "Semester" from fact_kp
+inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
+inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+group by dim_semester.tahun_ajaran, dim_semester.semester
+order by  dim_semester.tahun_ajaran, dim_semester.semester''', con)
+    fig = px.bar(df, y=df['Jumlah KP'], x=df['Tahun Ajaran'], color=df['Semester'], barmode='group')
+    return fig
+
+
+@app.callback(
+    Output('grf_kppkm', 'figure'),
+    Input('grf_kppkm', 'id'),
+)
+def graphJmlMhsKPDosen(id):
+    df = dfkppkm
+    fig = px.bar(df, y=df['Jumlah KP'], x=df['Tahun Ajaran'])
     return fig
 
 

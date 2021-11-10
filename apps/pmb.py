@@ -7,9 +7,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from sqlalchemy import create_engine
 from plotly.subplots import make_subplots
-
 from dash.dependencies import Input, Output, State
 from appConfig import app
+from urllib.request import urlopen
+import json
+
+with urlopen(
+        'https://raw.githubusercontent.com/ans-4175/peta-indonesia-geojson/master/indonesia-prov.geojson') as response:
+    province = json.load(response)
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 dfseleksi = pd.read_sql('''select 
@@ -153,6 +158,10 @@ cardgrf_style = {
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
+cardoncard_style = {
+    'padding': '10px',
+}
+
 ttlgrf_style = {
     'textAlign': 'center',
     'padding': '10px',
@@ -282,41 +291,136 @@ mhsasmasmk = dbc.Container([
 
 mhsprovinsi = dbc.Container([
     dbc.Card([
-        html.H5('Lokasi Asal Mahasiswa Pendaftar',
+        html.H5('Lokasi Asal Calon Mahasiswa',
                 style=ttlgrf_style),
         html.Div(
             dcc.Tabs([
                 dcc.Tab(label='Pendaftar', value='daftar',
                         children=[
-                            dbc.CardLink(
-                                dcc.Graph(id='grf_mhsprovdaftar'),
-                                id='cll_grfmhsprovdaftar', n_clicks=0
-                            )
+                            dbc.Card([
+                                dbc.Row([
+                                    dbc.Col([
+                                        dcc.RadioItems(
+                                            id='radio_daftar',
+                                            options=[{'label': 'Persebaran', 'value': 'geojson'},
+                                                     {'label': 'Jumlah', 'value': 'bar'}
+                                                     ],
+                                            value='geojson',
+                                            style={'width': '100%', 'padding-bottom': '0px',
+                                                   'padding-top': '0.7rem'},
+                                            className='card-body',
+                                            labelStyle={'display': 'block'}
+                                        ),
+                                    ], width=6),
+                                    dbc.Col([
+                                        html.Div([
+                                            dcc.Dropdown(
+                                                id='drpdwn_TAdaftar',
+                                                options=[{'label': '2015/2016', 'value': '2015/2016'}],
+                                                value='2015/2016',
+                                                style={'color': 'black'},
+                                                clearable=False,
+                                            ),
+                                        ],id='visi_TAdaftar')
+                                    ], width=6),
+                                ]),
+                                dbc.CardLink(
+                                    dcc.Graph(id='grf_mhsprovdaftar'),
+                                    id='cll_grfmhsprovdaftar', n_clicks=0
+                                ),
+                            ], style={'padding': '10px', 'border': 'white'})
                         ], style=tab_style, selected_style=selected_style),
                 dcc.Tab(label='Lolos Seleksi', value='lolos',
                         children=[
-                            dbc.CardLink(
-                                dcc.Graph(id='grf_mhsprovlolos'),
-                                id='cll_grfmhsprovlolos', n_clicks=0
-                            )
+                            dbc.Card([
+                                dbc.Row([
+                                    dbc.Col([
+                                        dcc.RadioItems(
+                                            id='radio_lolos',
+                                            options=[{'label': 'Persebaran', 'value': 'geojson'},
+                                                     {'label': 'Jumlah', 'value': 'bar'}
+                                                     ],
+                                            value='geojson',
+                                            style={'width': '100%', 'padding-bottom': '0px',
+                                                   'padding-top': '0.7rem'},
+                                            className='card-body',
+                                            labelStyle={'display': 'block'}
+                                        ),
+                                    ], width=6),
+                                    dbc.Col([
+                                        html.Div([
+                                            dcc.Dropdown(
+                                                id='drpdwn_TAlolos',
+                                                options=[{'label': '2015/2016', 'value': '2015/2016'}],
+                                                value='2015/2016',
+                                                style={'color': 'black'},
+                                                clearable=False,
+                                            ),
+                                        ], id='visi_TAlolos')
+                                    ], width=6),
+                                ]),
+                                dbc.CardLink(
+                                    dcc.Graph(id='grf_mhsprovlolos'),
+                                    id='cll_grfmhsprovlolos', n_clicks=0
+                                ),
+                            ], style={'padding': '10px', 'border': 'white'})
                         ], style=tab_style, selected_style=selected_style),
                 dcc.Tab(label='Registrasi Ulang', value='regis',
                         children=[
-                            dbc.CardLink(
-                                dcc.Graph(id='grf_mhsprovregis'),
-                                id='cll_grfmhsprovregis', n_clicks=0
-                            )
+                            dbc.Card([
+                                dbc.Row([
+                                    dbc.Col([
+                                        dcc.RadioItems(
+                                            id='radio_regis',
+                                            options=[{'label': 'Persebaran', 'value': 'geojson'},
+                                                     {'label': 'Jumlah', 'value': 'bar'}
+                                                     ],
+                                            value='geojson',
+                                            style={'width': '100%', 'padding-bottom': '0px',
+                                                   'padding-top': '0.7rem'},
+                                            className='card-body',
+                                            labelStyle={'display': 'block'}
+                                        ),
+                                    ], width=6),
+                                    dbc.Col([
+                                        html.Div([
+                                            dcc.Dropdown(
+                                                id='drpdwn_TAregis',
+                                                options=[{'label': '2015/2016', 'value': '2015/2016'}],
+                                                value='2015/2016',
+                                                style={'color': 'black'},
+                                                clearable=False,
+                                            ),
+                                        ], id='visi_TAregis')
+                                    ], width=6),
+                                ]),
+                                dbc.CardLink(
+                                    dcc.Graph(id='grf_mhsprovregis'),
+                                    id='cll_grfmhsprovregis', n_clicks=0
+                                ),
+                            ], style={'padding': '10px', 'border': 'white'})
                         ], style=tab_style, selected_style=selected_style)
             ], style=tabs_styles, id='tab_mhsprov', value='daftar'
             )
         )
     ], style=cardgrf_style),
     dbc.Collapse(
-
         id='cll_tblmhsprov',
         is_open=False
     ),
 ], style=cont_style)
+
+layout = html.Div([
+    html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
+                     style={'margin-top': '30px', 'textAlign': 'center'}
+                     )
+             ),
+    html.Div([mhsseleksi]),
+    html.Div([mhsasing]),
+    html.Div([mhsrasio]),
+    html.Div([mhsasmasmk]),
+    html.Div([mhsprovinsi], style={'margin-bottom': '50px'})
+], style={'justify-content': 'center'})
 
 
 @app.callback(
@@ -443,19 +547,6 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
     if nregis and prov == 'regis':
         return not is_open, isiRegis
     return is_open, None
-
-
-layout = html.Div([
-    html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
-                     style={'margin-top': '30px', 'textAlign': 'center'}
-                     )
-             ),
-    html.Div([mhsseleksi]),
-    html.Div([mhsasing]),
-    html.Div([mhsrasio]),
-    html.Div([mhsasmasmk]),
-    html.Div([mhsprovinsi], style={'margin-bottom': '50px'})
-], style={'justify-content': 'center'})
 
 
 @app.callback(
@@ -608,33 +699,118 @@ def graphAsalSekolah(id):
 
 
 @app.callback(
-    Output('grf_mhsprovdaftar', 'figure'),
-    Input('grf_mhsprovdaftar', 'id')
+    Output('grf_jsonprovdaftar', 'figure'),
+    Output('grf_jsonprovlolos', 'figure'),
+    Output('grf_jsonprovregis', 'figure'),
+    Input('grf_jsonprovdaftar', 'id')
 )
-def graphProvincePendaftar(id):
-    df = dfmhsprovdaftar
-    fig = px.bar(df, x=df['Provinsi'], y=df['Jumlah Pendaftar'], color=df['Tahun Ajaran'], barmode='group')
-    fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-    return fig
+def graphProvinceJson(id):
+    figdaftar = px.choropleth_mapbox(dfmhsprovdaftar, geojson=province, locations="Provinsi",
+                                     color_continuous_scale="Viridis",
+                                     featureidkey="properties.Propinsi",
+                                     center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                     mapbox_style="carto-positron",
+                                     color='Jumlah Pendaftar')
+    figlolos = px.choropleth_mapbox(dfmhsprovlolos, geojson=province, locations="Provinsi",
+                                    color_continuous_scale="Viridis",
+                                    featureidkey="properties.Propinsi",
+                                    center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                    mapbox_style="carto-positron",
+                                    color='Pendaftar Lolos Seleksi')
+    figregis = px.choropleth_mapbox(dfmhsprovregis, geojson=province, locations="Provinsi",
+                                    color_continuous_scale="Viridis",
+                                    featureidkey="properties.Propinsi",
+                                    center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                    mapbox_style="carto-positron",
+                                    color='Pendaftar Registrasi Ulang')
+    return figdaftar, figlolos, figregis
 
+
+@app.callback(
+    Output('grf_mhsprovdaftar', 'figure'),
+    Output('visi_TAdaftar', 'hidden'),
+    Input('drpdwn_TAdaftar', 'value'),
+    Input('radio_daftar', 'value')
+)
+def graphProvinceDaftar(valueDrpdwn, valueRadio):
+    dfJson = pd.read_sql('''select
+    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+where ds.tahun_ajaran=%(TA)s
+group by ds.tahun_ajaran, dl.provinsi
+order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
+    if valueRadio == 'bar':
+        bardaftar = px.bar(dfmhsprovdaftar, x=dfmhsprovdaftar['Provinsi'], y=dfmhsprovdaftar['Jumlah Pendaftar'],
+                           color=dfmhsprovdaftar['Tahun Ajaran'], barmode='group')
+        bardaftar.update_layout(xaxis=go.layout.XAxis(tickangle=45))
+        return bardaftar, True
+    else:
+        jsondaftar = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
+                                          color_continuous_scale="Viridis",
+                                          featureidkey="properties.Propinsi",
+                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                          mapbox_style="carto-positron",
+                                          color='Jumlah Pendaftar')
+        return jsondaftar, False
 
 @app.callback(
     Output('grf_mhsprovlolos', 'figure'),
-    Input('grf_mhsprovlolos', 'id')
+    Output('visi_TAlolos', 'hidden'),
+    Input('drpdwn_TAlolos', 'value'),
+    Input('radio_lolos', 'value')
 )
-def graphProvinceSeleksi(id):
-    df = dfmhsprovlolos
-    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Lolos Seleksi'], color=df['Tahun Ajaran'], barmode='group')
-    fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-    return fig
-
+def graphProvinceLolos(valueDrpdwn, valueRadio):
+    dfJson = pd.read_sql('''select
+    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Pendaftar Lolos Seleksi'
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+where fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
+and ds.tahun_ajaran=%(TA)s
+group by ds.tahun_ajaran, dl.provinsi
+order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
+    if valueRadio == 'bar':
+        barlolos = px.bar(dfmhsprovlolos, x=dfmhsprovlolos['Provinsi'], y=dfmhsprovlolos['Pendaftar Lolos Seleksi'],
+                           color=dfmhsprovlolos['Tahun Ajaran'], barmode='group')
+        barlolos.update_layout(xaxis=go.layout.XAxis(tickangle=45))
+        return barlolos, True
+    else:
+        jsonlolos = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
+                                          color_continuous_scale="Viridis",
+                                          featureidkey="properties.Propinsi",
+                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                          mapbox_style="carto-positron",
+                                          color='Pendaftar Lolos Seleksi')
+        return jsonlolos, False
 
 @app.callback(
     Output('grf_mhsprovregis', 'figure'),
-    Input('grf_mhsprovregis', 'id')
+    Output('visi_TAregis', 'hidden'),
+    Input('drpdwn_TAregis', 'value'),
+    Input('radio_regis', 'value')
 )
-def graphProvinceRegis(id):
-    df = dfmhsprovregis
-    fig = px.bar(df, x=df['Provinsi'], y=df['Pendaftar Registrasi Ulang'], color=df['Tahun Ajaran'], barmode='group')
-    fig.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-    return fig
+def graphProvinceRegis(valueDrpdwn, valueRadio):
+    dfJson = pd.read_sql('''select
+    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Pendaftar Registrasi Ulang'
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+and ds.tahun_ajaran=%(TA)s
+group by ds.tahun_ajaran, dl.provinsi
+order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
+    if valueRadio == 'bar':
+        barregis = px.bar(dfmhsprovregis, x=dfmhsprovregis['Provinsi'], y=dfmhsprovregis['Pendaftar Registrasi Ulang'],
+                           color=dfmhsprovregis['Tahun Ajaran'], barmode='group')
+        barregis.update_layout(xaxis=go.layout.XAxis(tickangle=45))
+        return barregis, True
+    else:
+        jsonregis = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
+                                          color_continuous_scale="Viridis",
+                                          featureidkey="properties.Propinsi",
+                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                          mapbox_style="carto-positron",
+                                          color='Pendaftar Registrasi Ulang')
+        return jsonregis, False
