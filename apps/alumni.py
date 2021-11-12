@@ -1,14 +1,17 @@
 import dash
 import pandas as pd
 import dash_table as dt
-from dash import html, dcc
+import plotly.express as px
 import dash_bootstrap_components as dbc
+from apps import pmb, registrasi, kegiatan_kerjasama, tgsakhir, alumni, ppp
+from dash.dependencies import Input, Output, State
 from sqlalchemy import create_engine
+from appConfig import app, server
 from dash import html, dcc
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
-tbl_masatunggu = pd.read_sql('''
+dfmasatunggu = pd.read_sql('''
 select data2.*, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
  (
     select tahun_lulus,
@@ -39,7 +42,7 @@ left join(
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
 order by tahun_lulus;''', con)
 
-tbl_bidangkerja = pd.read_sql('''
+dfbidangkerja = pd.read_sql('''
  select data2.tahun_lulus as "Tahun Lulus", 
         TINGGI as 'Tinggi', SEDANG as 'Sedang', RENDAH as 'Rendah', LAINNYA as 'Lainnya',
         lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" 
@@ -74,7 +77,7 @@ left join(
 order by data2.tahun_lulus
 ''', con)
 
-tbl_tempatkerja = pd.read_sql('''
+dftempatkerja = pd.read_sql('''
  select data2.tahun_lulus as 'Tahun Lulus', Lokal+Regional as 'Lokal/Regional', Nasional, Internasional, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
  (
     select tahun_lulus,
@@ -106,7 +109,7 @@ left join(
 order by terlacak.tahun_lulus
 ''', con)
 
-tbl_skill = pd.read_sql('''
+dfskill = pd.read_sql('''
 select kriteria as Kriteria, 
     SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as Jumlah, 
     concat(round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Sangat Baik",
@@ -209,14 +212,88 @@ select kriteria as Kriteria,
 order by nomor
 ''', con)
 
-masatunggu = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('8.d.1 Waktu Tunggu Lulusan Program Sarjana',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row([
+dfjabatan = pd.read_sql('''
+select 
+count(*) as Jumlah, 
+ifnull(posisi_jabatan_alumni,'LAINNYA') as Posisi, 
+posisi_jabatan_alumni as 'Jabatan Alumni'
+from fact_tracer_study tracer
+inner join dim_lulusan on dim_lulusan.id_lulusan = tracer.id_lulusan
+where dim_lulusan.tahun_lulus='2015'
+group by posisi, posisi_jabatan_alumni
+order by posisi_jabatan_alumni desc
+''', con)
+
+dfperusahaan = pd.read_sql('''
+select nama_mapping_organisasi as 'Nama Perusahaan', count(*) as 'Jumlah Lulusan'
+from fact_tracer_study tracer
+inner join dim_lulusan on tracer.id_lulusan = dim_lulusan.id_lulusan
+inner join dim_organisasi_pengguna_lulusan org on dim_lulusan.id_organisasi_pengguna_lulusan = org.id_organisasi_pengguna_lulusan
+where dim_lulusan.tahun_lulus='2015'
+group by nama_mapping_organisasi
+order by 'Jumlah Lulusan' desc
+limit 15
+''',con)
+
+tabs_styles = {
+    'background': '#FFFFFF',
+    'color': '#b0b0b0',
+    'border': 'white'
+}
+
+tab_style = {
+    'background': "#FFFFFF",
+    'border-bottom-color': '#ededed',
+    'border-top-color': 'white',
+    'border-left-color': 'white',
+    'border-right-color': 'white',
+    'color': '#b0b0b0',
+    'align-items': 'center',
+    'justify-content': 'center'
+}
+
+selected_style = {
+    "background": "#FFFFFF",
+    'align-items': 'center',
+    'border-bottom': '2px solid',
+    'border-top-color': 'white',
+    'border-bottom-color': '#2780e3',
+    'border-left-color': 'white',
+    'border-right-color': 'white'
+}
+
+cont_style = {
+    'padding': '0px',
+    'justify-content': 'center',
+    'margin-top': '25px'
+}
+
+cardgrf_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
+ttlgrf_style = {
+    'textAlign': 'center',
+    'padding': '10px',
+    'color': 'black'
+}
+
+masatunggu = dbc.Container([
+    dbc.Card([
+        html.H5('8.d.1 Waktu Tunggu Lulusan Program Sarjana',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody(
+                dcc.Graph(id='grf_masatunggu')
+            ),
+            id='cll_grfmasatunggu',
+            n_clicks=0
+        )
+    ], style=cardgrf_style),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_masatunggu',
@@ -229,127 +306,188 @@ masatunggu = dbc.CardGroup([
                     {'name': '>18 Bulan', 'id': '>18 BULAN'},
                     {'name': 'Lainnya', 'id': 'LAINNYA'}
                 ],
-                data=tbl_masatunggu.to_dict('records'),
+                data=dfmasatunggu.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '600px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-            ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
+            ), style=cardgrf_style
         ),
-        dbc.Card(
-            dcc.Graph(id='grf_masatunggu', style={'width': '70vh', 'height': '90vh'}),
-            style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
-        )
-    ])
-], style={'margin-top': '50px', 'justify-content': 'center'})
+        id='cll_tblmasatunggu',
+        is_open=False
+    )
+], style=cont_style)
 
-bidangkerja = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('8.d.2 Kesesuaian Bidang Kerja Lulusan',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row([
+bidangkerja = dbc.Container([
+    dbc.Card([
+        html.H5('8.d.2 Kesesuaian Bidang Kerja Lulusan',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody(
+                dcc.Graph(id='grf_bidangkerja')
+            ),
+            id='cll_grfbidangkerja',
+            n_clicks=0
+        ),
+    ], style=cardgrf_style),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_bidangkerja',
-                columns=[{"name": i, "id": i} for i in tbl_bidangkerja.columns],
-                data=tbl_bidangkerja.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dfbidangkerja.columns],
+                data=dfbidangkerja.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '600px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-            ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
+            ), style=cardgrf_style
         ),
-        dbc.Card(
-            dcc.Graph(id='grf_bidangkerja', style={'width': '70vh', 'height': '90vh'}),
-            style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
-        )
-    ])
-], style={'margin-top': '20px', 'justify-content': 'center'})
+        id='cll_tblbidangkerja',
+        is_open=False
+    )
+], style=cont_style)
 
-tempatkerja = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('8.e.1 Tempat Kerja Lulusan',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row([
+tempatkerja = dbc.Container([
+    dbc.Card([
+        html.H5('8.e.1 Tempat Kerja Lulusan',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody(
+                dcc.Graph(id='grf_tempatkerja')
+            ),
+            id='cll_grftempatkerja',
+            n_clicks=0
+        ),
+    ], style=cardgrf_style),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_tempatkerja',
-                columns=[{"name": i, "id": i} for i in tbl_tempatkerja.columns],
-                data=tbl_tempatkerja.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dftempatkerja.columns],
+                data=dftempatkerja.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '600px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-            ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
+            ), style=cardgrf_style
         ),
-        dbc.Card(
-            dcc.Graph(id='grf_tempatkerja', style={'width': '70vh', 'height': '90vh'}),
-            style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
-        )
-    ])
-], style={'margin-top': '20px', 'justify-content': 'center'})
+        id='cll_tblseleksi',
+        is_open=False
+    )
+], style=cont_style)
 
-kemampuan = dbc.CardGroup([
-    dbc.Row(
-        dbc.Card('8.e.1 Kemampuan Lulusan',
-                 style={'justify-content': 'center', 'width': '1200px', 'textAlign': 'center'}
-                 )
-        , style={'z-index': '2'}
-    ),
-    dbc.Row([
+kemampuan = dbc.Container([
+    dbc.Card([
+        html.H5('8.e.1 Kemampuan Lulusan',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody(
+                dcc.Graph(id='grf_skill')
+            ),
+            id='cll_grfskill',
+            n_clicks=0
+        ),
+    ], style=cardgrf_style),
+    dbc.Collapse(
         dbc.Card(
             dt.DataTable(
                 id='tbl_skill',
-                columns=[{"name": i, "id": i} for i in tbl_skill.columns],
-                data=tbl_skill.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dfskill.columns],
+                data=dfskill.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'width': '600px', 'padding': '10px'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
-            ), style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
+            ), style=cardgrf_style
         ),
-        dbc.Card(dcc.Graph(id='grf_skill', style={'width': '70vh', 'height': '90vh'}),
-                 style={'height': '400px', 'width': '600px', 'justify-content': 'center'}
-                 )
-    ])
-], style={'margin-top': '20px', 'justify-content': 'center'})
+        id='cll_tblskill',
+        is_open=False
+    )
+], style=cont_style)
 
-tab_lulusanlkps = html.Div([
+jabatan = dbc.Container([
+    dbc.Card([
+        html.H5('Posisi Jabatan Lulusan pada Perusahaan',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody(
+                dcc.Graph(id='grf_jabatan')
+            ),
+            id='cll_grfjabatan',
+            n_clicks=0
+        ),
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_jabatan',
+                columns=[{"name": i, "id": i} for i in dfjabatan.columns],
+                data=dfjabatan.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
+            ), style=cardgrf_style
+        ),
+        id='cll_tbljabatan',
+        is_open=False
+    )
+], style=cont_style)
+
+perusahaan = dbc.Container([
+    dbc.Card([
+        html.H5('Lulusan pada Perusahaan',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody(
+                dcc.Graph(id='grf_perusahaan')
+            ),
+            id='cll_grfperusahaan',
+            n_clicks=0
+        ),
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_perusahaan',
+                columns=[{"name": i, "id": i} for i in dfperusahaan.columns],
+                data=dfperusahaan.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'}
+            ), style=cardgrf_style
+        ),
+        id='cll_tblperusahaan',
+        is_open=False
+    )
+], style=cont_style)
+
+tab_alumni = html.Div([
     html.Div(
-        html.H1(
-            'Analisis Lulusan dan Tracer Study Prodi Informatika [LKPS]',
+        html.H5(
+            'Analisis Lulusan dan Tracer Study Prodi Informatika',
             style={'margin-top': '30px', 'text-align': 'center'}
         )
     ),
     masatunggu,
     bidangkerja,
     tempatkerja,
-    kemampuan
+    kemampuan,
+    jabatan,
+    perusahaan
 ])
 
-tab_lulusannon = html.Div([
+tab_fasilitas = html.Div([
     html.Div(
-        html.H1(
-            'Analisis Lulusan dan Tracer Study Prodi Informatika',
-            style={'margin-top': '30px', 'text-align': 'center'}
-        )
-    ),
-])
-
-tab_alumni = html.Div([
-    html.Div(
-        html.H1(
-            'Kepuasan Fasilitas dan Layanan',
+        html.H5(
+            'Analisis Kepuasan Lulusan terhadap Fasilitas dan Layanan Prodi Informatika',
             style={'margin-top': '30px', 'text-align': 'center'}
         )
     ),
@@ -357,15 +495,84 @@ tab_alumni = html.Div([
 
 layout = html.Div([
     dbc.Container([
-        html.Div(html.H1('Analisis Lulusan, Tracer Study, Kepuasan Fasilitas dan Layanan',
+        html.Div(html.H4('Analisis Lulusan, Tracer Study, Kepuasan Fasilitas dan Layanan',
                          style={'margin-top': '30px', 'textAlign': 'center'}
                          )
                  ),
         dbc.Tabs([
-            dbc.Tab(label='Alumni [LKPS]', tab_id='lulusanLKPS'),
-            dbc.Tab(label='Alumni', tab_id='alumni'),
-            dbc.Tab(label='Fasilitas & Layanan', tab_id='fasilitas')
-        ], active_tab='lulusanLKPS', id='cardTabsAlumni'),
-        html.Div([], id='cardContentRegistrasi')
-    ], fluid=True, style={'margin-bottom': '50px'}),
-], style={'justify-content': 'center'})
+            dbc.Tab(label='Alumni', tab_id='alumni', style=tabs_styles),
+            dbc.Tab(label='Fasilitas & Layanan', tab_id='fasilitas',style=tabs_styles)
+        ], active_tab='alumni', id='cardTabsAlumni',style=tabs_styles),
+        html.Div([], id='cardContentAlumni')
+    ], fluid=True, style=cardgrf_style),
+])
+
+
+@app.callback(
+    Output("cll_tblmasatunggu", "is_open"),
+    [Input("cll_grfmasatunggu", "n_clicks")],
+    [State("cll_tblmasatunggu", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tbltempatkerja", "is_open"),
+    [Input("cll_grftempatkerja", "n_clicks")],
+    [State("cll_tbltempatkerja", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblbidangkerja", "is_open"),
+    [Input("cll_grfbidangkerja", "n_clicks")],
+    [State("cll_tblbidangkerja", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblskill", "is_open"),
+    [Input("cll_grfskill", "n_clicks")],
+    [State("cll_tblskill", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tbljabatan", "is_open"),
+    [Input("cll_grfjabatan", "n_clicks")],
+    [State("cll_tbljabatan", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output("cll_tblperusahaan", "is_open"),
+    [Input("cll_grfperusahaan", "n_clicks")],
+    [State("cll_tblperusahaan", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output('cardContentAlumni', 'children'),
+    [Input("cardTabsAlumni", "active_tab")]
+)
+def tab_contentRegistrasi(active_tab):
+    if active_tab == 'alumni':
+        return tab_alumni
+    if active_tab == 'fasilitas':
+        return tab_fasilitas

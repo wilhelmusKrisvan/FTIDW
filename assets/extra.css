@@ -8,7 +8,16 @@
 #tbl_mhsprovlolos button.export,
 #tbl_mhsprovregis button.export,
 #tbl_kpall button.export,
-#tbl_kppkm button.export{
+#tbl_kppkm button.export,
+tbl_jafunglast button.export,
+#tbl_jafunggrowth button.export,
+#tbl_mahasiswaAktif button.export,
+#tbl_mahasiswaAsing button.export,
+#tbl_matkulBaru button.export,
+#tbl_matkulBatal button.export,
+#tbl_matkulTawar button.export,
+#tbl_dosenTetap button.export,
+#tbl_dosenIndustri button.export{
     width: 120px;
     height: 30px;
     border-radius: 10px;
@@ -16,8 +25,8 @@
     border: 1px solid #fafafa;
     color: white;
     background-color: #2780e3;
-    margin-right: 20px;
-    position: absolute;
+    margin-left: 15px;
+    margin-top: 20px;
     right: 0;
 }
 
