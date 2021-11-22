@@ -5,42 +5,36 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
-import numpy as np
 from dash.dependencies import Input, Output, State
-from dask.array.tests.test_array_core import test_blockwise_1_in_shape_I
 from sqlalchemy import create_engine
 from appConfig import app, server
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
-dfbebanajarinf = pd.read_sql('''select ds.tahun_ajaran, ds.semester_nama, dd.nik, dd.nama, dd.nama_gelar, dm.kode_matakuliah, dm.nama_matakuliah, dm.sks,fact_dosen_mengajar.sifat_mengajar
+dfbebanajarinf = pd.read_sql('''
+select
+ds.tahun_ajaran 'Tahun Ajaran',
+ds.semester_nama 'Semester',
+dd.nama 'Nama Dosen',
+sum(dm.sks) 'SKS'
 from fact_dosen_mengajar
 inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
 inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
 inner join dim_matakuliah dm on fact_dosen_mengajar.id_matakuliah = dm.id_matakuliah
-where is_batal = 0 and dd.id_prodi = 9
-order by ds.tahun_ajaran, ds.semester, dd.nama''', con)
+where is_batal = 0 and dd.id_prodi = 9 and substr(tahun_ajaran,1,4)>=2018
+group by ds.tahun_ajaran, ds.semester_nama, dd.nama
+order by ds.tahun_ajaran desc, ds.semester_nama desc, dd.nama''', con)
 
-tbl_dosenTetap = pd.read_sql('''select nama, nik, nomor_induk,tipe_nomor_induk,jenis_kelamin,no_sertifikat, status_yayasan from dim_dosen
+tbl_dosenTetap = pd.read_sql('''
+select nama, nik, nomor_induk,tipe_nomor_induk,jenis_kelamin,no_sertifikat, status_yayasan from dim_dosen
 where id_prodi = 9 and status_yayasan = "TETAP"''', con)
 
 tbl_dosenIndustri = pd.read_sql('''select * from dim_dosen''', con)
 
-dfjafunglast = pd.read_sql('''
-select replace(jabatan_dosen,'T','') as 'Jabatan Dosen', count(*) as 'Jumlah' from (    
-    select distinct jabatan_dosen, data.id_dosen from(
-        select factGol.id_dosen, max(id_tanggal_terima_jabatan) as id_tanggal_terima_jabatan from fact_golongan_dosen_pemerintah factGol
-        inner join dim_dosen dimD on factGol.id_dosen = dimD.id_dosen
-        inner join dim_date tglJabat on tglJabat.id_date = factGol.id_tanggal_terima_jabatan
-        where id_prodi = 9
-        group by id_dosen 
-    ) data
-    inner join fact_golongan_dosen_pemerintah factGol2 on data.id_tanggal_terima_jabatan = factGol2.id_tanggal_terima_jabatan and data.id_dosen = factGol2.id_dosen
-    -- group by jabatan_dosen
-    order by data.id_dosen
-)data2
-group by 'Jabatan Dosen'
-order by 'Jabatan Dosen' ''', con)
+dfjafunglast = pd.read_sql('''select count(distinct dd.id_dosen) as Jumlah, jabatan_dosen 'Jabatan Dosen' from dosen_jabfung_monev df
+inner join dim_dosen dd on df.id_dosen = dd.id_dosen
+where tanggal_keluar is null and status_dosen='TETAP' AND tahun=2021 and id_prodi=9
+group by jabatan_dosen ''', con)
 
 dfjafunggrowth = pd.read_sql('''
 select Jabatan_dosen,  
@@ -164,7 +158,7 @@ bebandosen = dbc.Container([
                       'border-radius': '10px',
                       'padding': '10px',
                       'width': '100%',
-                      'height': '339px',
+                      'height': '390px',
                       'justify-content': 'right',
                       'box-shadow': '5px 10px 30px #ebedeb'}
             ), width=5
@@ -183,7 +177,8 @@ bebandosen = dbc.Container([
                                  'overflowY': 'auto', 'margin-top': '25px'},
                     style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                     style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                    page_size=5
+                    page_size=5,
+                    export_format='xlsx'
                 )
             ], style=cardgrf_style
             ), width=7
@@ -300,7 +295,7 @@ ipkmahasiswa = dbc.Container([
         html.H5('Rata-rata IPK Mahasiswa Aktif Tiap Semester',
                 style=ttlgrf_style),
         dbc.CardBody(
-            dcc.Graph(id='grf_ipkMosen')
+            dcc.Graph(id='grf_ipkMahasiswa')
         )
     ], style=cardgrf_style)
 ], style=cont_style)
@@ -504,18 +499,52 @@ def toggle_collapse(nlast, ngrowth, jafung, is_open):
         return not is_open, isiGrowth
     return is_open, None
 
+@app.callback(
+    Output('grf_bebanDosen','figure'),Input('grf_bebanDosen','id')
+)
+def FillRateDosen(id):
+    df=pd.read_sql('''select sks.`Tahun Ajaran`,semester_nama 'Semester', sks.SKS/dosen.Jumlah as 'Rata-rata Beban Ajar' from
+(select
+ds.tahun_ajaran 'Tahun Ajaran',
+substr(ds.tahun_ajaran,1,4) as Tahun,
+semester_nama,
+sum(dm.sks) 'SKS'
+from fact_dosen_mengajar
+inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
+inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
+inner join dim_matakuliah dm on fact_dosen_mengajar.id_matakuliah = dm.id_matakuliah
+where is_batal = 0 and dd.id_prodi = 9 and substr(tahun_ajaran,1,4)>=2018
+group by ds.tahun_ajaran,semester_nama,Tahun
+order by ds.tahun_ajaran) sks,
+(select sum(Jumlah) as Jumlah,2020 as tahun from
+(select count(*) as Jumlah,year(tanggal_masuk) as tahun
+from dim_dosen where id_prodi=9 and status_dosen='Tetap' group by tahun) data where data.tahun<2020
+union all
+select sum(Jumlah) as Jumlah,2019 as tahun from
+(select count(*) as Jumlah,year(tanggal_masuk) as tahun
+from dim_dosen where id_prodi=9 and status_dosen='Tetap' group by tahun) data where data.tahun<2019
+union all
+select sum(Jumlah) as Jumlah,2018 as tahun from
+(select count(*) as Jumlah,year(tanggal_masuk) as tahun 
+from dim_dosen where id_prodi=9 and status_dosen='Tetap' group by tahun) data where data.tahun<2018) dosen
+where CONVERT(sks.Tahun,int)=convert(dosen.tahun, int)
+order by `Tahun Ajaran` desc''',con)
+    fig=px.bar(df,x=df['Tahun Ajaran'],y=df['Rata-rata Beban Ajar'],color=df['Semester'])
+    fig.update_layout(barmode='group')
+    return fig
+
 
 @app.callback(
     Output("grf_ipkDosen", 'figure'), Input('grf_ipkDosen', 'id')
 )
 def FillIpkDosen(id):
-    df = pd.read_sql('''select ds.tahun_ajaran, ds.semester_nama, round(avg(fid.ipk),2) as "Rata-Rata"
+    df = pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama 'Semester', round(avg(fid.ipk),2) as "Rata-Rata"
 from fact_ipk_dosen fid
 inner join dim_dosen ddo on ddo.id_dosen = fid.id_dosen
 inner join dim_semester ds on ds.id_semester = fid.id_semester
 group by ds.tahun_ajaran, ds.semester_nama
 order by ds.tahun_ajaran, ds.semester_nama''', con)
-    fig = px.bar(df, x=df['tahun_ajaran'], y=df['Rata-Rata'], color=df['semester_nama'])
+    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Semester'])
     fig.update_layout(barmode='group')
     return fig
 
@@ -536,16 +565,10 @@ def graphJabatanDosen(id):
     Input('grf_jafunggrowth', 'id')
 )
 def graphPeningkatanJabatan(id):
-    df = pd.read_sql('''select Jabatan_dosen as "Jabatan Dosen", Tahun, count(*) as Jumlah
-from (
-    select distinct nama_gelar, jabatan_dosen ,  tglJabat.tahun from fact_golongan_dosen_pemerintah factGol
-    inner join dim_dosen dimD on factGol.id_dosen = dimD.id_dosen
-    inner join dim_date tglJabat on tglJabat.id_date = factGol.id_tanggal_terima_jabatan
-    where id_prodi = 9
-)data
-where tahun >= 2014 and tahun < 2021
-group by `Jabatan Dosen`, tahun
-order by `Jabatan Dosen`, tahun''', con)
+    df = pd.read_sql('''select count(distinct dd.id_dosen) Jumlah, jabatan_dosen 'Jabatan Dosen', tahun Tahun from dosen_jabfung_monev df
+inner join dim_dosen dd on df.id_dosen = dd.id_dosen
+where tanggal_keluar is null and status_dosen='TETAP' AND tahun>=2018 and id_prodi=9
+group by jabatan_dosen, tahun''', con)
     fig = px.bar(df, x=df["Tahun"], y=df['Jumlah'], color=df['Jabatan Dosen'],
                  labels=dict(x="Tahun", y="Jumlah", color="Jenis Jabatan"))
     return fig

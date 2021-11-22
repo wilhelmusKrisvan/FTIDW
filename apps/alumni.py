@@ -4,7 +4,7 @@ import dash_table as dt
 import plotly.express as px
 import dash_bootstrap_components as dbc
 from apps import pmb, registrasi, kegiatan_kerjasama, tgsakhir, alumni, ppp
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input,Output,State
 from sqlalchemy import create_engine
 from appConfig import app, server
 from dash import html, dcc
@@ -116,7 +116,7 @@ select kriteria as Kriteria,
     concat(round(BAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Baik",
     concat(round(CUKUP/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Cukup",
     concat(round(KURANG/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Kurang"
-    
+
     from (
     select "1" as nomor, "INTEGRITAS" as kriteria, 
     sum(case when integritas = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
@@ -233,7 +233,7 @@ where dim_lulusan.tahun_lulus='2015'
 group by nama_mapping_organisasi
 order by 'Jumlah Lulusan' desc
 limit 15
-''',con)
+''', con)
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -501,8 +501,8 @@ layout = html.Div([
                  ),
         dbc.Tabs([
             dbc.Tab(label='Alumni', tab_id='alumni', style=tabs_styles),
-            dbc.Tab(label='Fasilitas & Layanan', tab_id='fasilitas',style=tabs_styles)
-        ], active_tab='alumni', id='cardTabsAlumni',style=tabs_styles),
+            dbc.Tab(label='Fasilitas & Layanan', tab_id='fasilitas', style=tabs_styles)
+        ], active_tab='alumni', id='cardTabsAlumni', style=tabs_styles),
         html.Div([], id='cardContentAlumni')
     ], fluid=True, style=cardgrf_style),
 ])
@@ -557,6 +557,7 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+
 @app.callback(
     Output("cll_tblperusahaan", "is_open"),
     [Input("cll_grfperusahaan", "n_clicks")],
@@ -576,3 +577,132 @@ def tab_contentRegistrasi(active_tab):
         return tab_alumni
     if active_tab == 'fasilitas':
         return tab_fasilitas
+
+
+@app.callback(
+    Output('grf_masatunggu', 'figure'),
+    Input('grf_masatunggu', 'id')
+)
+def graphMasaTunggu(id):
+    df = pd.read_sql('''select count(*) as Jumlah, ifnull(waktu_tunggu,"LAINNYA") as "Waktu Tunggu",
+    ifnull(lulusan.jumlah,0) as "Lulusan",dim_lulusan.tahun_lulus as "Tahun Lulus"
+        from fact_tracer_study fact
+        inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+left join (
+    select count(id_mahasiswa) as jumlah, tahun_lulus
+    from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
+    from fact_yudisium) data
+    group by tahun_lulus
+)lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
+group by `Waktu Tunggu` ,dim_lulusan.tahun_lulus,Lulusan
+        order by dim_lulusan.tahun_lulus asc''', con)
+    fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Waktu Tunggu"], barmode='stack',
+                 labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
+    fig.add_scatter(x=df["Tahun Lulus"], y=df["Lulusan"], name='Lulusan',
+                    hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}", mode='lines+markers')
+    return fig
+
+
+@app.callback(
+    Output('grf_bidangkerja', 'figure'),
+    Input('grf_bidangkerja', 'id')
+)
+def graphBidangKerja(id):
+    df = pd.read_sql('''select count(*) as Jumlah, 
+    ifnull(tingkat_kesesuaian_bidang_kerja,"LAINNYA") as "Kesesuaian Bidang Kerja", 
+    ifnull(lulusan.jumlah,0) as "Jumlah Lulusan", dim_lulusan.tahun_lulus as "Tahun Lulus"
+        from fact_tracer_study fact
+        inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+left join(
+    select count(id_mahasiswa) as jumlah, tahun_lulus
+    from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
+    from fact_yudisium) data
+    group by tahun_lulus
+)lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
+group by dim_lulusan.tahun_lulus,`Kesesuaian Bidang Kerja`,`Jumlah Lulusan`
+        order by dim_lulusan.tahun_lulus asc''', con)
+    fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"], barmode='stack',
+                 labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
+    fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
+                    hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+    return fig
+
+
+@app.callback(
+    Output('grf_tempatkerja', 'figure'),
+    Input('grf_tempatkerja', 'id')
+)
+def graphTempatKerja(id):
+    df = dftempatkerja
+    fig = px.line(df, x=df["Tahun Lulus"], y=df["Lulusan Terlacak"], color=px.Constant('Lulusan Terlacak'),
+                 labels=dict(x="Tahun Lulus", y="Lingkup Kerja", color="Lulusan"))
+    fig.add_bar(x=df["Tahun Lulus"], y=df["Lokal/Regional"], name='Lokal/Regional',
+                hovertemplate="Lulusan=Total Lulusan <br>Tahun Lulus=%{x} </br> Jumlah=%{y}")
+    fig.add_bar(x=df["Tahun Lulus"], y=df["Nasional"], name='Nasional',
+                hovertemplate="Lulusan=Total Lulusan <br>Tahun Lulus=%{x} </br> Jumlah=%{y}")
+    fig.add_bar(x=df["Tahun Lulus"], y=df["Internasional"], name='Internasional',
+                hovertemplate="Lulusan=Total Lulusan <br>Tahun Lulus=%{x} </br> Jumlah=%{y}")
+    fig.update_layout(barmode='stack')
+    # fig.add_scatter(x=df["Tahun Lulus"], y=df["Lulusan Terlacak"], name='Lulusan Terlacak', mode='lines+markers',
+    #                 hovertemplate="Lulusan=Total Lulusan <br>Tahun Lulus=%{x} </br> Jumlah=%{y}")
+    return fig
+
+
+# @app.callback(
+#     Output('grf_skill','figure'),
+#     Input('grf_skill','id')
+# )
+# def graphSkill(id):
+#     df= pd.read_sql('''''',con)
+#     fig=px.bar(df,x=df["Integritas"],y=df["Sangat Baik"],color=df['Kriteria'],
+#                labels=dict(x="Tahun Lulus", y="Lingkup Kerja", color="Lulusan"))
+#     fig.add_bar(x=df["Tahun Lulus"],y=df["Nasional"],name='Nasional',
+#                     hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+#     fig.add_bar(x=df["Tahun Lulus"], y=df["Internasional"], name='Internasional',
+#                 hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+#     return fig
+
+@app.callback(
+    Output('grf_jabatan', 'figure'),
+    Input('grf_jabatan', 'id')
+)
+def graphJabatan(id):
+    df = pd.read_sql('''select count(*) as Jumlah, ifnull(posisi_jabatan_alumni,'LAINNYA') as Posisi, posisi_jabatan_alumni
+from fact_tracer_study tracer
+inner join dim_lulusan on dim_lulusan.id_lulusan = tracer.id_lulusan
+group by posisi, posisi_jabatan_alumni
+order by posisi_jabatan_alumni desc''', con)
+    fig = px.bar(df, x=df['Posisi'], y=df['Jumlah'], color=px.Constant('Jabatan'),
+                 labels=dict(x="Jabatan", y="Jumlah", color="Jabatan"))
+    return fig
+
+
+# @app.callback(
+#     Output('grf_skill','figure'),
+#     Input('grf_skill','id')
+# )
+# def graphSkill(id):
+#     df= pd.read_sql('''''',con)
+#     fig=px.bar(df,x=df["Integritas"],y=df["Sangat Baik"],color=df['Kriteria'],
+#                labels=dict(x="Tahun Lulus", y="Lingkup Kerja", color="Lulusan"))
+#     fig.add_bar(x=df["Tahun Lulus"],y=df["Nasional"],name='Nasional',
+#                     hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+#     fig.add_bar(x=df["Tahun Lulus"], y=df["Internasional"], name='Internasional',
+#                 hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+#     return fig
+
+@app.callback(
+    Output('grf_perusahaan', 'figure'),
+    Input('grf_perusahaan', 'id')
+)
+def graphPerusahaan(id):
+    df = pd.read_sql('''select count(*) as Jumlah, nama_mapping_organisasi as "Perusahaan"
+    from fact_tracer_study tracer
+    inner join dim_lulusan on tracer.id_lulusan = dim_lulusan.id_lulusan
+    inner join dim_organisasi_pengguna_lulusan org on dim_lulusan.id_organisasi_pengguna_lulusan = org.id_organisasi_pengguna_lulusan
+    group by `Perusahaan`
+    order by jumlah desc
+    limit 15''', con)
+    fig = px.bar(df, x=df['Perusahaan'], y=df['Jumlah'], color=px.Constant('Perusahaan'),
+                 labels=dict(x="Perusahaan", y="Jumlah", color="Perusahaan"))
+    return fig

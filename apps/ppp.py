@@ -5,7 +5,6 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from dash.dependencies import Input, Output, State
-from dask.array.tests.test_array_core import test_blockwise_1_in_shape_I
 from sqlalchemy import create_engine
 from appConfig import app, server
 
