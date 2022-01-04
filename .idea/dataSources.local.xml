@@ -2,7 +2,7 @@
 <project version="4">
   <component name="dataSourceStorageLocal">
     <data-source name="dw@fti" uuid="086f2af8-7dc0-4be6-a439-87233ff150f5">
-      <database-info product="MariaDB" version="10.5.11-MariaDB" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="2.6.0" dbms="MARIADB" exact-version="10.5.11" exact-driver-version="2.6">
+      <database-info product="MariaDB" version="10.5.13-MariaDB" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="2.6.0" dbms="MARIADB" exact-version="10.5.13" exact-driver-version="2.6">
         <extra-name-characters>#@</extra-name-characters>
         <identifier-quote-string>`</identifier-quote-string>
       </database-info>
@@ -10,7 +10,10 @@
       <user-name>wilhelmus</user-name>
       <schema-mapping>
         <introspection-scope>
-          <node kind="schema" qname="@" />
+          <node kind="schema">
+            <name qname="@" />
+            <name qname="datawarehouse" />
+          </node>
         </introspection-scope>
       </schema-mapping>
       <ssh-properties>

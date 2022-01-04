@@ -2,7 +2,8 @@ from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
 from appConfig import app, server
-from dash.dependencies import Input, Output
+from dash.dependencies import \
+    Input, Output
 from flask_login import logout_user, current_user
 from apps import pmb,registrasi,kegiatan_kerjasama,tgsakhir,alumni,ppp
 import login, home, profile, admin
@@ -183,4 +184,4 @@ def navBarPage(input1):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

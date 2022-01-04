@@ -1,6 +1,6 @@
 import dash
-import pandas as pd
 import dash_table as dt
+import pandas as pd
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
@@ -10,113 +10,30 @@ from plotly.subplots import make_subplots
 from dash.dependencies import Input, Output, State
 from appConfig import app
 from urllib.request import urlopen
+import model.data as data
 import json
 
 with urlopen(
-        'https://raw.githubusercontent.com/ans-4175/peta-indonesia-geojson/master/indonesia-prov.geojson') as response:
+        'https://raw.githubusercontent.com/wilhelmusKrisvan/GEOJSON_IDN/main/IDN_prov.json') as response:
     province = json.load(response)
 
-con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-dfseleksi = pd.read_sql('''select 
-dataMahasiswa.tahun_aka as 'Tahun Ajaran', dy_tampung as 'Daya Tampung',jml_pendaftar as 'Pendaftar', 
-lolos as 'Lolos Seleksi', baru as 'Baru Reguler', Barutransfer as 'Baru Transfer', 
-aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
-    select dataPendaftar.*, count(id_tanggal_lolos_seleksi) as lolos, count(id_mahasiswa) as baru,  
-    0 as Barutransfer
-    from(
-    select dy.id_semester, tahun_ajaran as tahun_aka, dy.jumlah as dy_tampung, count(fpmbDaftar.id_pmb)  as jml_pendaftar 
-    from dim_daya_tampung dy
-    inner join dim_semester smstr on dy.id_semester = smstr.id_semester
-    inner join dim_prodi prodi on prodi.id_prodi = dy.id_prodi
-    left join fact_pmb fpmbDaftar on dy.id_semester = fpmbDaftar.id_semester and (fpmbDaftar.id_prodi_pilihan_1 || fpmbDaftar.id_prodi_pilihan_3 || fpmbDaftar.id_prodi_pilihan_3 = 9)
-    where kode_prodi = '71' and dy.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
-    group by tahun_aka, dy_tampung, dy.id_semester
-    ) dataPendaftar
-    left join fact_pmb fpmbLolos on dataPendaftar.id_semester = fpmbLolos.id_semester and fpmbLolos.id_prodi_diterima = 9
-    group by id_semester, tahun_aka,dy_tampung, jml_pendaftar
-    order by id_semester asc
-)dataMahasiswa
-left join (
-select count(*) as jmlaktif, tahun_ajaran from fact_mahasiswa_status
-left join dim_semester on fact_mahasiswa_status.id_semester = dim_semester.id_semester
-where status = 'AK' 
-group by tahun_ajaran
-)aktif on aktif.tahun_ajaran = tahun_aka ''', con)
+dfseleksi = data.getSeleksi()
 
-dfmhsasing = pd.read_sql('''
-select data.nama_prodi as 'Program Studi', tahun_semster as 'Tahun Ajaran', jumlah as 'Jumlah', parttime as 'Parttime', (jumlah - parttime) as 'Fulltime'
-from (
-select dim_prodi.nama_prodi, concat(tahun_angkatan, '/', cast(tahun_angkatan+1 as char(4))) as tahun_semster, count(*) as jumlah,
-SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
-from dim_mahasiswa
-inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_prodi.id_prodi = 9 || 10)
-where warga_negara = 'WNA'
-group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
-) data
-inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran = '2018/2019' limit 1)
-order by nama_prodi, tahun_semster desc
-''', con)
+dfmhsasing = data.getMahasiswaAsing()
 
-dfmhsrasio = pd.read_sql('''
-select tahun_ajaran as 'Tahun Ajaran', jumlah as 'Jumlah', pendaftar_regis as 'Pendaftar Registrasi',
-concat(round(jumlah/jumlah,0) ,' : ', round(pendaftar_regis/jumlah,2)) as 'Rasio Daya Tampung : Pendaftar Registrasi'
-from(
-    SELECT ds.tahun_ajaran,ds.kode_semester,dt.jumlah,
-        sum(case when id_tanggal_registrasi is not null and id_prodi_diterima = 9 then 1 else 0 end) as pendaftar_regis
-    FROM fact_pmb
-    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
-    inner join dim_daya_tampung dt on ds.id_semester = dt.id_semester and dt.id_prodi = 9
-    group by ds.kode_semester, ds.tahun_ajaran,dt.jumlah
-    order by ds.tahun_ajaran
-) as DataMentah
-''', con)
+dfmhssmasmk = data.getJenisSekolahPendaftar()
 
-dfmhssmasmk = pd.read_sql('''
-select
-       (case
-           when tipe_sekolah_asal=1 then "NEGERI"
-           WHEN tipe_sekolah_asal=2 THEN "SWASTA"
-           when tipe_sekolah_asal=3 then "N/A"
-       END)
-           as 'Tipe Sekolah Asal', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
-from fact_pmb
-inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
-where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
-group by ds.tahun_ajaran,'Tipe Sekolah Asal'
-order by ds.tahun_ajaran
-''', con)
+dfmhsprovdaftar = data.getProvinsiDaftar()
 
-dfmhsprovdaftar = pd.read_sql('''
-select
-    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
-from fact_pmb
-inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
-inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
-group by ds.tahun_ajaran, dl.provinsi
-order by ds.tahun_ajaran, dl.provinsi
-''', con)
+dfmhsprovlolos = data.getProvinsiLolos()
 
-dfmhsprovlolos = pd.read_sql('''
-select
-    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Pendaftar Lolos Seleksi'
-from fact_pmb
-inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
-inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
-where fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
-group by ds.tahun_ajaran, dl.provinsi
-order by ds.tahun_ajaran, dl.provinsi
-''', con)
+dfmhsprovregis = data.getProvinsiRegis()
 
-dfmhsprovregis = pd.read_sql('''
-select
-    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Pendaftar Registrasi Ulang'
-from fact_pmb
-inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
-inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
-where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
-group by ds.tahun_ajaran, dl.provinsi
-order by ds.tahun_ajaran, dl.provinsi
-''', con)
+dfmhsrasio = data.getRasioCalonMahasiswa()
+
+dfmhsJml = data.getPerkembanganJumlahMaba()
+
+dfmhsPersenNaik = data.getPersentaseKenaikanMaba()
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -410,6 +327,66 @@ mhsprovinsi = dbc.Container([
     ),
 ], style=cont_style)
 
+mhsKembangJml = dbc.Container([
+    dbc.Card([
+        html.H5('Perkembangan Jumlah Penerimaan Mahasiswa Baru',
+                style=ttlgrf_style),
+        dbc.CardLink([
+            dcc.Graph(id='grf_mhsJml')
+        ], id='cll_grfJml',
+            n_clicks=0)
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_Jml',
+                columns=[{"name": i, "id": i} for i in dfmhsJml.columns],
+                data=dfmhsJml.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                export_format='xlsx',
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
+            ), style=cardgrf_style
+        ),
+        id='cll_tblJml',
+        is_open=False
+    )
+], style=cont_style)
+
+mhsPersenNaik = dbc.Container([
+    dbc.Card([
+        html.H5('Persentase Kenaikan Penerimaan Mahasiswa Baru',
+                style=ttlgrf_style),
+        dbc.CardLink([
+            dcc.Graph(id='grf_mhsPersenNaik')
+        ], id='cll_grfPersenNaik',
+            n_clicks=0)
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_PersenNaik',
+                columns=[{"name": i, "id": i} for i in dfmhsPersenNaik.columns],
+                data=dfmhsPersenNaik.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                export_format='xlsx',
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
+            ), style=cardgrf_style
+        ),
+        id='cll_tblPersenNaik',
+        is_open=False
+    )
+], style=cont_style)
+
 layout = html.Div([
     html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
                      style={'margin-top': '30px', 'textAlign': 'center'}
@@ -419,10 +396,14 @@ layout = html.Div([
     html.Div([mhsasing]),
     html.Div([mhsrasio]),
     html.Div([mhsasmasmk]),
-    html.Div([mhsprovinsi], style={'margin-bottom': '50px'})
+    html.Div([mhsprovinsi]),
+    html.Div([mhsKembangJml]),
+    html.Div([mhsPersenNaik],style={'margin-bottom': '50px'}),
 ], style={'justify-content': 'center'})
 
 
+
+# CONTROL COLLAPSE
 @app.callback(
     Output("cll_tblseleksi", "is_open"),
     [Input("cll_grfseleksi", "n_clicks")],
@@ -431,7 +412,6 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
-
 
 @app.callback(
     Output("cll_tblasing", "is_open"),
@@ -465,7 +445,6 @@ def toggle_collapse(nall, ninf, nsi, mhs, is_open):
         return not is_open, isiMhsAsing
     return is_open, None
 
-
 @app.callback(
     Output("cll_tblrasio", "is_open"),
     [Input("cll_grfrasio", "n_clicks")],
@@ -475,7 +454,6 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
-
 @app.callback(
     Output("cll_tblsmasmk", "is_open"),
     [Input("cll_grfsmasmk", "n_clicks")],
@@ -484,7 +462,6 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
-
 
 @app.callback(
     Output("cll_tblmhsprov", "is_open"),
@@ -548,7 +525,27 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
         return not is_open, isiRegis
     return is_open, None
 
+@app.callback(
+    Output("cll_tblJml", "is_open"),
+    [Input("cll_grfJml", "n_clicks")],
+    [State("cll_tblJml", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
 
+@app.callback(
+    Output("cll_tblPersenNaik", "is_open"),
+    [Input("cll_grfPersenNaik", "n_clicks")],
+    [State("cll_tblPersenNaik", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+
+# SHOW GRAPHIC ANALYSIS
 @app.callback(
     Output('grf_mhsseleksi', 'figure'),
     Input('grf_mhsseleksi', 'id')
@@ -576,13 +573,12 @@ def graphSeleksi(id):
                     hovertemplate="Jenis Pendaftar=Aktif Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
     return fig
 
-
 @app.callback(
     Output('grf_mhsasing', 'figure'),
     Input('grf_mhsasing', 'id')
 )
 def graphMhsAsing(id):
-    df = pd.read_sql('''select tahun_semster as "Tahun Semester", Jumlah, parttime,(Jumlah - parttime) as fulltime
+    df = data.getDataFrameFromDB('''select tahun_semster as "Tahun Semester", Jumlah, parttime,(Jumlah - parttime) as fulltime
 from (
 select concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, count(*) as Jumlah,
 SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
@@ -592,7 +588,7 @@ where warga_negara = 'WNA'
 group by tahun_semster, tahun_angkatan
 ) data
 inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
-order by tahun_semster asc''', con)
+order by tahun_semster asc''')
     fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
                  labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
     fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
@@ -601,13 +597,12 @@ order by tahun_semster asc''', con)
                     hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
     return fig
 
-
 @app.callback(
     Output('grf_mhsasingINF', 'figure'),
     Input('grf_mhsasingINF', 'id')
 )
 def graphMhsAsingINF(id):
-    df = pd.read_sql('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
+    df = data.getDataFrameFromDB('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
 from (
 select dim_prodi.nama_prodi, concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, count(*) as jumlah,
 SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
@@ -617,7 +612,7 @@ where warga_negara = 'WNA'
 group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
 ) data
 inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
-order by nama_prodi, tahun_semster asc''', con)
+order by nama_prodi, tahun_semster asc''')
     fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
                  labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
     fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
@@ -626,13 +621,12 @@ order by nama_prodi, tahun_semster asc''', con)
                     hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
     return fig
 
-
 @app.callback(
     Output('grf_mhsasingSI', 'figure'),
     Input('grf_mhsasingSI', 'id')
 )
 def graphMhsAsingSI(id):
-    df = pd.read_sql('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
+    df = data.getDataFrameFromDB('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
 from (
 select dim_prodi.nama_prodi, concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, count(*) as jumlah,
 SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
@@ -642,7 +636,7 @@ where warga_negara = 'WNA'
 group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
 ) data
 inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
-order by nama_prodi, tahun_semster asc''', con)
+order by nama_prodi, tahun_semster asc''')
     fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
                  labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
     fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
@@ -651,30 +645,29 @@ order by nama_prodi, tahun_semster asc''', con)
                     hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
     return fig
 
-
 @app.callback(
     Output('grf_mhsrasio', 'figure'),
     Input('grf_mhsrasio', 'id')
 )
 def graphRasioDTPR(id):
-    df_dayaTampung = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', ddt.jumlah as "Jumlah Daya Tampung" from dim_daya_tampung ddt
+    df_dayaTampung = data.getDataFrameFromDB('''select ds.tahun_ajaran as 'Tahun Ajaran', ddt.jumlah as "Jumlah Daya Tampung" from dim_daya_tampung ddt
 inner join dim_semester ds on ddt.id_semester = ds.id_semester
 where id_prodi = 9 and ds.tahun_ajaran in ('2015/2016',
-'2016/2017','2017/2018','2018/2019')''', con)
-    df_pendaftarRegistrasi = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
+'2016/2017','2017/2018','2018/2019')''')
+    df_pendaftarRegistrasi = data.getDataFrameFromDB('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
 inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
 where fpmb.id_tanggal_registrasi is not null and fpmb.id_prodi_diterima = 9
 group by ds.tahun_ajaran
-order by ds.tahun_ajaran''', con)
-    df_lolosSeleksi = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar' from fact_pmb fpmb
+order by ds.tahun_ajaran''')
+    df_lolosSeleksi = data.getDataFrameFromDB('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar' from fact_pmb fpmb
 inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
 where fpmb.id_tanggal_lolos_seleksi is not null and fpmb.id_prodi_diterima = 9
 group by ds.tahun_ajaran
-order by ds.tahun_ajaran''', con)
-    df_pendaftar = pd.read_sql('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
+order by ds.tahun_ajaran''')
+    df_pendaftar = data.getDataFrameFromDB('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
 inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
 group by ds.tahun_ajaran 
-order by ds.tahun_ajaran''', con)
+order by ds.tahun_ajaran''')
     fig = px.bar(df_dayaTampung, x=df_dayaTampung['Tahun Ajaran'], y=df_dayaTampung['Jumlah Daya Tampung'],
                  color=px.Constant('Daya Tampung'), labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
     fig.add_scatter(x=df_pendaftarRegistrasi['Tahun Ajaran'], y=df_pendaftarRegistrasi['Jumlah Pendaftar'],
@@ -686,7 +679,6 @@ order by ds.tahun_ajaran''', con)
                     hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
     return fig
 
-
 @app.callback(
     Output('grf_mhssmasmk', 'figure'),
     Input('grf_mhssmasmk', 'id')
@@ -696,7 +688,6 @@ def graphAsalSekolah(id):
     fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'], color=df['Tipe Sekolah Asal'])
     fig.update_layout(barmode='group')
     return fig
-
 
 @app.callback(
     Output('grf_jsonprovdaftar', 'figure'),
@@ -720,11 +711,10 @@ def graphProvinceJson(id):
     figregis = px.choropleth_mapbox(dfmhsprovregis, geojson=province, locations="Provinsi",
                                     color_continuous_scale="Viridis",
                                     featureidkey="properties.Propinsi",
-                                    center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                    center={"lat": -0.47399, "lon": 113.29266}, zoom=3.5,
                                     mapbox_style="carto-positron",
                                     color='Pendaftar Registrasi Ulang')
     return figdaftar, figlolos, figregis
-
 
 @app.callback(
     Output('grf_mhsprovdaftar', 'figure'),
@@ -733,14 +723,14 @@ def graphProvinceJson(id):
     Input('radio_daftar', 'value')
 )
 def graphProvinceDaftar(valueDrpdwn, valueRadio):
-    dfJson = pd.read_sql('''select
+    dfJson = data.getDataFrameFromDBwithParams('''select
     dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
 from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
 inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
 where ds.tahun_ajaran=%(TA)s
 group by ds.tahun_ajaran, dl.provinsi
-order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
+order by ds.tahun_ajaran, dl.provinsi''', {'TA': valueDrpdwn})
     if valueRadio == 'bar':
         bardaftar = px.bar(dfmhsprovdaftar, x=dfmhsprovdaftar['Provinsi'], y=dfmhsprovdaftar['Jumlah Pendaftar'],
                            color=dfmhsprovdaftar['Tahun Ajaran'], barmode='group')
@@ -750,7 +740,7 @@ order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
         jsondaftar = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
                                           color_continuous_scale="Viridis",
                                           featureidkey="properties.Propinsi",
-                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                          center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
                                           mapbox_style="carto-positron",
                                           color='Jumlah Pendaftar')
         return jsondaftar, False
@@ -762,7 +752,7 @@ order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
     Input('radio_lolos', 'value')
 )
 def graphProvinceLolos(valueDrpdwn, valueRadio):
-    dfJson = pd.read_sql('''select
+    dfJson = data.getDataFrameFromDBwithParams('''select
     dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Pendaftar Lolos Seleksi'
 from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
@@ -770,7 +760,7 @@ inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
 where fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
 and ds.tahun_ajaran=%(TA)s
 group by ds.tahun_ajaran, dl.provinsi
-order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
+order by ds.tahun_ajaran, dl.provinsi''', {'TA': valueDrpdwn})
     if valueRadio == 'bar':
         barlolos = px.bar(dfmhsprovlolos, x=dfmhsprovlolos['Provinsi'], y=dfmhsprovlolos['Pendaftar Lolos Seleksi'],
                            color=dfmhsprovlolos['Tahun Ajaran'], barmode='group')
@@ -780,7 +770,7 @@ order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
         jsonlolos = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
                                           color_continuous_scale="Viridis",
                                           featureidkey="properties.Propinsi",
-                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                          center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
                                           mapbox_style="carto-positron",
                                           color='Pendaftar Lolos Seleksi')
         return jsonlolos, False
@@ -792,7 +782,7 @@ order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
     Input('radio_regis', 'value')
 )
 def graphProvinceRegis(valueDrpdwn, valueRadio):
-    dfJson = pd.read_sql('''select
+    dfJson = data.getDataFrameFromDBwithParams('''select
     dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Pendaftar Registrasi Ulang'
 from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
@@ -800,7 +790,7 @@ inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
 where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
 and ds.tahun_ajaran=%(TA)s
 group by ds.tahun_ajaran, dl.provinsi
-order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
+order by ds.tahun_ajaran, dl.provinsi''', {'TA': valueDrpdwn})
     if valueRadio == 'bar':
         barregis = px.bar(dfmhsprovregis, x=dfmhsprovregis['Provinsi'], y=dfmhsprovregis['Pendaftar Registrasi Ulang'],
                            color=dfmhsprovregis['Tahun Ajaran'], barmode='group')
@@ -810,7 +800,27 @@ order by ds.tahun_ajaran, dl.provinsi''', con, params={'TA': valueDrpdwn})
         jsonregis = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
                                           color_continuous_scale="Viridis",
                                           featureidkey="properties.Propinsi",
-                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
+                                          center={"lat": -0.789275, "lon": 113.921327}, zoom=3.25,
                                           mapbox_style="carto-positron",
                                           color='Pendaftar Registrasi Ulang')
         return jsonregis, False
+
+@app.callback(
+    Output('grf_mhsJml', 'figure'),
+    Input('grf_mhsJml', 'id')
+)
+def graphPerkembanganJumlahMaba(id):
+    df = dfmhsJml
+    fig = px.line(df, x=df['Tahun Ajaran'], y=df['Jumlah'],)
+    fig.update_traces(mode='lines+markers')
+    return fig
+
+@app.callback(
+    Output('grf_mhsPersenNaik', 'figure'),
+    Input('grf_mhsPersenNaik', 'id')
+)
+def graphPersentaseKenaikanMaba(id):
+    df = dfmhsPersenNaik
+    fig = px.line(df, x=df['Tahun Ajaran'], y=df['% Pertumbuhan'])
+    fig.update_traces(mode='lines+markers')
+    return fig
