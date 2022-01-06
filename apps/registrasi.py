@@ -1,14 +1,11 @@
-import dash
-import pandas as pd
 import dash_table as dt
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
-import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from sqlalchemy import create_engine
 from appConfig import app, server
-import model.data as data
+import model.dao_kbm as data
 
 tbl_matkulBaru = data.getMatkulBaru()
 tbl_MatkulBatal = data.getMatkulBatal()

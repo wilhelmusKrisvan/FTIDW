@@ -10,7 +10,7 @@ from plotly.subplots import make_subplots
 from dash.dependencies import Input, Output, State
 from appConfig import app
 from urllib.request import urlopen
-import model.data as data
+import model.dao_pmb as data
 import json
 
 with urlopen(
