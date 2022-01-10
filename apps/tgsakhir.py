@@ -17,8 +17,6 @@ dfdosbing = data.getMahasiswaBimbinganSkripsi()
 
 dflulusan = data.getIPK()
 
-#dfjmllulusan = data.getJmlLulusan()
-
 dfavgmasa = data.getRateMasaStudi()
 
 dfmasastudilulusan = data.getMasaStudi()
@@ -26,6 +24,16 @@ dfmasastudilulusan = data.getMasaStudi()
 dfkppkm = data.getMahasiswaKPpkm()
 
 dfkpall = data.getMahasiswaKP()
+
+dfskripmhs = data.getMhahasiswaSkripsipkm()
+
+dfmitra = data.getMitraKP()
+
+dfttgumhs = data.getTTGU()
+
+dfpersen_mhsLulus = data.getMahasiswaLulus()
+
+dfpersen_mhsLulusAngkt = data.getMahasiswaLulusBandingTotal()
 
 Fillsemester = pd.read_sql('select tahun_ajaran from dim_semester', con)
 semester = Fillsemester['tahun_ajaran'].dropna().unique()
@@ -115,7 +123,7 @@ dosbing = dbc.Container([
     )
 ], style=cont_style)
 
-lulusan = dbc.Container([
+ipk_lulusan = dbc.Container([
     dbc.Card([
         html.H5('8.a. IPK Lulusan',
                 style=ttlgrf_style),
@@ -142,21 +150,42 @@ lulusan = dbc.Container([
 ], style=cont_style)
 
 masa_studi = dbc.Container([
-    dbc.CardLink(
-        dbc.Card([
-            html.H5('Grafik Lulusan Skripsi Tepat Waktu',
-                    style=ttlgrf_style),
-            dcc.Graph(
-                id='grf_jmllulusan',
-                style={'height': '100%'}
-            )],
-            style={'border': '1px solid #fafafa',
-                   'border-radius': '10px',
-                   'justify-content': 'center',
-                   'width': '100%',
-                   'box-shadow': '5px 10px 30px #ebedeb'}
-        )
-    ),
+    dbc.Row([
+        dbc.Col([
+            dbc.CardLink(
+                dbc.Card([
+                    html.H5('Grafik Lulusan Setiap Tahun Ajaran',
+                            style=ttlgrf_style),
+                    dcc.Graph(
+                        id='grf_jmllulusan',
+                        style={'height': '100%'}
+                    )],
+                    style={'border': '1px solid #fafafa',
+                           'border-radius': '10px',
+                           'justify-content': 'center',
+                           'width': '100%',
+                           'box-shadow': '5px 10px 30px #ebedeb'}
+                )
+            ),
+        ]),
+        dbc.Col([
+            dbc.CardLink(
+                dbc.Card([
+                    html.H5('Grafik Mahasiswa Lulus Skripsi Tepat Waktu',
+                            style=ttlgrf_style),
+                    dcc.Graph(
+                        id='grf_skriplulusan',
+                        style={'height': '100%'}
+                    )],
+                    style={'border': '1px solid #fafafa',
+                           'border-radius': '10px',
+                           'justify-content': 'center',
+                           'width': '100%',
+                           'box-shadow': '5px 10px 30px #ebedeb'}
+                )
+            ),
+        ])
+    ], style={'margin-top': '10px'}),
     dbc.Row([
         dbc.Col(
             dbc.Card([
@@ -235,15 +264,134 @@ kp_prodi = dbc.Container([
     )
 ], style=cont_style)
 
+ttguKP = dbc.Container([
+    dbc.Row([
+        dbc.Col(
+            dbc.Card([
+                html.H5('Mahasiswa KP yang Memiliki output Teknologi Tepat Guna (TTGU)',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_ttgumhs',
+                    columns=[{"name": i, "id": i} for i in dfttgumhs.columns],
+                    data=dfttgumhs.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                )
+            ], style=cardgrf_style
+            ),
+        )
+    ], style={'margin-top': '10px'})
+], style=cont_style)
+
+skripsi = dbc.Container([
+    dbc.Row([
+        dbc.Col(
+            dbc.Card([
+                html.H5('Mahasiswa Skripsi Terlibat PKM',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_skripmhs',
+                    columns=[{"name": i, "id": i} for i in dfskripmhs.columns],
+                    data=dfskripmhs.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                )
+            ], style=cardgrf_style
+            ),
+        )
+    ], style={'margin-top': '10px'})
+], style=cont_style)
+
+mitra = dbc.Container([
+    dbc.Row([
+        dbc.Col(
+            dbc.Card([
+                html.H5('Mitra yang Terlibat di setiap Semester berdasarkan Tingkat Wilayah',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_mitra',
+                    columns=[{"name": i, "id": i} for i in dfmitra.columns],
+                    data=dfmitra.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                )
+            ], style=cardgrf_style
+            ),
+        )
+    ], style={'margin-top': '10px'})
+], style=cont_style)
+
+persen_mhsLulus = dbc.Container([
+    dbc.Row([
+        dbc.Col(
+            dbc.Card([
+                html.H5('Persentase Mahasiswa Lulus Tepat Waktu setiap Tahun Ajaran',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_persen_mhsLulus',
+                    columns=[{"name": i, "id": i} for i in dfpersen_mhsLulus.columns],
+                    data=dfpersen_mhsLulus.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                )
+            ], style=cardgrf_style
+            ),
+        ),
+        dbc.Col([
+            dbc.Card([
+                html.H5('Persentase Mahasiswa Lulus dibanding Total Jumlah Mahasiswa',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='tbl_persen_mhsLulusAngkt',
+                    columns=[{"name": i, "id": i} for i in dfpersen_mhsLulusAngkt.columns],
+                    data=dfpersen_mhsLulusAngkt.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=3
+                )
+            ], style=cardgrf_style
+            ),
+        ]),
+    ], style={'margin-top': '10px'})
+], style=cont_style)
+
 layout = html.Div([
     html.Div(html.H1('Analisis Skripsi, KP, dan Yudisium Prodi Informatika',
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
     html.Div([dosbing]),
-    html.Div([lulusan]),
+    html.Div([ipk_lulusan]),
+    html.Div([persen_mhsLulus]),
     html.Div([masa_studi]),
-    html.Div([kp_prodi], style={'margin-bottom': '50px'})
+    html.Div([kp_prodi]),
+    html.Div([ttguKP]),
+    html.Div([skripsi]),
+    html.Div([mitra], style={'margin-bottom': '50px'})
 ], style={'justify-content': 'center'})
 
 
@@ -256,6 +404,7 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+
 @app.callback(
     Output("cll_tbldosbing", "is_open"),
     [Input("cll_grfdosbing", "n_clicks")],
@@ -265,6 +414,7 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+
 @app.callback(
     Output("cll_tbllulusan", "is_open"),
     [Input("cll_grflulusan", "n_clicks")],
@@ -273,6 +423,7 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
 
 @app.callback(
     Output('cll_tblkp', 'is_open'),
@@ -323,37 +474,34 @@ def toggle_collapse(nall, npkm, kp, is_open):
     Input('drpdwn_TA', 'value'),
 )
 def graphDosbing(id, value):
-    df = pd.read_sql('''select count(*) as "Jumlah Skripsi",dim_dosen.nama as "Nama Dosen", dim_semester.semester,
-CASE dim_semester.semester
-    WHEN 1 THEN "Ganjil"
-    WHEN 2 THEN "Genap"
-  END as "Semester Tahun Ajaran"
-from fact_skripsi
-inner join dim_dosen on fact_skripsi.id_dosen_pembimbing1 = dim_dosen.id_dosen and dim_dosen.id_prodi = 9
-inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester 
-where dim_semester.tahun_ajaran=%(tahun_ajaran)s
-group by dim_dosen.nama, dim_semester.semester,"Semester Tahun Ajaran"
-order by dim_dosen.nama, dim_semester.semester''', con, params={'tahun_ajaran': value})
-    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Skripsi'], color=df['Semester Tahun Ajaran'], barmode='group')
+    df = data.getDataFrameFromDBwithParams('''select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',count(id_mahasiswa) 'Jumlah Mahasiswa', nama 'Nama Dosen' 
+    from fact_skripsi fs
+inner join dim_dosen dd on fs.id_dosen_pembimbing1=dd.id_dosen
+inner join dim_semester ds on fs.id_semester = ds.id_semester
+where tahun_ajaran=%(tahun_ajaran)s
+group by tahun_ajaran,semester_nama,nama
+order by tahun_ajaran desc, semester_nama asc''', {'tahun_ajaran': value})
+    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Mahasiswa'], color=df['Semester'], barmode='group')
     return fig
+
 
 @app.callback(
     Output('grf_ipklulusan', 'figure'),
     Input('grf_ipklulusan', 'id'),
 )
 def graphIPKLulusan(id):
-    dfavg = pd.read_sql('''select avg(ipk) as 'Rata-rata IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+    dfavg = data.getDataFrameFromDB('''select avg(ipk) as 'Rata-rata IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
 from fact_yudisium
 group by tahun_ajaran_yudisium
-order by tahun_ajaran_yudisium''', con)
-    dfmax = pd.read_sql('''select max(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+order by tahun_ajaran_yudisium''')
+    dfmax = data.getDataFrameFromDB('''select max(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
 from fact_yudisium
 group by tahun_ajaran_yudisium
-order by tahun_ajaran_yudisium''', con)
-    dfmin = pd.read_sql('''select min(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+order by tahun_ajaran_yudisium''')
+    dfmin = data.getDataFrameFromDB('''select min(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
     from fact_yudisium
     group by tahun_ajaran_yudisium
-    order by tahun_ajaran_yudisium''', con)
+    order by tahun_ajaran_yudisium''')
     fig = px.bar(dfavg, y=dfavg['Rata-rata IPK'], x=dfavg['Tahun Ajaran'], color=px.Constant('Rata-rata IPK'),
                  labels=dict(x="Tahun Ajaran", y="IPK", color="IPK"))
     fig.add_scatter(y=dfmax['IPK'], x=dfmax['Tahun Ajaran'],
@@ -365,24 +513,42 @@ order by tahun_ajaran_yudisium''', con)
                     )
     return fig
 
+
 @app.callback(
     Output('grf_jmllulusan', 'figure'),
     Input('grf_jmllulusan', 'id'),
 )
 def graphJmlLulusan(id):
-    df = pd.read_sql('''select count(*) as "Jumlah Mahasiswa", dim_semester.tahun_ajaran as "Tahun Ajaran"
+    df = data.getDataFrameFromDB('''select count(*) as 'Jumlah Mahasiswa', tahun_ajaran_yudisium 'Tahun Ajaran'
+from fact_yudisium
+group by tahun_ajaran_yudisium
+order by tahun_ajaran_yudisium''')
+    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=px.Constant('Jumlah Mahasiswa'),
+                 labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
+    return fig
+
+
+@app.callback(
+    Output('grf_skriplulusan', 'figure'),
+    Input('grf_skriplulusan', 'id'),
+)
+def graphJmlLulusan(id):
+    df = data.getDataFrameFromDB('''select count(*) 'Jumlah Mahasiswa', 
+    dim_mahasiswa.tahun_angkatan 'Angkatan',
+    dim_semester.tahun_ajaran 'Tahun Ajaran'
 from fact_skripsi
 inner join(
 select count(*) as jumlah, id_mahasiswa from fact_skripsi
 group by id_mahasiswa
 ) data_skripsi on data_skripsi.id_mahasiswa = fact_skripsi.id_mahasiswa AND data_skripsi.jumlah=1
 inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester
+inner join dim_mahasiswa on fact_skripsi.id_mahasiswa = dim_mahasiswa.id_mahasiswa
 where id_dosen_penguji1 <>''
-group by dim_semester.tahun_ajaran
-order by dim_semester.tahun_ajaran''', con)
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=px.Constant('Jumlah Mahasiswa'),
-                 labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
+group by dim_semester.tahun_ajaran, dim_mahasiswa.tahun_angkatan
+order by dim_semester.tahun_ajaran,dim_mahasiswa.tahun_angkatan''')
+    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Angkatan'], barmode='stack')
     return fig
+
 
 @app.callback(
     Output('grf_kpall', 'figure'),
@@ -392,6 +558,7 @@ def graphJmlMhsKP(id):
     df = dfkpall
     fig = px.bar(df, y=df['Jumlah KP'], x=df['Tahun Ajaran'], color=df['Semester'], barmode='group')
     return fig
+
 
 @app.callback(
     Output('grf_kppkm', 'figure'),
