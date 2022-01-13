@@ -7,228 +7,100 @@ import plotly.express as px
 from dash.dependencies import Input, Output, State
 from sqlalchemy import create_engine
 from appConfig import app, server
+import model.dao_ppp as data
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
-tbl_jmlPPP = pd.read_sql('''select Nama, Tahun, max(Penelitian) Penelitian, max(pkm) as pkm , max(publikasi) as "Publikasi Penelitan dan PKM", max(LuaranLainnya) as "Luaran Lainnya" from (
+dfjmlppp = data.getJumlahPPP()
+dfpenelitiandana = data.getPenelitianDana()
+dfpkmdana = data.getPKMDana()
 
-   ( select nama, dim_dosen.id_dosen, tahun, count(*) as Penelitian, null as pkm, null as publikasi, null as LuaranLainnya from fact_penelitian fact
-    inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
-    inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
-    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
-    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-    group by nama,dim_dosen.id_dosen, tahun
-    order by nama, tahun)
-    union 
-    (select nama, dim_dosen.id_dosen, tahun, null as Penelitian, count(*) as pkm , null as publikasi, null as LuaranLainnya  from fact_pkm fact
-    inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
-    inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
-    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
-    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-    group by dim_dosen.id_dosen, nama, tahun
-    order by nama, tahun)
-    union
-    (select nama, dimdos.id_dosen, tahun_publikasi as tahun, null as Penelitian, null as pkm, count(*) as publikasi, null as LuaranLainnya from fact_publikasi fact
-        inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
-        inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
-        inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9  
-        group by nama, dimdos.id_dosen, tahun_publikasi
-        order by nama)        
-    union
-    (select nama, dim_dosen.id_dosen, tahun, 
-        null as Penelitian, null as pkm, null as publikasi ,  
-        count(*) LuaranLainnya
-        from fact_luaran_lainnya fatl
-        inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
-        inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
-        inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
-        inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9  
-        inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
-        group by  nama, dim_dosen.id_dosen, tahun)
-    
-) data
-where tahun >2014
-group by nama, tahun
-order by nama, tahun''', con)
+dfpenelitianmhs = data.getPenelitianMhs()
+dfpkmmhs = data.getPKMMhs()
+dfpublikasimhs = data.getPublikasiMhs()
+dfttguadopsimhs = data.getTTGUMhsDiadopsi()
+dfluaranhkimhs = data.getLuaranHKIMhsperTh()
+dfppdosenkpskripsimhs = data.getPPDosenKPSkripsiMhs()
 
-tbl_penelitianDana = pd.read_sql('''select Tahun, judul_penelitian as "Judul Penelitan", dim_penelitian_pkm.wilayah_nama "Nama Wilayah", br_pp_dana.besaran_dana "Jumlah Dana", dim_sumber_dana.jenis_sumber_dana "Sumber Dana", dim_sumber_dana.status "Asal Sumber Dana"
-from fact_penelitian fact
-inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
-inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
-inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
-inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-order by tahun, judul_penelitian''', con)
+tbl_kerjasamaPP = data.getKerjasamaPP()
+dfkisitasi3th = data.getKISitasi3th()
+dfluaranhkidosen = data.getLuaranHKIDosenperTh()
+dfluaranttgudosen = data.getLuaranTTGUDosenperTh()
+dfluaranbukudosen = data.getLuaranBukuDosenperTh()
 
-tbl_pkmDana = pd.read_sql('''select fact.id_pkm, jumlah_Dosen "Jumlah Dosen", GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ')  "Nama Dosen", judul_pkm "Judul PkM", jumlah_mahasiswa "Jumlah Mahasiswa", 
-    GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') "Nama Mahasiswa",  Tahun 
-from fact_pkm fact
-inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
-inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
-inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
-inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-inner join br_pp_mahasiswa on fact.id_pkm = br_pp_mahasiswa.id_penelitian_pkm
-inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa 
-group by fact.id_pkm, jumlah_Dosen,judul_pkm, jumlah_mahasiswa, tahun
-order by tahun, judul_pkm''', con)
+dfratajumlpenelitiandosen = data.getRerataJumlPenelitianDosenperTh()
+dfratejumlpublikasidosen = data.getRerataJumlPublikasiDosenperTh()
 
-tbl_penelitianMhs = pd.read_sql('''select fact.id_penelitian, jumlah_Dosen, GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ') namaDosen, judul_penelitian, jumlah_mahasiswa, GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') namaMahasiswa,  tahun from fact_penelitian fact
-inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
-inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
-    inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
-    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
-    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-    inner join br_pp_mahasiswa on fact.id_penelitian = br_pp_mahasiswa.id_penelitian_pkm
-    inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa 
-    group by fact.id_penelitian, jumlah_Dosen,judul_penelitian, jumlah_mahasiswa, tahun''', con)
+tabs_styles = {
+    'background': '#FFFFFF',
+    'color': '#b0b0b0',
+    'border': 'white'
+}
 
-tbl_pkmMhs = pd.read_sql('''select fact.id_pkm, jumlah_Dosen "Jumlah Dosen", GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ')  "Nama Dosen", judul_pkm "Judul PkM", jumlah_mahasiswa "Jumlah Mahasiswa", 
-    GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') "Nama Mahasiswa",  Tahun 
-from fact_pkm fact
-inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
-inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
-inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
-inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-inner join br_pp_mahasiswa on fact.id_pkm = br_pp_mahasiswa.id_penelitian_pkm
-inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa 
-group by fact.id_pkm, jumlah_Dosen,judul_pkm, jumlah_mahasiswa, tahun
-order by tahun, judul_pkm''', con)
+tab_style = {
+    'background': "#FFFFFF",
+    'border-bottom-color': '#ededed',
+    'border-top-color': 'white',
+    'border-left-color': 'white',
+    'border-right-color': 'white',
+    'color': '#b0b0b0',
+    'align-items': 'center',
+    'justify-content': 'center'
+}
 
-tbl_kerjasamaPP = pd.read_sql('''select ddselesai.tahun as tahun_selesai,
-       br_pp_perjanjian.jenis, dpp.judul , CASE WHEN dp.tipe_perjanjian = 'MO' THEN 'MOU' ELSE 'PERJANJIAN KERJASAMA' END AS tipe_perjanjian
-       , dp.no_perjanjian
-       , CASE WHEN dm.wilayah = '1' THEN 'LOKAL'
-		WHEN dm.wilayah = '2' THEN 'REGIONAL'
-		WHEN dm.wilayah = '3' THEN 'NASIONAL'
-        WHEN dm.wilayah = '3' THEN 'INTERNASIONAL'
-		ELSE 'NONE' END AS wilayah_mitra
-       , dm.jenis_mitra, dm.nama_mitra
-from br_pp_perjanjian
-inner join dim_penelitian_pkm dpp on br_pp_perjanjian.id_penelitian_pkm = dpp.id_penelitian_pkm
-inner join dim_perjanjian dp on br_pp_perjanjian.id_perjanjian = dp.id_perjanjian
-inner join br_mitra_perjanjian bmp on dp.id_perjanjian = bmp.id_perjanjian
-inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
-inner join dim_date ddselesai on ddselesai.id_date = dpp.id_tanggal_selesai
-inner join dim_date ddmulai on ddmulai.id_date = dpp.id_tanggal_mulai''', con)
+selected_style = {
+    "background": "#FFFFFF",
+    'align-items': 'center',
+    'border-bottom': '2px solid',
+    'border-top-color': 'white',
+    'border-bottom-color': '#2780e3',
+    'border-left-color': 'white',
+    'border-right-color': 'white'
+}
 
-ppp = html.Div([
-    dbc.Row([
-        dbc.Col([
-            dbc.Card('Jumlah Penelitian PKM Publikasi',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
-        ])
-    ], style={'z-index': '2'}),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                html.H3('Jumlah Penelitian PKM Publikasi PerDosen PerTahun', style={'text-align': 'center'}),
-                html.Div([
-                    dt.DataTable(
-                        id='tbl_pppDosen',
-                        columns=[
-                            {'name': i, 'id': i} for i in tbl_jmlPPP.columns
-                        ],
-                        data=tbl_jmlPPP.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'padding': '10px', 'overflowX': 'auto'},
-                        style_header={'textAlign': 'center'},
-                        style_data={'font-size': '80%', 'textAlign': 'center'},
-                        style_cell={'width': 95},
-                        page_size=10,
-                    )
-                ])
-            ], style={'height': '450px'}),
-        ], width=12),
-    ])
-], style={'margin-top': '50px', 'width': '100%'})
+cont_style = {
+    'padding': '0px',
+    'justify-content': 'center',
+    'margin-top': '25px'
+}
+
+cardgrf_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
+card_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '10px'
+}
+
+ttlgrf_style = {
+    'textAlign': 'center',
+    'padding': '10px',
+    'color': 'black'
+}
 
 penelitianDana = html.Div([
     dbc.Row([
         dbc.Col([
-            dbc.Card('Penelitian dan Sumber Dana',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
-        ])
-    ], style={'z-index': '2'}),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                html.H3('Daftar Penelitian dan Sumber Dana', style={'text-align': 'center'}),
-                html.Div([
-                    dt.DataTable(
-                        id='tbl_penelitianDana',
-                        columns=[
-                            {'name': i, 'id': i} for i in tbl_penelitianDana.columns
-                        ],
-                        data=tbl_penelitianDana.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'padding': '10px', 'overflowX': 'auto'},
-                        style_header={'textAlign': 'center'},
-                        style_data={'font-size': '80%', 'textAlign': 'center'},
-                        style_cell={'width': 95},
-                        page_size=10,
-                    )
-                ])
-            ], style={'height': '450px'}),
-        ], width=12),
-    ])
-], style={'margin-top': '50px', 'width': '100%'})
-
-grafikPenelitian = html.Div([
-    dbc.Row([
-        dbc.Col([
-            dbc.Card('Penelitian Dosen',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
-        ])
-    ], style={'z-index': '2'}),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                html.H3('Penelitian PerTahun'),
-                dcc.Graph(id='grf_DosenPenelitian'),
-            ], style={'justify-content': 'center'})
-        ], width=6),
-        dbc.Col([
-            dbc.Card([
-                html.H3('Perbandingan Asal Sumber Dana Penelitian'),
-                dcc.Graph(id='grf_bdgDosenPenelitian'),
-            ], style={'justify-content': 'center'})
-        ], width=6)
-    ])
-], style={'margin-top': '50px', 'width': '100%'})
-
-penelitianMhs = html.Div([
-    dbc.Row([
-        dbc.Col([
-            dbc.Card('Keterlibatan Mahasiswa',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
-        ])
-    ], style={'z-index': '2'}),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                html.H3('Penelitian Melibatkan Mahasiswa', style={'text-align': 'center'}),
-                html.Div([
-                    dt.DataTable(
-                        id='tbl_penelitianMhs',
-                        columns=[
-                            {'name': i, 'id': i} for i in tbl_penelitianMhs.columns
-                        ],
-                        data=tbl_penelitianMhs.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'padding': '10px', 'overflowX': 'auto'},
-                        style_header={'textAlign': 'center'},
-                        style_data={'font-size': '80%', 'textAlign': 'center'},
-                        style_cell={'width': 95},
-                        page_size=10,
-                    )
-                ])
-            ], style={'height': '450px'}),
+                html.H5('Penelitian dan Sumber Dana', style=ttlgrf_style),
+                dt.DataTable(
+                    id='dfpenelitiandana',
+                    columns=[
+                        {'name': i, 'id': i} for i in dfpenelitiandana.columns
+                    ],
+                    data=dfpenelitiandana.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                    style_header={'textAlign': 'center'},
+                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                    style_cell={'width': 95},
+                    page_size=10,
+                )
         ], width=12),
     ])
 ], style={'margin-top': '50px', 'width': '100%'})
@@ -236,42 +108,52 @@ penelitianMhs = html.Div([
 pkmDana = html.Div([
     dbc.Row([
         dbc.Col([
-            dbc.Card('PkM dan Sumber Dana',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
-        ])
-    ], style={'z-index': '2'}),
-    dbc.Row([
-        dbc.Col([
             dbc.Card([
-                html.H3('Daftar PkM dan Sumber Dana', style={'text-align': 'center'}),
-                html.Div([
-                    dt.DataTable(
-                        id='tbl_pkmDana',
-                        columns=[
-                            {'name': i, 'id': i} for i in tbl_pkmDana.columns
-                        ],
-                        data=tbl_pkmDana.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'padding': '10px', 'overflowX': 'auto'},
-                        style_header={'textAlign': 'center'},
-                        style_data={'font-size': '80%', 'textAlign': 'center'},
-                        style_cell={'width': 95},
-                        page_size=10,
-                    )
-                ])
-            ], style={'height': '450px'}),
+                html.H5('PKM dan Sumber Dana',
+                        style=ttlgrf_style),
+                dt.DataTable(
+                    id='dfpkmdana',
+                    columns=[
+                        {'name': i, 'id': i} for i in dfpkmdana.columns
+                    ],
+                    data=dfpkmdana.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                    style_header={'textAlign': 'center'},
+                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                    style_cell={'width': 95},
+                    page_size=10,
+                )
+            ], style=card_style),
         ], width=12),
     ])
-], style={'margin-top': '50px', 'width': '100%'})
+], style=card_style)
+
+grafikPenelitian = html.Div([
+    dbc.Row([
+        dbc.Col([
+            html.H5('Penelitian Dosen',
+                    style=ttlgrf_style),
+        ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.H3('Penelitian PerTahun'),
+            dcc.Graph(id='grf_DosenPenelitian'),
+        ], width=6),
+        dbc.Col([
+            html.H3('Perbandingan Asal Sumber Dana Penelitian'),
+            dcc.Graph(id='grf_bdgDosenPenelitian')
+        ], width=6)
+    ])
+], style=card_style)
 
 grafikPkm = html.Div([
     dbc.Row([
         dbc.Col([
-            dbc.Card('Pkm Dosen',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
+            html.H5('PKM dan Sumber Dana',
+                    style=ttlgrf_style),
         ])
     ], style={'z-index': '2'}),
     dbc.Row([
@@ -288,130 +170,142 @@ grafikPkm = html.Div([
             ], style={'justify-content': 'center'})
         ], width=6)
     ])
-], style={'margin-top': '50px', 'width': '100%'})
+], style=card_style)
+
+penelitianMhs = html.Div([
+    dbc.Row([
+        dbc.Col([
+            html.H5('Keterlibatan Mahasiswa',
+                    style=ttlgrf_style),
+        ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.H3('Penelitian Melibatkan Mahasiswa', style={'text-align': 'center'}),
+            html.Div([
+                dt.DataTable(
+                    id='dfpenelitianmhs',
+                    columns=[
+                        {'name': i, 'id': i} for i in dfpenelitianmhs.columns
+                    ],
+                    data=dfpenelitianmhs.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                    style_header={'textAlign': 'center'},
+                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                    style_cell={'width': 95},
+                    page_size=10,
+                )
+            ])
+        ], width=12),
+    ])
+], style=card_style)
 
 pkmMhs = html.Div([
     dbc.Row([
         dbc.Col([
-            dbc.Card('Keterlibatan Mahasiswa',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
+            html.H5('Keterlibatan Mahasiswa',
+                    style=ttlgrf_style),
         ])
     ], style={'z-index': '2'}),
     dbc.Row([
         dbc.Col([
-            dbc.Card([
-                html.H3('PkM Melibatkan Mahasiswa', style={'text-align': 'center'}),
-                html.Div([
-                    dt.DataTable(
-                        id='tbl_pkmMhs',
-                        columns=[
-                            {'name': i, 'id': i} for i in tbl_pkmMhs.columns
-                        ],
-                        data=tbl_pkmMhs.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'padding': '10px', 'overflowX': 'auto'},
-                        style_header={'textAlign': 'center'},
-                        style_data={'font-size': '80%', 'textAlign': 'center'},
-                        style_cell={'width': 95},
-                        page_size=10,
-                    )
+            html.H3('PkM Melibatkan Mahasiswa', style={'text-align': 'center'}),
+            html.Div([
+                dt.DataTable(
+                    id='dfpkmmhs',
+                    columns=[
+                        {'name': i, 'id': i} for i in dfpkmmhs.columns
+                    ],
+                    data=dfpkmmhs.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                    style_header={'textAlign': 'center'},
+                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                    style_cell={'width': 95},
+                    page_size=10,
+                )
                 ])
-            ], style={'height': '450px'}),
         ], width=12),
     ])
-], style={'margin-top': '50px', 'width': '100%'})
+], style=card_style)
 
-kerjasama = html.Div([
-    dbc.Row([
-        dbc.Col([
-            dbc.Card('Kerjasama',
-                     style={'justify-content': 'center', 'width': '100%', 'textAlign': 'center'}
-                     )
-        ])
-    ], style={'z-index': '2'}),
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                html.H3('Kerjasama Penelitian dan PkM', style={'text-align': 'center'}),
-                html.Div([
-                    dt.DataTable(
-                        id='tbl_kerjasamaPPP',
-                        columns=[
-                            {'name': i, 'id': i} for i in tbl_kerjasamaPP.columns
-                        ],
-                        data=tbl_kerjasamaPP.to_dict('records'),
-                        sort_action='native',
-                        sort_mode='multi',
-                        style_table={'padding': '10px', 'overflowX': 'auto'},
-                        style_header={'textAlign': 'center'},
-                        style_data={'font-size': '80%', 'textAlign': 'center'},
-                        style_cell={'width': 95},
-                        page_size=10,
-                    )
-                ])
-            ], style={'height': '450px'}),
-        ], width=12),
-    ])
-], style={'margin-top': '50px', 'width': '100%'})
+ppp = dbc.Container([
+    dbc.Card([
+        html.H5('Penelitian PKM Publikasi',
+                style=ttlgrf_style),
+        dcc.Tabs([
+            dcc.Tab(label='PPP Dosen', value='pppdosen',
+                    children=[
+                        dt.DataTable(
+                            id='tbl_pppDosen',
+                            columns=[
+                                {'name': i, 'id': i} for i in dfjmlppp.columns
+                            ],
+                            data=dfjmlppp.to_dict('records'),
+                            sort_action='native',
+                            sort_mode='multi',
+                            style_table={'padding': '10px', 'overflowX': 'auto'},
+                            style_header={'textAlign': 'center'},
+                            style_data={'font-size': '80%', 'textAlign': 'center'},
+                            style_cell={'width': 95},
+                            page_size=10,
+                            export_format='xlsx'
+                        )
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Kerjasama Penelitian PKM', value='kerjasamappkm',
+                    children=[
+                        dt.DataTable(
+                            id='tbl_kerjasamaPPP',
+                            columns=[
+                                {'name': i, 'id': i} for i in tbl_kerjasamaPP.columns
+                            ],
+                            data=tbl_kerjasamaPP.to_dict('records'),
+                            sort_action='native',
+                            sort_mode='multi',
+                            style_table={'padding': '10px', 'overflowX': 'auto'},
+                            style_header={'textAlign': 'center'},
+                            style_data={'font-size': '80%', 'textAlign': 'center'},
+                            style_cell={'width': 95},
+                            page_size=10,
+                            export_format='xlsx'
+                        )
+                    ],
+                    style=tab_style, selected_style=selected_style)
+        ], style=tabs_styles, value='pppdosen'),
+    ], style=cardgrf_style)
+], style=cont_style)
 
-tab_penelitian = html.Div([
-    html.Div(
-        html.H1(
-            'Analisis Penelitian',
-            style={'margin-top': '30px', 'text-align': 'center'}
-        )
-    ),
-    penelitianDana,
-    grafikPenelitian,
-    penelitianMhs,
-]),
-
-tab_pkm = html.Div([
-    html.Div(
-        html.H1(
-            'Analisis Penelitian',
-            style={'margin-top': '30px', 'text-align': 'center'}
-        )
-    ),
-    pkmDana,
-    grafikPkm,
-    pkmMhs,
-]),
+analisispp = dbc.Container([
+    dbc.Card([
+        html.H5('Penelitian & PKM',
+                style=ttlgrf_style),
+        dcc.Tabs([
+            dcc.Tab(label='Penelitian', value='penelitian',
+                    children=[
+                        penelitianDana,
+                        grafikPenelitian,
+                        penelitianMhs
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='PKM', value='pkm',
+                    children=[
+                        pkmDana,
+                        grafikPkm,
+                        pkmMhs
+                    ],
+                    style=tab_style, selected_style=selected_style)
+        ], style=tabs_styles, value='penelitian')
+    ],style=cardgrf_style)
+], style=cont_style)
 
 layout = html.Div([
-    dbc.Container([
-        html.H1(
-            'Analisis PPP',
-            style={'margin-top': '30px', 'text-align': 'center'}
-        ),
-        ppp,
-        kerjasama,
-        dbc.Card([
-            dbc.CardHeader([
-                dbc.Tabs([
-                    dbc.Tab(label='Penelitian', tab_id='penelitian'),
-                    dbc.Tab(label='PkM', tab_id='pkm'),
-                ], active_tab='penelitian', id='cardTabsPPP')
-            ]),
-            dbc.CardBody([
-
-            ], id='cardContentPPP'),
-        ], style={'margin': '25px'})
-
-    ], fluid=True),
-], style={'width': '100%'})
-
-
-@app.callback(
-    Output("cardContentPPP", "children"), [Input("cardTabsPPP", "active_tab")]
-)
-def tab_contentRegistrasi(active_tab):
-    if active_tab == 'penelitian':
-        return tab_penelitian
-    if active_tab == 'pkm':
-        return tab_pkm
+    html.Div([ppp]),
+    html.Div([analisispp], style={'margin-bottom': '50px'})
+], style={'justify-content': 'center'})
 
 @app.callback(
     Output("grf_DosenPenelitian", 'figure'), Input('grf_DosenPenelitian', 'id')
@@ -426,6 +320,7 @@ order by tahun''', con)
     fig = px.line(df, x=df['tahun'], y=df['Jumlah'])
     fig.update_traces(mode='lines+markers')
     return fig
+
 
 @app.callback(
     Output("grf_bdgDosenPenelitian", 'figure'), Input('grf_bdgDosenPenelitian', 'id')
@@ -443,6 +338,7 @@ order by Tahun''', con)
     fig.update_layout(barmode='group')
     return fig
 
+
 @app.callback(
     Output("grf_DosenPkm", 'figure'), Input('grf_DosenPkm', 'id')
 )
@@ -456,6 +352,7 @@ order by tahun''', con)
     fig = px.line(df, x=df['tahun'], y=df['Jumlah'])
     fig.update_traces(mode='lines+markers')
     return fig
+
 
 @app.callback(
     Output("grf_bdgDosenPkm", 'figure'), Input('grf_bdgDosenPkm', 'id')

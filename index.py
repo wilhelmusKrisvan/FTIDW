@@ -5,7 +5,7 @@ from appConfig import app, server
 from dash.dependencies import \
     Input, Output
 from flask_login import logout_user, current_user
-from apps import pmb,registrasi,kegiatan_kerjasama,tgsakhir,alumni,ppp
+from apps import pmb,kbm,kegiatan_kerjasama,tgsakhir,alumni,ppp
 import login, home, profile, admin
 
 navBar = dbc.Navbar(

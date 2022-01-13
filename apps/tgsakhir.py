@@ -14,25 +14,17 @@ import model.dao_tgsakhir as data
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
 dfdosbing = data.getMahasiswaBimbinganSkripsi()
-
 dflulusan = data.getIPK()
 
 dfavgmasa = data.getRateMasaStudi()
-
 dfmasastudilulusan = data.getMasaStudi()
-
 dfkppkm = data.getMahasiswaKPpkm()
-
 dfkpall = data.getMahasiswaKP()
 
 dfskripmhs = data.getMhahasiswaSkripsipkm()
-
 dfmitra = data.getMitraKP()
-
 dfttgumhs = data.getTTGU()
-
 dfpersen_mhsLulus = data.getMahasiswaLulus()
-
 dfpersen_mhsLulusAngkt = data.getMahasiswaLulusBandingTotal()
 
 Fillsemester = pd.read_sql('select tahun_ajaran from dim_semester', con)

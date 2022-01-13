@@ -11,7 +11,7 @@ def getDataFrameFromDBwithParams(query,parameter):
     return pd.read_sql(query,con,params=parameter)
 
 
-def getMatkulBaru():
+def getMatkulKurikulumBaru():
     return pd.read_sql('''select kode_matakuliah Kode, kelompok_matakuliah 'Kelompok Matakuliah', 
     upper(nama_matakuliah) Matakuliah, sks SKS from fact_matakuliah_kurikulum
 inner join dim_matakuliah on fact_matakuliah_kurikulum.id_matakuliah = dim_matakuliah.id_matakuliah

@@ -26,7 +26,11 @@
 #tbl_matkulBatal button.export,
 #tbl_matkulTawar button.export,
 #tbl_dosenTetap button.export,
-#tbl_dosenIndustri button.export{
+#tbl_dosenIndustri button.export,
+#tbl_pppDosen button.export,
+#tbl_kerjasamaPPP button.export,
+#tbl_presNonAkademik button.export,
+#tbl_presAkademik button.export{
     width: 120px;
     height: 30px;
     border-radius: 10px;

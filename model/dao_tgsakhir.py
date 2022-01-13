@@ -32,17 +32,31 @@ order by tahun_ajaran_yudisium''',con)
 
 def getRateMasaStudi():
     return pd.read_sql('''
-select 
-    concat(round((masa_studi-mods)/12,0) ," tahun ", mods, " bulan")  as "Masa Studi" , 
-    tahun_ajaran_yudisium as 'TA Yudisium'
-from (
-select  mod(masa_studi,12) as mods, masa_studi, tahun_ajaran_yudisium
-from (
-select round(avg(masa_studi_dalam_bulan),0) as "masa_studi", tahun_ajaran_yudisium from fact_yudisium
-group by tahun_ajaran_yudisium) as data_mentah
-) as data_ready
-order by tahun_ajaran_yudisium
+    select 
+        concat(round((masa_studi-mods)/12,0) ," tahun ", mods, " bulan")  as "Masa Studi" , 
+        tahun_ajaran_yudisium as 'TA Yudisium'
+    from (
+    select  mod(masa_studi,12) as mods, masa_studi, tahun_ajaran_yudisium
+    from (
+    select round(avg(masa_studi_dalam_bulan),0) as "masa_studi", tahun_ajaran_yudisium from fact_yudisium
+    group by tahun_ajaran_yudisium) as data_mentah
+    ) as data_ready
+    order by tahun_ajaran_yudisium
 ''', con)
+
+def getJumlLulusSkripsiOntime():
+    return ('''
+    select count(*) as jumlah_mahasiswa, dim_semester.tahun_ajaran
+    from fact_skripsi
+        inner join(
+            select count(*) as jumlah, id_mahasiswa from fact_skripsi
+            group by id_mahasiswa
+        ) data_skripsi on data_skripsi.id_mahasiswa = fact_skripsi.id_mahasiswa AND data_skripsi.jumlah=1
+        inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester
+    where id_dosen_penguji1 <>''
+    group by dim_semester.tahun_ajaran
+    order by dim_semester.tahun_ajaran
+    ''',con)
 
 def getMasaStudi():
     return pd.read_sql('''

@@ -18,21 +18,13 @@ with urlopen(
     province = json.load(response)
 
 dfseleksi = data.getSeleksi()
-
 dfmhsasing = data.getMahasiswaAsing()
-
 dfmhssmasmk = data.getJenisSekolahPendaftar()
-
 dfmhsprovdaftar = data.getProvinsiDaftar()
-
 dfmhsprovlolos = data.getProvinsiLolos()
-
 dfmhsprovregis = data.getProvinsiRegis()
-
 dfmhsrasio = data.getRasioCalonMahasiswa()
-
 dfmhsJml = data.getPerkembanganJumlahMaba()
-
 dfmhsPersenNaik = data.getPersentaseKenaikanMaba()
 
 tabs_styles = {

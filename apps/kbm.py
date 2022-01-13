@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from appConfig import app, server
 import model.dao_kbm as data
 
-tbl_matkulBaru = data.getMatkulBaru()
+tbl_matkulBaru = data.getMatkulKurikulumBaru()
 tbl_MatkulBatal = data.getMatkulBatal()
 tbl_matkulTawar = data.getMatkulTawar()
 tbl_mahasiswaAktif = data.getMahasiswaAktif()
@@ -281,7 +281,7 @@ matkul = dbc.Container([
                 style=ttlgrf_style),
         html.Div([
             dcc.Tabs([
-                dcc.Tab(label='Matakuliah Kurikulum', value='kurikulum',
+                dcc.Tab(label='Kurikulum', value='kurikulum',
                         children=[
                             dt.DataTable(
                                 id='tbl_matkulBaru',
@@ -299,7 +299,7 @@ matkul = dbc.Container([
                                 page_size=10,
                             )
                         ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Matakuliah Batal dengan Keterangan Dosen', value='batal',
+                dcc.Tab(label='Batal dengan Keterangan Dosen', value='batal',
                         children=[
                             dt.DataTable(
                                 id='tbl_matkulBatal',
@@ -317,7 +317,7 @@ matkul = dbc.Container([
                                 page_size=10,
                             )
                         ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Matakuliah Ditawarkan Setiap TS', value='ts',
+                dcc.Tab(label='Ditawarkan Setiap Semester', value='ts',
                         children=[
                             dt.DataTable(
                                 id='tbl_matkulTawar',
