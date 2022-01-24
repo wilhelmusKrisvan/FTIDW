@@ -29,8 +29,6 @@ def add_user(username, password, email, admin):
     )
     conn = engine.connect()
     conn.execute(insert_stmt)
-    conn.close()
-    engine.dispose()
 
 def update_password(username, password):
     hashed_password = generate_password_hash(password, method='sha256')
@@ -39,6 +37,7 @@ def update_password(username, password):
         where(userTable.c.username==username)
     conn = engine.connect()
     conn.execute(update)
+    db.session.remove()
     conn.close()
     engine.dispose()
 
@@ -49,6 +48,7 @@ def update_role(username, role):
 
     conn = engine.connect()
     conn.execute(update)
+    db.session.remove()
     conn.close()
     engine.dispose()
 
@@ -57,6 +57,7 @@ def delete_user(username):
 
     conn = engine.connect()
     conn.execute(update)
+    db.session.remove()
     conn.close()
     engine.dispose()
 
@@ -70,8 +71,6 @@ def show_role():
             'username':result[0],
             'role': result[1],
         })
-    conn.close()
-    engine.dispose()
     return users
 
 def show_users():
@@ -82,7 +81,6 @@ def show_users():
 
     conn = engine.connect()
     results = conn.execute(select_stmt)
-
     users = []
 
     for result in results:
@@ -91,7 +89,4 @@ def show_users():
             'email' : result[2],
             'role' : result[3]
         })
-
-    conn.close()
-    engine.dispose()
     return users

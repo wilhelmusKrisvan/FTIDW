@@ -3,11 +3,14 @@ from sqlalchemy import create_engine
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
+
 def getDataFrameFromDB(query):
     return pd.read_sql(query, con)
 
+
 def getDataFrameFromDBwithParams(query, parameter):
     return pd.read_sql(query, con, params=parameter)
+
 
 def getMasaTunggu():
     return pd.read_sql('''select data2.*, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
@@ -38,7 +41,7 @@ left join(
     from dim_lulusan
     group by tahun_lulus
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
-order by tahun_lulus;''', con)
+order by tahun_lulus''', con)
 
 
 def getBidangKerja():
@@ -77,7 +80,7 @@ left join(
 order by data2.tahun_lulus''', con)
 
 
-def getTempatKerja():
+def getWirausaha():
     return pd.read_sql('''
 select data2.tahun_lulus as 'Tahun Lulus', Lokal+Regional as 'Lokal/Regional', Nasional, Internasional, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
  (
@@ -109,11 +112,110 @@ left join(
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
 order by terlacak.tahun_lulus''', con)
 
+def getKepuasanLayanan():
+    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 '%', kepuasan.Nilai  from
+(select sum(Jumlah) Semua,Nilai,1 gabung from
+(select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by fasilitas_kesehatan_poliklinik
+union all
+select count(fasilitas_internet) Jumlah,fasilitas_internet Nilai,'fasilitas_internet' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by fasilitas_internet
+union all
+select count(ketersediaan_fasilitas_olahraga) Jumlah,ketersediaan_fasilitas_olahraga Nilai,'ketersediaan_fasilitas_olahraga' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by ketersediaan_fasilitas_olahraga
+union all
+select count(ketersediaan_fasilitas_makanan) Jumlah,ketersediaan_fasilitas_makanan Nilai,'ketersediaan_fasilitas_makanan' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by ketersediaan_fasilitas_makanan
+union all
+select count(dukungan_terhadap_ukm) Jumlah,dukungan_terhadap_ukm Nilai,'dukungan_terhadap_ukm' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by dukungan_terhadap_ukm
+union all
+select count(fasilitas_ruangan) Jumlah,fasilitas_ruangan Nilai,'fasilitas_ruangan' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by fasilitas_ruangan
+union all
+select count(dukungan_unit_terhadap_keg_mhs) Jumlah,dukungan_unit_terhadap_keg_mhs Nilai,'dukungan_unit_terhadap_keg_mhs' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by dukungan_unit_terhadap_keg_mhs
+union all
+select count(penyediaan_informasi_dan_beasiswa) Jumlah,penyediaan_informasi_dan_beasiswa Nilai,'penyediaan_informasi_dan_beasiswa' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by penyediaan_informasi_dan_beasiswa
+union all
+select count(penyediaan_surat) Jumlah,penyediaan_surat Nilai,'penyediaan_surat' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by penyediaan_surat
+union all
+select count(layanan_print) Jumlah,layanan_print Nilai,'layanan_print' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by layanan_print
+union all
+select count(penyediaan_ruang_publik) Jumlah,penyediaan_ruang_publik Nilai,'penyediaan_ruang_publik' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by penyediaan_ruang_publik
+union all
+select count(pelayanan_kesehatan_dan_askes) Jumlah,pelayanan_kesehatan_dan_askes Nilai,'pelayanan_kesehatan_dan_askes' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by pelayanan_kesehatan_dan_askes) data
+group by data.Nilai) kepuasan,
+(select sum(Jumlah) Semua, 1 gabung from
+(select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by fasilitas_kesehatan_poliklinik
+union all
+select count(fasilitas_internet) Jumlah,fasilitas_internet Nilai,'fasilitas_internet' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by fasilitas_internet
+union all
+select count(ketersediaan_fasilitas_olahraga) Jumlah,ketersediaan_fasilitas_olahraga Nilai,'ketersediaan_fasilitas_olahraga' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by ketersediaan_fasilitas_olahraga
+union all
+select count(ketersediaan_fasilitas_makanan) Jumlah,ketersediaan_fasilitas_makanan Nilai,'ketersediaan_fasilitas_makanan' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by ketersediaan_fasilitas_makanan
+union all
+select count(dukungan_terhadap_ukm) Jumlah,dukungan_terhadap_ukm Nilai,'dukungan_terhadap_ukm' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by dukungan_terhadap_ukm
+union all
+select count(fasilitas_ruangan) Jumlah,fasilitas_ruangan Nilai,'fasilitas_ruangan' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by fasilitas_ruangan
+union all
+select count(dukungan_unit_terhadap_keg_mhs) Jumlah,dukungan_unit_terhadap_keg_mhs Nilai,'dukungan_unit_terhadap_keg_mhs' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by dukungan_unit_terhadap_keg_mhs
+union all
+select count(penyediaan_informasi_dan_beasiswa) Jumlah,penyediaan_informasi_dan_beasiswa Nilai,'penyediaan_informasi_dan_beasiswa' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by penyediaan_informasi_dan_beasiswa
+union all
+select count(penyediaan_surat) Jumlah,penyediaan_surat Nilai,'penyediaan_surat' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by penyediaan_surat
+union all
+select count(layanan_print) Jumlah,layanan_print Nilai,'layanan_print' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by layanan_print
+union all
+select count(penyediaan_ruang_publik) Jumlah,penyediaan_ruang_publik Nilai,'penyediaan_ruang_publik' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by penyediaan_ruang_publik
+union all
+select count(pelayanan_kesehatan_dan_askes) Jumlah,pelayanan_kesehatan_dan_askes Nilai,'pelayanan_kesehatan_dan_askes' Kategori
+from fact_kepuasan_pengguna_mahasiswa
+group by pelayanan_kesehatan_dan_askes) data) total
+where total.gabung = kepuasan.gabung''',con)
 
 def getSkill():
     return pd.read_sql('''
 select kriteria as Kriteria, 
-    SANGATBAIK+BAIK+CUKUP+KURANG+LAINNYA as Jumlah, 
     concat(round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Sangat Baik",
     concat(round(BAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Baik",
     concat(round(CUKUP/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Cukup",
@@ -212,27 +314,44 @@ select kriteria as Kriteria,
 ) dataJumlah
 order by nomor''', con)
 
-
-def getJabatan():
+def getMasaTungguperGol():
     return pd.read_sql('''
-select 
-count(*) as Jumlah, 
-ifnull(posisi_jabatan_alumni,'LAINNYA') as Posisi, 
-posisi_jabatan_alumni as 'Jabatan Alumni'
-from fact_tracer_study tracer
-inner join dim_lulusan on dim_lulusan.id_lulusan = tracer.id_lulusan
-where dim_lulusan.tahun_lulus='2015'
-group by posisi, posisi_jabatan_alumni
-order by posisi_jabatan_alumni desc
-''', con)
+        select count(waktu_tunggu) Jumlah, waktu_tunggu Waktu,tahun_lulus Tahun from fact_tracer_study fts
+inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+where waktu_tunggu is not null
+group by waktu_tunggu,tahun_lulus
+order by tahun_lulus asc
+    ''', con)
 
-def getPerusahaan():
-    return pd.read_sql('''
-select nama_mapping_organisasi as 'Nama Perusahaan', count(*) as 'Jumlah Lulusan'
-from fact_tracer_study tracer
-inner join dim_lulusan on tracer.id_lulusan = dim_lulusan.id_lulusan
-inner join dim_organisasi_pengguna_lulusan org on dim_lulusan.id_organisasi_pengguna_lulusan = org.id_organisasi_pengguna_lulusan
-where dim_lulusan.tahun_lulus='2015'
-group by nama_mapping_organisasi
-order by 'Jumlah Lulusan' desc
-limit 15''', con)
+def getGajiLulusan():
+    return pd.read_sql('''select tahun_lulus 'Tahun',ceiling(avg(pendapatan_utama)) Pendapatan from fact_tracer_study fts
+inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+where waktu_tunggu like 'KURANG 6 BULAN'
+group by tahun_lulus
+order by tahun_lulus''',con)
+
+
+# # NONE
+# def getJabatan():
+#     return pd.read_sql('''
+# select
+# count(*) as Jumlah,
+# ifnull(posisi_jabatan_alumni,'LAINNYA') as Posisi,
+# posisi_jabatan_alumni as 'Jabatan Alumni'
+# from fact_tracer_study tracer
+# inner join dim_lulusan on dim_lulusan.id_lulusan = tracer.id_lulusan
+# where dim_lulusan.tahun_lulus='2015'
+# group by posisi, posisi_jabatan_alumni
+# order by posisi_jabatan_alumni desc
+# ''', con)
+#
+# def getPerusahaan():
+#     return pd.read_sql('''
+# select nama_mapping_organisasi as 'Nama Perusahaan', count(*) as 'Jumlah Lulusan'
+# from fact_tracer_study tracer
+# inner join dim_lulusan on tracer.id_lulusan = dim_lulusan.id_lulusan
+# inner join dim_organisasi_pengguna_lulusan org on dim_lulusan.id_organisasi_pengguna_lulusan = org.id_organisasi_pengguna_lulusan
+# where dim_lulusan.tahun_lulus='2015'
+# group by nama_mapping_organisasi
+# order by 'Jumlah Lulusan' desc
+# limit 15''', con)

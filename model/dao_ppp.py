@@ -11,7 +11,8 @@ def getDataFrameFromDB(query):
 def getDataFrameFromDBwithParams(query, parameter):
     return pd.read_sql(query, con, params=parameter)
 
-#jumlah judul
+
+# jumlah judul
 def getJumlahPPP(): return pd.read_sql('''
 select Nama, Tahun, max(Penelitian) Penelitian, max(pkm) as pkm , max(publikasi) as "Publikasi Penelitan dan PKM", max(LuaranLainnya) as "Luaran Lainnya" from (
    ( select nama, dim_dosen.id_dosen, tahun, count(*) as Penelitian, null as pkm, null as publikasi, null as LuaranLainnya from fact_penelitian fact
@@ -52,7 +53,8 @@ where tahun >2014
 group by nama, tahun
 order by nama, tahun''', con)
 
-#pendanaan
+
+# pendanaan
 def getPenelitianDana(): return pd.read_sql('''
 select  Tahun, judul_penelitian as "Judul Penelitan", dim_penelitian_pkm.wilayah_nama "Nama Wilayah", 
         br_pp_dana.besaran_dana "Jumlah Dana", dim_sumber_dana.jenis_sumber_dana "Sumber Dana", dim_sumber_dana.status "Asal Sumber Dana"
@@ -77,7 +79,8 @@ inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_maha
 group by fact.id_pkm, jumlah_Dosen,judul_pkm, jumlah_mahasiswa, tahun
 order by tahun, judul_pkm''', con)
 
-#mahasiswa
+
+# mahasiswa
 def getPenelitianMhs(): return pd.read_sql('''
 select 
     fact.id_penelitian, jumlah_Dosen, GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ') namaDosen, 
@@ -107,6 +110,7 @@ inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_maha
 group by fact.id_pkm, jumlah_Dosen,judul_pkm, jumlah_mahasiswa, tahun
 order by tahun, judul_pkm''', con)
 
+
 def getPublikasiMhs():
     return pd.read_sql('''
     select tahun_ajaran, count(distinct fp.id_publikasi)
@@ -118,18 +122,22 @@ def getPublikasiMhs():
     where fp.is_deleted != 1
     group by tahun_ajaran
     order by tahun_ajaran desc;
-    ''',con)
+    ''', con)
+
 
 def getTTGUMhsDiadopsi():
     return pd.read_sql('''
-    select count(distinct bpl.id_penelitian_pkm)
-    from br_pp_luaranlainnya bpl
-             inner join fact_luaran_lainnya fll on bpl.id_penelitian_pkm = fll.id_penelitian_pkm
-             inner join dim_luaran_lainnya dll on bpl.id_penelitian_pkm = dll.id_penelitian_pkm
+    select tahun,count(distinct dll.id_penelitian_pkm)
+    from dim_luaran_lainnya dll
+             #inner join fact_luaran_lainnya fll on bpl.id_penelitian_pkm = fll.id_penelitian_pkm
              inner join dim_jenis_luaran djl on dll.id_jenis_luaran = djl.id_jenis_luaran
              inner join br_ll_mahasiswa blm on dll.id_luaran_lainnya = blm.id_luaran_lainnya
-    where keterangan_jenis_luaran='TEKNOLOGI TEPAT GUNA';
-    ''',con)
+             inner join dim_date dd on dd.id_date=dll.id_tanggal_luaran
+    where keterangan_jenis_luaran='TEKNOLOGI TEPAT GUNA'
+    group by tahun
+    order by tahun desc;
+    ''', con)
+
 
 def getLuaranHKIMhsperTh():
     return pd.read_sql('''
@@ -139,8 +147,10 @@ def getLuaranHKIMhsperTh():
              inner join dim_luaran_lainnya dll on blm.id_luaran_lainnya = dll.id_luaran_lainnya
              inner join dim_date dd on dd.id_date = fll.id_tanggal_luaran
     where no_haki is not null
-    group by tahun;
-    ''',con)
+    group by tahun
+    order by tahun desc;
+    ''', con)
+
 
 def getPPDosenKPSkripsiMhs():
     return pd.read_sql('''
@@ -149,10 +159,11 @@ def getPPDosenKPSkripsiMhs():
     inner join dim_date dd on dd.id_date=dpp.id_tanggal_selesai
     group by tahun
     order by tahun desc
-    ''',con)
+    ''', con)
 
-#kerjasama
-def getKerjasamaPP(): return pd.read_sql('''select ddselesai.tahun as tahun_selesai,
+
+# kerjasama
+def getKerjasamaPenelitian(): return pd.read_sql('''select ddselesai.tahun as tahun_selesai,
        br_pp_perjanjian.jenis, dpp.judul , CASE WHEN dp.tipe_perjanjian = 'MO' THEN 'MOU' ELSE 'PERJANJIAN KERJASAMA' END AS tipe_perjanjian
        , dp.no_perjanjian
        , CASE WHEN dm.wilayah = '1' THEN 'LOKAL'
@@ -167,52 +178,77 @@ inner join dim_perjanjian dp on br_pp_perjanjian.id_perjanjian = dp.id_perjanjia
 inner join br_mitra_perjanjian bmp on dp.id_perjanjian = bmp.id_perjanjian
 inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
 inner join dim_date ddselesai on ddselesai.id_date = dpp.id_tanggal_selesai
-inner join dim_date ddmulai on ddmulai.id_date = dpp.id_tanggal_mulai''', con)
+inner join dim_date ddmulai on ddmulai.id_date = dpp.id_tanggal_mulai
+where br_pp_perjanjian.jenis="Penelitian"''', con)
 
-#sitasi
+
+def getKerjasamaPKM(): return pd.read_sql('''select ddselesai.tahun as tahun_selesai,
+       br_pp_perjanjian.jenis, dpp.judul , CASE WHEN dp.tipe_perjanjian = 'MO' THEN 'MOU' ELSE 'PERJANJIAN KERJASAMA' END AS tipe_perjanjian
+       , dp.no_perjanjian
+       , CASE WHEN dm.wilayah = '1' THEN 'LOKAL'
+		WHEN dm.wilayah = '2' THEN 'REGIONAL'
+		WHEN dm.wilayah = '3' THEN 'NASIONAL'
+        WHEN dm.wilayah = '3' THEN 'INTERNASIONAL'
+		ELSE 'NONE' END AS wilayah_mitra
+       , dm.jenis_mitra, dm.nama_mitra
+from br_pp_perjanjian
+inner join dim_penelitian_pkm dpp on br_pp_perjanjian.id_penelitian_pkm = dpp.id_penelitian_pkm
+inner join dim_perjanjian dp on br_pp_perjanjian.id_perjanjian = dp.id_perjanjian
+inner join br_mitra_perjanjian bmp on dp.id_perjanjian = bmp.id_perjanjian
+inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
+inner join dim_date ddselesai on ddselesai.id_date = dpp.id_tanggal_selesai
+inner join dim_date ddmulai on ddmulai.id_date = dpp.id_tanggal_mulai
+where br_pp_perjanjian.jenis="PKM"''', con)
+
+
+# sitasi
 def getKISitasi3th():
     return pd.read_sql('''
     select id_publikasi, tahun_sitasi, sum(jumlah_sitasi) from fact_publikasi_sitasi
     where tahun_sitasi>=year(now())-3
     group by tahun_sitasi,id_publikasi
-    ''',con)
+    ''', con)
 
-#luaran
+
+# luaran
 def getLuaranHKIDosenperTh():
     return pd.read_sql('''
     select tahun,nama,jenis_luaran,count(dpp.id_penelitian_pkm) Jumlah from dim_penelitian_pkm dpp
-    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-    where jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL'
-    group by tahun, nama,jenis_luaran
-    order by tahun desc
-    ''',con)
+inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+where jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL'
+group by tahun, nama,jenis_luaran
+order by tahun desc
+    ''', con)
+
 
 def getLuaranTTGUDosenperTh():
     return pd.read_sql('''
     select tahun,nama,jenis_luaran,count(dpp.id_penelitian_pkm) Jumlah from dim_penelitian_pkm dpp
-    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-    where jenis_luaran not like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran not like 'TEKNOLOGI TEPAT GUNA'
-    group by tahun, nama,jenis_luaran
-    order by tahun desc
-    ''',con)
+inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+where jenis_luaran like 'TEKNOLOGI TEPAT GUNA'
+group by tahun, nama,jenis_luaran
+order by tahun desc
+    ''', con)
+
 
 def getLuaranBukuDosenperTh():
     return pd.read_sql('''
     select tahun,nama,jenis_luaran,count(dpp.id_penelitian_pkm) Jumlah from dim_penelitian_pkm dpp
-    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-    where jenis_luaran not like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran not like 'TEKNOLOGI TEPAT GUNA'
-    group by tahun, nama,jenis_luaran
-    order by tahun desc
-    ''',con)
+inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+where not(jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA')
+group by tahun, nama,jenis_luaran
+order by tahun desc
+    ''', con)
+
 
 def getRerataJumlPenelitianDosenperTh():
     return pd.read_sql('''
@@ -224,7 +260,8 @@ def getRerataJumlPenelitianDosenperTh():
           where bpd.jenis = 'PENELITIAN'
           group by bpd.id_dosen, dd.tahun) pp
     group by pp.id;
-    ''',con)
+    ''', con)
+
 
 def getRerataJumlPublikasiDosenperTh():
     return pd.read_sql('''
@@ -232,4 +269,4 @@ def getRerataJumlPublikasiDosenperTh():
     from (select count(distinct id_publikasi) jumlah
           from br_pp_publikasi bpp
           group by id_penelitian_pkm) pp;
-    ''',con)
+    ''', con)

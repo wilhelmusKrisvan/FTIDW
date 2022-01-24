@@ -371,6 +371,7 @@ persen_mhsLulus = dbc.Container([
     ], style={'margin-top': '10px'})
 ], style=cont_style)
 
+
 layout = html.Div([
     html.Div(html.H1('Analisis Skripsi, KP, dan Yudisium Prodi Informatika',
                      style={'margin-top': '30px', 'textAlign': 'center'}

@@ -5,8 +5,6 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
-from sqlalchemy import create_engine
-from plotly.subplots import make_subplots
 from dash.dependencies import Input, Output, State
 from appConfig import app
 from urllib.request import urlopen
@@ -134,7 +132,6 @@ mhsasing = dbc.Container([
     dbc.Collapse(
         id='cll_tblasing',
         is_open=False,
-
     )
 ], style=cont_style)
 
@@ -813,6 +810,6 @@ def graphPerkembanganJumlahMaba(id):
 )
 def graphPersentaseKenaikanMaba(id):
     df = dfmhsPersenNaik
-    fig = px.line(df, x=df['Tahun Ajaran'], y=df['% Pertumbuhan'])
+    fig = px.line(df, x=df['Tahun Ajaran'], y=df['% Pertumbuhan'].apply(pd.to_numeric))
     fig.update_traces(mode='lines+markers')
     return fig
