@@ -2,11 +2,10 @@ from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
 from appConfig import app, server
-from dash.dependencies import \
-    Input, Output
+from dash.dependencies import Input, Output
 from flask_login import logout_user, current_user
-from apps import pmb,kbm,kegiatan_kerjasama,tgsakhir,alumni,ppp
-import login, home, profile, admin
+from apps import pmb,kbm,kegiatan_kerjasama,tgsakhir,alumni,ppp,mbkm,dosen
+import login, home, user_profile, admin
 
 navBar = dbc.Navbar(
     children=[
@@ -61,9 +60,21 @@ def displayPage(pathname):
 
     if pathname == '/dashboard/registrasi':
         if current_user.is_authenticated:
-            return registrasi.layout
+            return kbm.layout
         else:
-            return registrasi.layout
+            return kbm.layout
+
+    if pathname == '/dashboard/mbkm':
+        if current_user.is_authenticated:
+            return mbkm.layout
+        else:
+            return mbkm.layout
+
+    if pathname == '/dashboard/profil-dosen':
+        if current_user.is_authenticated:
+            return dosen.layout
+        else:
+            return dosen.layout
 
     if pathname == '/dashboard/kegiatan-kerjasama':
         if current_user.is_authenticated:
@@ -91,7 +102,7 @@ def displayPage(pathname):
 
     if pathname == '/profile':
         if current_user.is_authenticated:
-            return profile.layout
+            return user_profile.layout
         else:
             return login.layout
 
@@ -184,4 +195,5 @@ def navBarPage(input1):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    # app.run_server(debug=False)
+    app.run_server(host='0.0.0.0',debug=False)

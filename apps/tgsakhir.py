@@ -387,7 +387,42 @@ layout = html.Div([
     html.Div([mitra], style={'margin-bottom': '50px'})
 ], style={'justify-content': 'center'})
 
+tgsakhir = dbc.Container([
+    html.Div([
+        dcc.Tabs([
+            dcc.Tab(label='Kerja Praktik', value='kp',
+                    children=[
+                        kp_prodi,
+                        ttguKP
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Skripsi', value='skripsi',
+                    children=[
+                        skripsi,
+                        dosbing
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Yudisium', value='yudisium',
+                    children=[
+                        persen_mhsLulus,
+                        ipk_lulusan,
+                        masa_studi,
+                        mitra
+                    ],
+                    style=tab_style, selected_style=selected_style)
+        ], style=tabs_styles, value='kp')
+    ])
+])
 
+layout = html.Div([
+    html.Div(html.H1('Analisis KP, Skripsi, Yudisium',
+                     style={'margin-top': '30px', 'textAlign': 'center'}
+                     )
+             ),
+    html.Div([tgsakhir])
+])
+
+#COLLAPSE CALLBACK
 @app.callback(
     Output("cll_tblallmasa", "is_open"),
     [Input("cll_tblavgmasa", "n_clicks")],
@@ -417,7 +452,7 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
-
+#GRAPH CALLBACK
 @app.callback(
     Output('cll_tblkp', 'is_open'),
     Output('cll_tblkp', 'children'),

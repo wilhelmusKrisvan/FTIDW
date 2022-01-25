@@ -14,7 +14,8 @@ def getDataFrameFromDBwithParams(query, parameter):
 
 def getMahasiswaMBKMperSemester():
     return pd.read_sql('''
-    select (case
+    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+       (case
             when kode_bkp = 'PP' then 'Pertukaran Pelajar'
             when kode_bkp = 'PI' then 'Proyek Independen'
             when kode_bkp = 'PR' then 'Penelitian & Riset'
@@ -26,44 +27,48 @@ def getMahasiswaMBKMperSemester():
             when kode_bkp = 'AK' then 'Ambil Kredit Unit'
             else kode_bkp
     end) as Bentuk,
-       count(distinct id_mahasiswa) Jumlah,
-       kode_semester Semester
+       count(distinct id_mahasiswa) Jumlah
     from mbkm_matkul_monev
-    group by kode_semester, Bentuk;''', con)
+    inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+    group by ds.kode_semester, Bentuk , Semester
+    order by ds.kode_semester;''', con)
 
 
 def getMitraMBKM():
     return pd.read_sql('''
-    select distinct mitra Mitra from mbkm_matkul_monev;''', con)
+    select distinct mitra Mitra, kode_semester
+    from mbkm_matkul_monev
+    group by mitra, kode_semester;''', con)
 
 
 def getJumlMitraMBKMperSemester():
     return pd.read_sql('''
-    select ds.kode_semester, count(distinct mitra)
-    from mbkm_matkul_monev
-    inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
-    group by ds.kode_semester;
-    ''')
+    select CONCAT(semester_nama,' ',tahun_ajaran) Semester, count(distinct mitra) 'Jumlah Mitra'
+    from mbkm_matkul_monev mmm
+    inner join dim_semester ds on mmm.kode_semester = ds.kode_semester
+    group by ds.kode_semester, Semester
+    order by ds.kode_semester
+    ''',con)
 
 
 def getDosbingMBKMperSemester():
     return pd.read_sql('''
-    select tahun_ajaran 'Tahun Ajaran', semester_nama 'Semester', count(distinct dd.id_dosen) 'Jumlah Dosen'
+    select CONCAT(semester_nama,' ',tahun_ajaran) Semester, count(distinct dd.id_dosen) 'Jumlah Dosen'
     from mbkm_matkul_monev mbm
          inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
          inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
          inner join fact_khs fk on dm.id_matakuliah = fk.id_matakuliah
          inner join fact_dosen_mengajar fdm on dm.id_matakuliah = fdm.id_matakuliah
          inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
-    group by mbm.kode_semester, Semester, `Tahun Ajaran`
-    order by `Tahun Ajaran`;''', con)
+    group by mbm.kode_semester, Semester
+    order by mbm.kode_semester;''', con)
 
 
 def getRerataSKSMBKMperSemester():
     return pd.read_sql('''
-    select tahun_ajaran 'Tahun Ajaran', semester_nama 'Semester', count(sks) 'Jumlah SKS'
+    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, count(sks) 'Jumlah SKS'
     from mbkm_matkul_monev mbm
          inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
          inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
-    group by mbm.kode_semester, Semester, `Tahun Ajaran`
-    order by `Tahun Ajaran`;''', con)
+    group by mbm.kode_semester, Semester
+    order by mbm.kode_semester;''', con)

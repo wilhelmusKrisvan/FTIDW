@@ -162,7 +162,7 @@ menu = dbc.CardGroup([
                         style=title_style),
                 html.P('Profil Dosen Fakultas Teknologi Informasi',
                        style=desc_style)
-            ], href='/dashboard/dosen')
+            ], href='/dashboard/profil-dosen')
             , outline=True
             , id='card_menu'
         ),

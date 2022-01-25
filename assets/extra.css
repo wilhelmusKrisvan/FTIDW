@@ -30,7 +30,17 @@
 #tbl_pppDosen button.export,
 #tbl_kerjasamaPPP button.export,
 #tbl_presNonAkademik button.export,
-#tbl_presAkademik button.export{
+#tbl_presAkademik button.export,
+#tbl_dosens3 button.export,
+#tbl_jabfungth button.export,
+#tbl_persenjabfungth button.export,
+#tbl_dosentetapinf button.export,
+#tbl_dosenindustriinf button.export,
+#tbl_mahasiswambkm button.export,
+#tbl_reratasksmbkm button.export,
+#tbl_dosbingmbkm button.export,
+#tbl_jumlmitrambkm button.export
+{
     width: 120px;
     height: 30px;
     border-radius: 10px;

@@ -533,7 +533,6 @@ def toggle_collapse(n, is_open):
     return is_open
 
 
-
 # SHOW GRAPHIC ANALYSIS
 @app.callback(
     Output('grf_mhsseleksi', 'figure'),
@@ -812,4 +811,5 @@ def graphPersentaseKenaikanMaba(id):
     df = dfmhsPersenNaik
     fig = px.line(df, x=df['Tahun Ajaran'], y=df['% Pertumbuhan'].apply(pd.to_numeric))
     fig.update_traces(mode='lines+markers')
+    fig.update_yaxes(categoryorder='category ascending')
     return fig
