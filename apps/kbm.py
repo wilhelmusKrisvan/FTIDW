@@ -409,13 +409,13 @@ def toggle_collapse(naktif, nasing, mhs, is_open):
     Output("grf_ipkMahasiswa", 'figure'), Input('grf_ipkMahasiswa', 'id')
 )
 def FillIpkMahasiswa(id):
-    df = data.getDataFrameFromDB('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester, avg(ipk) as "Rata-Rata"
+    df = data.getDataFrameFromDB('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama, avg(ipk) as "Rata-Rata"
 from fact_mahasiswa_status fms 
 inner join dim_semester ds on ds.id_semester = fms.id_semester
 where ds.tahun_ajaran in ('2015/2016','2016/2017','2017/2018','2018/2019','2019/2020') and fms.status = 'AK'
-group by ds.tahun_ajaran, ds.semester
-order by ds.tahun_ajaran, ds.semester''')
-    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['semester'])
+group by ds.tahun_ajaran, ds.semester_nama
+order by ds.tahun_ajaran, ds.semester_nama''')
+    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['semester_nama'])
     fig.update_layout(barmode='group')
     return fig
 

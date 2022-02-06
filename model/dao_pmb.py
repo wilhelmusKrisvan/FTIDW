@@ -23,7 +23,7 @@ aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
     inner join dim_semester smstr on dy.id_semester = smstr.id_semester
     inner join dim_prodi prodi on prodi.id_prodi = dy.id_prodi
     left join fact_pmb fpmbDaftar on dy.id_semester = fpmbDaftar.id_semester and (fpmbDaftar.id_prodi_pilihan_1 || fpmbDaftar.id_prodi_pilihan_3 || fpmbDaftar.id_prodi_pilihan_3 = 9)
-    where kode_prodi = '71' and dy.id_semester <= (select id_semester from dim_semester where tahun_ajaran='2018/2019' limit 1)
+    where kode_prodi = '71' and dy.id_semester <= (select id_semester from dim_semester where tahun_ajaran=concat(year(now())-1,'/',year(now())) limit 1)
     group by tahun_aka, dy_tampung, dy.id_semester
     ) dataPendaftar
     left join fact_pmb fpmbLolos on dataPendaftar.id_semester = fpmbLolos.id_semester and fpmbLolos.id_prodi_diterima = 9
@@ -47,7 +47,8 @@ inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_pro
 where warga_negara = 'WNA'
 group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
 ) data
-inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran = '2018/2019' limit 1)
+inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 
+and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran=concat(year(now())-1,'/',year(now())) limit 1)
 order by nama_prodi, tahun_semster desc''',con)
 
 def getJenisSekolahPendaftar():
@@ -71,6 +72,8 @@ def getProvinsiDaftar():
 from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
 inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+where ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 group by ds.tahun_ajaran, dl.provinsi
 order by ds.tahun_ajaran, dl.provinsi''',con)
 
@@ -81,6 +84,8 @@ from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
 inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
 where fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
+and ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 group by ds.tahun_ajaran, dl.provinsi
 order by ds.tahun_ajaran, dl.provinsi''',con)
 
@@ -91,6 +96,8 @@ from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
 inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
 where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+and ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 group by ds.tahun_ajaran, dl.provinsi
 order by ds.tahun_ajaran, dl.provinsi''',con)
 
