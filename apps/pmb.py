@@ -1,4 +1,3 @@
-import dash
 import dash_table as dt
 import pandas as pd
 from dash import html, dcc
@@ -29,8 +28,10 @@ dfmhsPersenNaik = data.getPersentaseKenaikanMaba()
 listDropdown = []
 for x in range(0, 5):
     counter = x + 1
+    tahun = 5
+    yearnow = date.today().strftime('%Y')
     listDropdown.append(
-        str(int(date.today().strftime('%Y')) - 5 + x) + '/' + str(int(date.today().strftime('%Y')) - 4 + x))
+        str(int(yearnow) - tahun + x) + '/' + str(int(yearnow) - (tahun - 1) + x))
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -82,6 +83,12 @@ ttlgrf_style = {
     'color': 'black'
 }
 
+filterLabel_style = {
+    'textAlign': 'center',
+    'padding': '0px',
+    'color': 'black'
+}
+
 button_style = {
     'width': '120px',
     'height': '50px',
@@ -99,25 +106,33 @@ mhsseleksi = dbc.Container([
                 style=ttlgrf_style),
         dbc.CardLink(
             dbc.CardBody([
-                html.Div([
-                    dcc.Dropdown(
-                        id='Fromdrpdwn_mhsseleksi',
-                        options=[{'label': i, 'value': i} for i in listDropdown],
-                        value=listDropdown[0],
-                        style={'color': 'black'},
-                        clearable=False,
-                        placeholder='Dari',
-                    ),
-                ]),
-                html.Div([
-                    dcc.Dropdown(
-                        id='Todrpdwn_mhsseleksi',
-                        options=[{'label': i, 'value': i} for i in listDropdown],
-                        value=listDropdown[len(listDropdown) - 1],
-                        style={'color': 'black'},
-                        clearable=False,
-                        placeholder='Sampai',
-                    ),
+                dbc.Row([
+                    dbc.Col([
+                        html.Div([
+                            html.P('Dari', style={'color': 'black'}),
+                            dcc.Dropdown(
+                                id='Fromdrpdwn_mhsseleksi',
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[0],
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='Dari',
+                            ),
+                        ]),
+                    ], width=6),
+                    dbc.Col([
+                        html.Div([
+                            html.P('Sampai', style={'color': 'black'}),
+                            dcc.Dropdown(
+                                id='Todrpdwn_mhsseleksi',
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[len(listDropdown) - 1],
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='Sampai',
+                            ),
+                        ]),
+                    ], width=6),
                 ]),
                 dcc.Graph(id='grf_mhsseleksi'),
                 dbc.Button('Lihat Tabel', id='cll_grfseleksi',
@@ -149,26 +164,34 @@ mhsasing = dbc.Container([
     dbc.Card([
         html.H5('2.b Mahasiswa Asing',
                 style=ttlgrf_style),
-        html.Div([
-            dcc.Dropdown(
-                id='Fromdrpdwn_mhsasing',
-                options=[{'label': i, 'value': i} for i in listDropdown],
-                value=listDropdown[0],
-                style={'color': 'black'},
-                clearable=False,
-                placeholder='Dari',
-            ),
-        ]),
-        html.Div([
-            dcc.Dropdown(
-                id='Todrpdwn_mhsasing',
-                options=[{'label': i, 'value': i} for i in listDropdown],
-                value=listDropdown[len(listDropdown) - 1],
-                style={'color': 'black'},
-                clearable=False,
-                placeholder='Sampai',
-            ),
-        ]),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.P('Dari', style={'color': 'black'}),
+                    dcc.Dropdown(
+                        id='Fromdrpdwn_mhsasing',
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='Dari',
+                    ),
+                ]),
+            ], width=6),
+            dbc.Col([
+                html.Div([
+                    html.P('Sampai', style={'color': 'black'}),
+                    dcc.Dropdown(
+                        id='Todrpdwn_mhsasing',
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[len(listDropdown) - 1],
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='Sampai',
+                    ),
+                ]),
+            ], width=6),
+        ], style={'padding': '15px'}),
         dcc.Tabs([
             dcc.Tab(label='FTI', value='all',
                     children=[
@@ -207,25 +230,33 @@ mhsrasio = dbc.Container([
         html.H5('Rasio Daya Tampung : Pendaftar Registrasi Mahasiswa',
                 style=ttlgrf_style),
         dbc.CardBody([
-            html.Div([
-                dcc.Dropdown(
-                    id='Fromdrpdwn_mhsrasio',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[0],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Dari',
-                ),
-            ]),
-            html.Div([
-                dcc.Dropdown(
-                    id='Todrpdwn_mhsrasio',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[len(listDropdown) - 1],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Sampai',
-                ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.P('Dari', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Fromdrpdwn_mhsrasio',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[0],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Dari',
+                        ),
+                    ]),
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.P('Sampai', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Todrpdwn_mhsrasio',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[len(listDropdown) - 1],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Sampai',
+                        ),
+                    ]),
+                ], width=6),
             ]),
             dcc.Graph(id='grf_mhsrasio'),
             dbc.Button('Lihat Tabel', id='cll_grfrasio', n_clicks=0, style=button_style),
@@ -257,25 +288,33 @@ mhsasmasmk = dbc.Container([
         html.H5('Asal Sekolah Mahasiswa Pendaftar',
                 style=ttlgrf_style),
         dbc.CardBody([
-            html.Div([
-                dcc.Dropdown(
-                    id='Fromdrpdwn_mhssmasmk',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[0],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Dari',
-                ),
-            ]),
-            html.Div([
-                dcc.Dropdown(
-                    id='Todrpdwn_mhssmasmk',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[len(listDropdown) - 1],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Sampai',
-                ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.P('Dari', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Fromdrpdwn_mhssmasmk',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[0],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Dari',
+                        ),
+                    ]),
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.P('Sampai', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Todrpdwn_mhssmasmk',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[len(listDropdown) - 1],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Sampai',
+                        ),
+                    ]),
+                ], width=6),
             ]),
             dcc.Graph(id='grf_mhssmasmk'),
             dbc.Button('Lihat Tabel', id='cll_grfsmasmk', n_clicks=0, style=button_style),
@@ -313,20 +352,8 @@ mhsprovinsi = dbc.Container([
                             dbc.Card([
                                 dbc.Row([
                                     dbc.Col([
-                                        dcc.RadioItems(
-                                            id='radio_daftar',
-                                            options=[{'label': 'Persebaran Wilayah', 'value': 'geojson'},
-                                                     {'label': 'Jumlah Mahasiswa per Provinsi', 'value': 'bar'}
-                                                     ],
-                                            value='geojson',
-                                            style={'width': '100%', 'padding-bottom': '0px',
-                                                   'padding-top': '0.7rem'},
-                                            className='card-body',
-                                            labelStyle={'display': 'block'}
-                                        ),
-                                    ], width=6),
-                                    dbc.Col([
                                         html.Div([
+                                            html.P('Dari', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Fromdrpdwn_TAdaftar',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -336,7 +363,10 @@ mhsprovinsi = dbc.Container([
                                                 placeholder='Dari',
                                             ),
                                         ], id='visiFrom_TAdaftar'),
+                                    ], width=6),
+                                    dbc.Col([
                                         html.Div([
+                                            html.P('Sampai', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Todrpdwn_TAdaftar',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -347,6 +377,22 @@ mhsprovinsi = dbc.Container([
                                             ),
                                         ], id='visiTo_TAdaftar')
                                     ], width=6),
+                                ], style={'margin-bottom': '15px'}),
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.P('Visualisasi: ', style={'color': 'black'}),
+                                        dcc.RadioItems(
+                                            id='radio_daftar',
+                                            options=[{'label': 'Persebaran Wilayah (Maps)', 'value': 'geojson'},
+                                                     {'label': 'Jumlah Mahasiswa per Provinsi (Bar Chart)',
+                                                      'value': 'bar'}
+                                                     ],
+                                            value='geojson',
+                                            style={'width': '100%', 'padding': '0px', },
+                                            className='card-body',
+                                            labelStyle={'display': 'block'}
+                                        ),
+                                    ]),
                                 ]),
                                 dbc.CardBody([
                                     dcc.Graph(id='grf_mhsprovdaftar'),
@@ -360,19 +406,8 @@ mhsprovinsi = dbc.Container([
                             dbc.Card([
                                 dbc.Row([
                                     dbc.Col([
-                                        dcc.RadioItems(
-                                            id='radio_lolos',
-                                            options=[{'label': 'Persebaran Wilayah', 'value': 'geojson'},
-                                                     {'label': 'Jumlah Mahasiswa per Provinsi', 'value': 'bar'}],
-                                            value='geojson',
-                                            style={'width': '100%', 'padding-bottom': '0px',
-                                                   'padding-top': '0.7rem'},
-                                            className='card-body',
-                                            labelStyle={'display': 'block'}
-                                        ),
-                                    ], width=6),
-                                    dbc.Col([
                                         html.Div([
+                                            html.P('Dari', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Fromdrpdwn_TAlolos',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -382,7 +417,10 @@ mhsprovinsi = dbc.Container([
                                                 placeholder='Dari',
                                             ),
                                         ], id='visiFrom_TAlolos'),
+                                    ], width=6),
+                                    dbc.Col([
                                         html.Div([
+                                            html.P('Sampai', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Todrpdwn_TAlolos',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -393,6 +431,19 @@ mhsprovinsi = dbc.Container([
                                             ),
                                         ], id='visiTo_TAlolos')
                                     ], width=6),
+                                ]),
+                                dbc.Row([
+                                    dbc.Col([
+                                        dcc.RadioItems(
+                                            id='radio_lolos',
+                                            options=[{'label': 'Persebaran Wilayah', 'value': 'geojson'},
+                                                     {'label': 'Jumlah Mahasiswa per Provinsi', 'value': 'bar'}],
+                                            value='geojson',
+                                            style={'width': '100%', 'padding': '0px', },
+                                            className='card-body',
+                                            labelStyle={'display': 'block'}
+                                        ),
+                                    ])
                                 ]),
                                 dbc.CardBody([
                                     dcc.Graph(id='grf_mhsprovlolos'),
@@ -406,20 +457,8 @@ mhsprovinsi = dbc.Container([
                             dbc.Card([
                                 dbc.Row([
                                     dbc.Col([
-                                        dcc.RadioItems(
-                                            id='radio_regis',
-                                            options=[{'label': 'Persebaran Wilayah', 'value': 'geojson'},
-                                                     {'label': 'Jumlah Mahasiswa per Provinsi', 'value': 'bar'}
-                                                     ],
-                                            value='geojson',
-                                            style={'width': '100%', 'padding-bottom': '0px',
-                                                   'padding-top': '0.7rem'},
-                                            className='card-body',
-                                            labelStyle={'display': 'block'}
-                                        ),
-                                    ], width=6),
-                                    dbc.Col([
                                         html.Div([
+                                            html.P('Dari', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Fromdrpdwn_TAregis',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -429,7 +468,10 @@ mhsprovinsi = dbc.Container([
                                                 placeholder='Dari',
                                             ),
                                         ], id='visiFrom_TAregis'),
+                                    ], width=6),
+                                    dbc.Col([
                                         html.Div([
+                                            html.P('Sampai', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Todrpdwn_TAregis',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -440,6 +482,20 @@ mhsprovinsi = dbc.Container([
                                             ),
                                         ], id='visiTo_TAregis')
                                     ], width=6),
+                                ]),
+                                dbc.Row([
+                                    dbc.Col([
+                                        dcc.RadioItems(
+                                            id='radio_regis',
+                                            options=[{'label': 'Persebaran Wilayah', 'value': 'geojson'},
+                                                     {'label': 'Jumlah Mahasiswa per Provinsi', 'value': 'bar'}
+                                                     ],
+                                            value='geojson',
+                                            style={'width': '100%', 'padding': '0px'},
+                                            className='card-body',
+                                            labelStyle={'display': 'block'}
+                                        ),
+                                    ]),
                                 ]),
                                 dbc.CardBody([
                                     dcc.Graph(id='grf_mhsprovregis'),
@@ -463,25 +519,33 @@ mhsKembangJml = dbc.Container([
         html.H5('Perkembangan Jumlah Penerimaan Mahasiswa Baru',
                 style=ttlgrf_style),
         dbc.CardBody([
-            html.Div([
-                dcc.Dropdown(
-                    id='Fromdrpdwn_mhsJml',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[0],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Dari',
-                ),
-            ]),
-            html.Div([
-                dcc.Dropdown(
-                    id='Todrpdwn_mhsJml',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[len(listDropdown) - 1],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Sampai',
-                ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.P('Dari', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Fromdrpdwn_mhsJml',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[0],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Dari',
+                        ),
+                    ]),
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.P('Sampai', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Todrpdwn_mhsJml',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[len(listDropdown) - 1],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Sampai',
+                        ),
+                    ]),
+                ], width=6)
             ]),
             dcc.Graph(id='grf_mhsJml'),
             dbc.Button('Lihat Tabel', id='cll_grfJml', n_clicks=0, style=button_style),
@@ -513,25 +577,33 @@ mhsPersenNaik = dbc.Container([
         html.H5('Persentase Kenaikan Penerimaan Mahasiswa Baru',
                 style=ttlgrf_style),
         dbc.CardBody([
-            html.Div([
-                dcc.Dropdown(
-                    id='Fromdrpdwn_mhsPersenNaik',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[0],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Dari',
-                ),
-            ]),
-            html.Div([
-                dcc.Dropdown(
-                    id='Todrpdwn_mhsPersenNaik',
-                    options=[{'label': i, 'value': i} for i in listDropdown],
-                    value=listDropdown[len(listDropdown) - 1],
-                    style={'color': 'black'},
-                    clearable=False,
-                    placeholder='Sampai',
-                ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.P('Dari', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Fromdrpdwn_mhsPersenNaik',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[0],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Dari',
+                        ),
+                    ]),
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.P('Sampai', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Todrpdwn_mhsPersenNaik',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[len(listDropdown) - 1],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Sampai',
+                        ),
+                    ]),
+                ], width=6),
             ]),
             dcc.Graph(id='grf_mhsPersenNaik'),
             dbc.Button('Lihat Tabel', id='cll_grfPersenNaik',
@@ -1070,7 +1142,7 @@ order by provinsi''', {'From': valueFrom, 'To': valueTo})
 )
 def graphPerkembanganJumlahMaba(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams(
-        '''select tahun_ajaran TahunAjar, 
+        '''select tahun_ajaran "Tahun Ajaran", 
         count(distinct fp.id_mahasiswa) Jumlah 
         from fact_pmb fp 
         inner join dim_date dd on dd.id_date = fp.id_tanggal_registrasi 
@@ -1079,7 +1151,7 @@ def graphPerkembanganJumlahMaba(valueFrom, valueTo):
         where nim like %(TI)s and ds.tahun_ajaran between %(From)s and %(To)s 
         group by tahun_ajaran 
         order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo, 'TI': '71%'})
-    fig = px.line(df, x=df['TahunAjar'], y=df['Jumlah'], )
+    fig = px.line(df, x=df['Tahun Ajaran'], y=df['Jumlah'], )
     fig.update_traces(mode='lines+markers')
     return fig
 

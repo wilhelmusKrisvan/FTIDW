@@ -41,26 +41,34 @@ order by ds.tahun_ajaran, ds.semester, kelompok_matakuliah, nama_matakuliah''',c
 def getMahasiswaAktif():
     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
-where fms.status = 'AK' and ds.tahun_ajaran in ('2015/2016','2016/2017','2017/2018','2018/2019','2019/2020')
+where fms.status = 'AK' and 
+ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 group by ds.tahun_ajaran, ds.semester_nama
 order by ds.tahun_ajaran, ds.semester_nama''',con)
 
 def getMahasiswaAsing():
-    return pd.read_sql('''select tahun_angkatan 'Tahun Angkatan', count(*) as 'Jumlah Mahasiswa Asing' from dim_mahasiswa 
-where warga_negara ='WNA' and tahun_angkatan >= 2015 group by tahun_angkatan order by tahun_angkatan''',con)
+    return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', 
+    count(*) as 'Jumlah Mahasiswa Asing' from fact_mahasiswa_status fms
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+inner join dim_mahasiswa dm on dm.id_mahasiswa = fms.id_mahasiswa
+where warga_negara ='WNA'and 
+tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+group by tahun_ajaran
+order by tahun_ajaran ''',con)
 
 def getDosenMengajar():
     return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',
     count(distinct fdm.id_dosen) 'Jumlah' from fact_dosen_mengajar fdm
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
-where kode_semester>=20171
+where ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 group by tahun_ajaran, semester_nama
 order by tahun_ajaran desc,semester_nama asc''',con)
 
 def getPersentaseDosenTidakTetap():
     return pd.read_sql('''select semua.tahun_ajaran 'Tahun Ajaran',semua.semester_nama 'Semester',
-       tetap.jumlah 'Dosen Tidak Tetap',semua.jumlah 'Semua Dosen',(tetap.jumlah/semua.jumlah)*100 '%' from
+       tetap.jumlah 'Dosen Tidak Tetap',semua.jumlah 'Semua Dosen',(tetap.jumlah/semua.jumlah)*100 as 'Persentase' from
 (select tahun_ajaran,semester_nama,count(distinct fdm.id_dosen) jumlah from fact_dosen_mengajar fdm
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
@@ -79,10 +87,10 @@ def getTingkatKepuasanDosen():
     return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran', semester_nama Semester, nama 'Nama Dosen', 
     Rata2 'Rata-rata',
        case
-        when Rata2>=0 and Rata2<=25 then 'KURANG BAIK'
-        when Rata2>=26 and Rata2<=50 then 'CUKUP BAIK'
-        when Rata2>51 and Rata2<=75 then 'BAIK'
-        when Rata2>=76 and Rata2<=100 then 'SANGAT BAIK'
+        when round(Rata2)>=0 and round(Rata2)<=25 then 'KURANG BAIK'
+        when round(Rata2)>=26 and round(Rata2)<=50 then 'CUKUP BAIK'
+        when round(Rata2)>51 and round(Rata2)<=75 then 'BAIK'
+        when round(Rata2)>=76 and round(Rata2)<=100 then 'SANGAT BAIK'
        END AS Predikat
 from
 (select tahun_ajaran,semester_nama, nama,((avg(q1)+avg(q2)+avg(q3)+avg(q4)+avg(q5)+avg(q6)+
@@ -90,9 +98,10 @@ from
 from fact_dosen_mengajar fdm
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
-where kode_semester>='20191' and id_prodi=9
+where ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and id_prodi=9
 group by tahun_ajaran,semester_nama,nama) kepuasan
-order by tahun_ajaran asc, semester_nama asc''',con)
+order by nama asc,tahun_ajaran asc, semester_nama asc''',con)
 
 def getRasioDosenMahasiswa():
     return pd.read_sql('''select data.tahun Tahun,if(substr(data.kode_semester,5,1)='1','GASAL','GENAP') as Semester,
@@ -148,26 +157,31 @@ on data.kode_semester=dosen.kode_semester''',con)
 
 def getPersentaseMahasiswaTidakAktif():
     return pd.read_sql('''select ak.tahun_angkatan 'Tahun Angkatan', 
-    concat(substr(ak.kode_semester,1,4),' ',if(substr(ak.kode_semester,5,1)='1','Ganjil','Genap')) Semester, 
+    ak.tahun_ajaran, 
     ak.jumlah 'Mahasiswa Aktif',
-    ifnull(ta.jumlah,0) 'Mahasiswa Tidak Aktif',IFNULL(ta.jumlah / ak.jumlah * 100,'0')'%'
-from (select tahun_angkatan, ds.kode_semester,count(distinct (fms.nim)) jumlah
-      from mahasiswa_status_monev fms
-               inner join dim_mahasiswa dm on fms.nim = dm.nim
-               inner join dim_semester ds on fms.kode_semester= ds.kode_semester
-      where tahun_angkatan >= 2015
+    concat(if(substr(ak.kode_semester,5,1)='1','Ganjil','Genap')) Semester,
+    ifnull(ta.jumlah,0) 'Mahasiswa Tidak Aktif',IFNULL(ta.jumlah / ak.jumlah * 100,'0')"persen"
+from (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester,count(distinct (dm.nim)) jumlah
+      from fact_mahasiswa_status fms
+               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+               inner join dim_semester ds on fms.id_semester= ds.id_semester
+      where tahun_angkatan >= year(now()) -7
         and (status = 'AK'or status='CS')
-        and ds.kode_semester>='20191'
-      group by tahun_angkatan,ds.kode_semester) ak
+        and ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+        and id_prodi=9
+      group by ds.tahun_ajaran,tahun_angkatan,ds.kode_semester) ak
     left join
-     (select tahun_angkatan, ds.kode_semester, count(distinct (fms.nim)) jumlah
-      from mahasiswa_status_monev fms
-               inner join dim_mahasiswa dm on fms.nim = dm.nim
-               inner join dim_semester ds on fms.kode_semester= ds.kode_semester
-      where tahun_angkatan >= 2015
+     (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester, count(distinct (dm.nim)) jumlah
+      from fact_mahasiswa_status fms
+               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+               inner join dim_semester ds on fms.id_semester= ds.id_semester
+      where tahun_angkatan >= year(now()) -7
         and status = 'TA'
-        and ds.kode_semester>='20191'
-      group by tahun_angkatan, ds.kode_semester) ta
+        and ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+        and id_prodi=9
+      group by ds.tahun_ajaran,tahun_angkatan, ds.kode_semester) ta
 on ak.tahun_angkatan = ta.tahun_angkatan
 and ak.kode_semester=ta.kode_semester
 order by ak.tahun_angkatan desc, Semester asc''',con)

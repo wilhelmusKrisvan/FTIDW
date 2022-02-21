@@ -123,7 +123,7 @@ order by tahun_ajaran asc,semester_nama asc''',con)
 
 def getMahasiswaLulus():
     return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran',lls.tahun_angkatan 'Tahun Angkatan',lls.jml as 'Jumlah Lulusan',
-    mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 '%' from
+    mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 'Persentase' from
 (select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium,semester_nama, tahun_angkatan from fact_yudisium fy
 inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
 inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
@@ -143,7 +143,7 @@ order by tahun_ajaran asc''',con)
 
 def getMahasiswaLulusBandingTotal():
     return pd.read_sql('''select lulus.tahun_angkatan 'Angkatan', lulus.jumlah 'Jumlah Lulusan', 
-    total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 "%"
+    total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 "persentase"
 from (
          select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
          from fact_yudisium fy

@@ -347,7 +347,7 @@ def graphGaji(id):
 )
 def graphLayanan(id):
     df = dfKepuasanPelayanan
-    fig = px.pie(df, values=df['%'], names=df['Nilai'])
+    fig = px.pie(df, values=df['persentase'], names=df['Nilai'])
     return fig
 
 

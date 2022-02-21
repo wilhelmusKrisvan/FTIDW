@@ -113,7 +113,7 @@ left join(
 order by terlacak.tahun_lulus''', con)
 
 def getKepuasanLayanan():
-    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 '%', kepuasan.Nilai  from
+    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'persentase', kepuasan.Nilai  from
 (select sum(Jumlah) Semua,Nilai,1 gabung from
 (select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
 from fact_kepuasan_pengguna_mahasiswa
@@ -216,10 +216,10 @@ where total.gabung = kepuasan.gabung''',con)
 def getSkill():
     return pd.read_sql('''
 select kriteria as Kriteria, 
-    concat(round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Sangat Baik",
-    concat(round(BAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Baik",
-    concat(round(CUKUP/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Cukup",
-    concat(round(KURANG/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'%') as "Kurang"
+    concat(round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'persen') as "Sangat Baik",
+    concat(round(BAIK/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'persen') as "Baik",
+    concat(round(CUKUP/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'persen') as "Cukup",
+    concat(round(KURANG/(SANGATBAIK+BAIK+CUKUP+KURANG)*100,2),'persen') as "Kurang"
     from (
     select "1" as nomor, "INTEGRITAS" as kriteria, 
     sum(case when integritas = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",

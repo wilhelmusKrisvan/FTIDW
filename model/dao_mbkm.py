@@ -30,6 +30,7 @@ def getMahasiswaMBKMperSemester():
        count(distinct id_mahasiswa) Jumlah
     from mbkm_matkul_monev
     inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+    WHERE ds.tahun_ajaran between '2017/2018' and '2021/2022'
     group by ds.kode_semester, Bentuk , Semester
     order by ds.kode_semester;''', con)
 

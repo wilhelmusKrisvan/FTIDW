@@ -115,18 +115,18 @@ from(
 ) as DataMentah''',con)
 
 def getPerkembanganJumlahMaba():
-    return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran', count(distinct fp.id_mahasiswa) 'Jumlah'
-from fact_pmb fp
+    return pd.read_sql('''select tahun_ajaran as TahunAjaran, count(distinct fp.id_mahasiswa) as Jumlah 
+    from fact_pmb fp
          inner join dim_date dd on dd.id_date = fp.id_tanggal_registrasi
          inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
          inner join dim_mahasiswa dm on fp.id_mahasiswa = dm.id_mahasiswa
-where nim like "71%"
+where id_prodi = 9
 group by tahun_ajaran
 order by tahun_ajaran''',con)
 
 def getPersentaseKenaikanMaba():
     return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran',
-       if(@last_entry = 0, 0, format(((entry-@last_entry)/entry)*100,2)) '% Pertumbuhan',
+       if(@last_entry = 0, 0, format(((entry-@last_entry)/entry)*100,2)) 'Pertumbuhan',
         @last_entry := entry 'Jumlah'
 from
       (select @last_entry := 0) x,
