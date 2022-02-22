@@ -78,6 +78,19 @@ ttlgrf_style = {
     'color': 'black'
 }
 
+buttonLink_style = {
+    'position': 'fixed',
+    'width': '60px',
+    'height': '60px',
+    'bottom': '40px',
+    'right': '40px',
+    'background-color': '#2780e3',
+    'color': 'white',
+    'border-radius': '50px',
+    'text-align': 'center',
+    'box-shadow': '5px 10px 20px #ebedeb',
+}
+
 button_style = {
     'width': '120px',
     'height': '50px',
@@ -479,6 +492,7 @@ layout = html.Div([
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
+    html.A(className='name'),
     html.Div([ipkmahasiswa]),
     html.Div([mahasiswa]),
     html.Div([mahasiswaTA]),
@@ -486,6 +500,11 @@ layout = html.Div([
     html.Div([tingkatKepuasan]),
     html.Div([Dosen]),
     html.Div([matkul], style={'margin-bottom': '50px'}),
+    dbc.Container([
+        dcc.Link([
+            dbc.Button('^', style=buttonLink_style),
+        ], href='#name'),
+    ], style={'margin-left': '90%'}),
 ], style={'width': '100%'})
 
 
@@ -770,13 +789,13 @@ where ds.tahun_ajaran between
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and id_prodi=9
 group by tahun_ajaran,semester_nama,nama) kepuasan
 where kepuasan.tahun_ajaran=%(TA)s and kepuasan.semester_nama LIKE %(Smt)s
-order by nama asc,tahun_ajaran asc, semester_nama asc''', {'TA':thnAjar,'Smt':Smt})
-    fig=px.bar(df,x=df['Rata-rata'],y=df['Nama Dosen'],color=df['Predikat'],orientation='h',
-               hover_name=df['Nama Dosen'],
-               color_discrete_map={
-                   'SANGAT BAIK':'green',
-                   'BAIK':'orange',
-                   'CUKUP BAIK':'yellow',
-                   'KURANG BAIK':'red'
-               })
+order by nama asc,tahun_ajaran asc, semester_nama asc''', {'TA': thnAjar, 'Smt': Smt})
+    fig = px.bar(df, x=df['Rata-rata'], y=df['Nama Dosen'], color=df['Predikat'], orientation='h',
+                 hover_name=df['Nama Dosen'],
+                 color_discrete_map={
+                     'SANGAT BAIK': 'green',
+                     'BAIK': 'orange',
+                     'CUKUP BAIK': 'yellow',
+                     'KURANG BAIK': 'red'
+                 })
     return fig

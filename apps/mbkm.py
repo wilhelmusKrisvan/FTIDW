@@ -77,6 +77,19 @@ ttlgrf_style = {
     'color': 'black'
 }
 
+buttonLink_style = {
+    'position': 'fixed',
+    'width': '60px',
+    'height': '60px',
+    'bottom': '40px',
+    'right': '40px',
+    'background-color': '#2780e3',
+    'color': 'white',
+    'border-radius': '50px',
+    'text-align': 'center',
+    'box-shadow': '5px 10px 20px #ebedeb',
+}
+
 button_style = {
     'width': '120px',
     'height': '50px',
@@ -258,16 +271,16 @@ mahasiswaMBKM = dbc.Container([
                     dbc.Col([
                         html.H6('Dari:'),
                         html.Div([
-                        dcc.Dropdown(
-                            options=[{'label': i, 'value': i} for i in listDropdown],
-                            value=listDropdown[0],
-                            id='Fromdrpdwn_mhsseleksi',
-                            style={'color': 'black'},
-                            clearable=False,
-                            placeholder='-',
-                        ),
+                            dcc.Dropdown(
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[0],
+                                id='Fromdrpdwn_mhsseleksi',
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='-',
+                            ),
                         ]),
-                    ],width=3),
+                    ], width=3),
                     dbc.Col([
                         html.H6('Sampai:'),
                         html.Div([
@@ -280,7 +293,7 @@ mahasiswaMBKM = dbc.Container([
                                 placeholder='-',
                             ),
                         ]),
-                    ],width=3)
+                    ], width=3)
                 ]),
                 dcc.Graph(id='grf_mahasiswambkm'),
                 dbc.Button('Lihat Tabel',
@@ -383,12 +396,11 @@ reratasksMBKM = dbc.Container([
     )
 ], style=cont_style)
 
-#layout
+# layout
 mbkm = dbc.Container([
     html.Div([
         html.H1('Analisis MBKM',
                 style=ttlgrf_style),
-        html.A(className='name'),
         dcc.Tabs([
             dcc.Tab(label='Mahasiswa', value='mahasiswa',
                     children=[
@@ -407,22 +419,22 @@ mbkm = dbc.Container([
                         dftrmitraMBKM
                     ],
                     style=tab_style, selected_style=selected_style)
-        ], style=tabs_styles, value='mahasiswa'),\
-        html.Br(),
-        dbc.Container([
-            dcc.Link([
-                dbc.Button('^', style=button_style),
-            ], href='#name'),
-        ],style={'margin-left': '90%',"position": "sticky"}),
-
+        ], style=tabs_styles, value='mahasiswa'),
     ])
 ], style=cont_style)
 
 layout = html.Div([
-    html.Div([mbkm], style={'margin-bottom': '50px'})
+    html.A(className='name'),
+    html.Div([mbkm], style={'margin-bottom': '50px'}),
+    dbc.Container([
+        dcc.Link([
+            dbc.Button('^', style=buttonLink_style),
+        ], href='#name'),
+    ], style={'margin-left': '90%'}),
 ], style={'justify-content': 'center'})
 
-#COLLAPSE CALLBACK
+
+# COLLAPSE CALLBACK
 @app.callback(
     Output("cll_tblmahasiswambkm", "is_open"),
     [Input("cll_grfmahasiswambkm", "n_clicks")],
@@ -431,6 +443,7 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
 
 @app.callback(
     Output("cll_tblreratasksmbkm", "is_open"),
@@ -441,6 +454,7 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+
 @app.callback(
     Output("cll_tbljumldosbingmbkm", "is_open"),
     [Input("cll_grfjumldosbingmbkm", "n_clicks")],
@@ -449,6 +463,7 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
 
 @app.callback(
     Output("cll_tbljumlmitrambkm", "is_open"),
@@ -459,16 +474,16 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
-#GRAPH CALLBACK
+
+# GRAPH CALLBACK
 @app.callback(
-    Output('grf_mahasiswambkm','figure'),
+    Output('grf_mahasiswambkm', 'figure'),
     Input('Fromdrpdwn_mhsseleksi', 'value'),
     Input('Todrpdwn_mhsseleksi', 'value'),
-    #Input('grf_mahasiswambkm','id')
+    # Input('grf_mahasiswambkm','id')
 )
 def grafMahasiswaMBKM(valueFrom, valueTo):
-
-    #df=dfmahasiswambkm
+    # df=dfmahasiswambkm
     print(valueFrom)
     df = data.getDataFrameFromDBwithParams('''
     select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
@@ -492,19 +507,20 @@ def grafMahasiswaMBKM(valueFrom, valueTo):
     group by ds.kode_semester, Bentuk , Semester
     order by ds.kode_semester
     ''', {'From': valueFrom, 'To': valueTo})
-    fig=px.bar(df,x=df['Semester'], y=df['Jumlah'], color=df['Bentuk'])
+    fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk'])
     fig.update_layout(barmode='group')
     return fig
 
+
 @app.callback(
-    Output('grf_reratasksmbkm','figure'),
+    Output('grf_reratasksmbkm', 'figure'),
     Input('Fromdrpdwn_reratasksmbkm', 'value'),
     Input('Todrpdwn_reratasksmbkm', 'value'),
-    #Input('grf_reratasksmbkm','id')
+    # Input('grf_reratasksmbkm','id')
 )
 def grafRerataKonversiSKS(valueFrom, valueTo):
-    #df=dfreratasksmbkm
-    df=data.getDataFrameFromDBwithParams('''
+    # df=dfreratasksmbkm
+    df = data.getDataFrameFromDBwithParams('''
     select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, count(sks) 'Jumlah SKS'
     from mbkm_matkul_monev mbm
          inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
@@ -513,17 +529,18 @@ def grafRerataKonversiSKS(valueFrom, valueTo):
     %(From)s and %(To)s
     group by mbm.kode_semester, Semester
     order by mbm.kode_semester;''', {'From': valueFrom, 'To': valueTo})
-    fig=px.line(df, x=df['Semester'], y=df['Jumlah SKS'])
+    fig = px.line(df, x=df['Semester'], y=df['Jumlah SKS'])
     return fig
 
+
 @app.callback(
-    Output('grf_jumldosbingmbkm','figure'),
+    Output('grf_jumldosbingmbkm', 'figure'),
     Input('Fromdrpdwn_dosbingmbkm', 'value'),
     Input('Todrpdwn_dosbingmbkm', 'value'),
-    #Input('grf_jumldosbingmbkm','id')
+    # Input('grf_jumldosbingmbkm','id')
 )
 def grafDosbingMBKM(valueFrom, valueTo):
-    #df=dfdosbingmbkm
+    # df=dfdosbingmbkm
     df = data.getDataFrameFromDBwithParams('''
     select CONCAT(semester_nama,' ',tahun_ajaran) Semester, count(distinct dd.id_dosen) 'Jumlah Dosen'
     from mbkm_matkul_monev mbm
@@ -536,18 +553,19 @@ def grafDosbingMBKM(valueFrom, valueTo):
     %(From)s and %(To)s
     group by mbm.kode_semester, Semester
     order by mbm.kode_semester;''', {'From': valueFrom, 'To': valueTo})
-    fig=px.bar(df, x=df['Semester'], y=df['Jumlah Dosen'])
-    #fig.show
+    fig = px.bar(df, x=df['Semester'], y=df['Jumlah Dosen'])
+    # fig.show
     return fig
 
+
 @app.callback(
-    Output('grf_jumlmitrambkm','figure'),
+    Output('grf_jumlmitrambkm', 'figure'),
     Input('Fromdrpdwn_jumlmitrambkm', 'value'),
     Input('Todrpdwn_jumlmitrambkm', 'value'),
-    #Input('grf_jumlmitrambkm','id')
+    # Input('grf_jumlmitrambkm','id')
 )
 def grafMitraMBKM(valueFrom, valueTo):
-    #df=dfjumlmitrambkm
+    # df=dfjumlmitrambkm
     df = data.getDataFrameFromDBwithParams('''
     select CONCAT(semester_nama,' ',tahun_ajaran) Semester, count(distinct mitra) 'Jumlah Mitra'
     from mbkm_matkul_monev mmm
@@ -557,5 +575,5 @@ def grafMitraMBKM(valueFrom, valueTo):
     group by ds.kode_semester, Semester
     order by ds.kode_semester
     ''', {'From': valueFrom, 'To': valueTo})
-    fig=px.bar(df,x=df['Semester'], y=df['Jumlah Mitra'])
+    fig = px.bar(df, x=df['Semester'], y=df['Jumlah Mitra'])
     return fig

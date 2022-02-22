@@ -89,6 +89,19 @@ filterLabel_style = {
     'color': 'black'
 }
 
+buttonLink_style = {
+    'position': 'fixed',
+    'width': '60px',
+    'height': '60px',
+    'bottom': '40px',
+    'right': '40px',
+    'background-color': '#2780e3',
+    'color': 'white',
+    'border-radius': '50px',
+    'text-align': 'center',
+    'box-shadow': '5px 10px 20px #ebedeb',
+}
+
 button_style = {
     'width': '120px',
     'height': '50px',
@@ -636,6 +649,7 @@ layout = html.Div([
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
+    html.A(className='name'),
     html.Div([mhsseleksi]),
     html.Div([mhsasing]),
     html.Div([mhsrasio]),
@@ -643,6 +657,11 @@ layout = html.Div([
     html.Div([mhsprovinsi]),
     html.Div([mhsKembangJml]),
     html.Div([mhsPersenNaik], style={'margin-bottom': '50px'}),
+    dbc.Container([
+        dcc.Link([
+            dbc.Button('^', style=buttonLink_style),
+        ], href='#name'),
+    ], style={'margin-left': '90%'}),
 ], style={'justify-content': 'center'})
 
 
