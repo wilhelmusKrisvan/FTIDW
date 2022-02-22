@@ -61,7 +61,7 @@ cont_style = {
 cardgrf_style = {
     'border': '1px solid #fafafa',
     'border-radius': '10px',
-    'padding': '10px',
+    'padding': '40px',
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 

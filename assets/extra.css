@@ -69,6 +69,13 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, .12), 0 4px 8px rgba(0, 0, 0, .06);
 }
 
+.export{
+    position: absolute;
+    top:95%;
+    right: 50%;
+    font-type: sans-serif;
+}
+
 
 
 
