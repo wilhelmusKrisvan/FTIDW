@@ -72,6 +72,13 @@ cardgrf_style = {
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
+cardtbl_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '20px 10px 60px 10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
 ttlgrf_style = {
     'textAlign': 'center',
     'padding': '10px',
@@ -239,7 +246,7 @@ mahasiswaTA = dbc.Container([
                 export_format='xlsx',
                 page_size=10,
             )
-        ], style=cardgrf_style),
+        ], style=cardtbl_style),
         id='cll_tblMhsTA',
         is_open=False
     )
@@ -356,7 +363,7 @@ tingkatKepuasan = dbc.Container([
                 export_format='xlsx',
                 page_size=10,
             )
-        ], style=cardgrf_style
+        ], style=cardtbl_style
         ),
         id='cll_tblKepuasanMhs',
         is_open=False
@@ -371,44 +378,48 @@ Dosen = dbc.Container([
             dcc.Tabs([
                 dcc.Tab(label='Rasio Dosen : Mahasiswa', value='dosen',
                         children=[
-                            dt.DataTable(
-                                id='tbl_DosenMhs',
-                                columns=[
-                                    {'name': i, 'id': i} for i in tbl_RasioDosenMhs.columns
-                                ],
-                                data=tbl_RasioDosenMhs.to_dict('records'),
-                                sort_action='native',
-                                sort_mode='multi',
-                                style_table={'padding': '10px', 'overflowX': 'auto'},
-                                style_header={'font-size': '80%', 'textAlign': 'center'},
-                                style_data={'font-size': '80%', 'textAlign': 'center'},
-                                style_cell={'width': 95},
-                                export_format='xlsx',
-                                page_size=10,
-                            )
+                            dbc.Card([
+                                dt.DataTable(
+                                    id='tbl_DosenMhs',
+                                    columns=[
+                                        {'name': i, 'id': i} for i in tbl_RasioDosenMhs.columns
+                                    ],
+                                    data=tbl_RasioDosenMhs.to_dict('records'),
+                                    sort_action='native',
+                                    sort_mode='multi',
+                                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                                    style_header={'font-size': '80%', 'textAlign': 'center'},
+                                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                                    style_cell={'width': 95},
+                                    export_format='xlsx',
+                                    page_size=10,
+                                )
+                            ], )
                         ], style=tab_style, selected_style=selected_style),
                 dcc.Tab(label='Rasio Dosen Mengajar : Mahasiswa', value='dosenMengajar',
                         children=[
-                            dt.DataTable(
-                                id='tbl_DosenMengajarMhs',
-                                columns=[
-                                    {'name': i, 'id': i} for i in tbl_rasioDosenMengajarMhs.columns
-                                ],
-                                data=tbl_rasioDosenMengajarMhs.to_dict('records'),
-                                sort_action='native',
-                                sort_mode='multi',
-                                style_table={'padding': '10px', 'overflowX': 'auto'},
-                                style_header={'font-size': '80%', 'textAlign': 'center'},
-                                style_data={'font-size': '80%', 'textAlign': 'center'},
-                                style_cell={'width': 95},
-                                export_format='xlsx',
-                                page_size=10,
-                            )
+                            dbc.Card([
+                                dt.DataTable(
+                                    id='tbl_DosenMengajarMhs',
+                                    columns=[
+                                        {'name': i, 'id': i} for i in tbl_rasioDosenMengajarMhs.columns
+                                    ],
+                                    data=tbl_rasioDosenMengajarMhs.to_dict('records'),
+                                    sort_action='native',
+                                    sort_mode='multi',
+                                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                                    style_header={'font-size': '80%', 'textAlign': 'center'},
+                                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                                    style_cell={'width': 95},
+                                    export_format='xlsx',
+                                    page_size=10,
+                                )
+                            ], )
                         ], style=tab_style, selected_style=selected_style),
             ], style=tab_style, id='tab_dosen', value='dosen'
             )
         ])
-    ], style=cardgrf_style
+    ], style=cardtbl_style
     ),
     dbc.Collapse(
         id='cll_tblDosen',
@@ -479,7 +490,7 @@ matkul = dbc.Container([
             ], style=tab_style, id='tab_kurikulum', value='kurikulum'
             )
         ])
-    ], style=cardgrf_style
+    ], style=cardtbl_style
     ),
     dbc.Collapse(
         id='cll_tblmatkul',
@@ -529,7 +540,7 @@ def toggle_collapse(naktif, nasing, mhs, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             page_size=10,
             export_format='xlsx'
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     isiAsing = dbc.Card(
         dt.DataTable(
@@ -543,7 +554,7 @@ def toggle_collapse(naktif, nasing, mhs, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             page_size=10,
             export_format='xlsx'
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     if naktif and mhs == 'mhsaktif':
         return not is_open, isiAktif
@@ -585,7 +596,7 @@ def toggle_collapse(najar, non, dsn, is_open):
             style_cell={'width': 95},
             export_format='xlsx',
             page_size=10,
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     isiNon = dbc.Card(
         dt.DataTable(
@@ -602,7 +613,7 @@ def toggle_collapse(najar, non, dsn, is_open):
             style_cell={'width': 95},
             export_format='xlsx',
             page_size=10,
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     if najar and dsn == 'dosenAjar':
         return not is_open, isiAjar

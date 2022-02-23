@@ -73,6 +73,13 @@ cardgrf_style = {
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
+cardtbl_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '20px 10px 60px 10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
 cardoncard_style = {
     'padding': '10px',
 }
@@ -166,7 +173,7 @@ mhsseleksi = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblseleksi',
         is_open=False
@@ -289,7 +296,7 @@ mhsrasio = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
                 page_size=10
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblrasio',
         is_open=False
@@ -347,7 +354,7 @@ mhsasmasmk = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
                 page_size=10
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblsmasmk',
         is_open=False
@@ -578,7 +585,7 @@ mhsKembangJml = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
                 page_size=10
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblJml',
         is_open=False
@@ -637,7 +644,7 @@ mhsPersenNaik = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 70},
                 page_size=10
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblPersenNaik',
         is_open=False
@@ -698,7 +705,7 @@ def toggle_collapse(nall, ninf, nsi, mhs, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     )
     if nall and mhs == 'all':
         return not is_open, isiMhsAsing
@@ -751,7 +758,7 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     isiLolos = dbc.Card(
         dt.DataTable(
@@ -766,7 +773,7 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     isiRegis = dbc.Card(
         dt.DataTable(
@@ -781,7 +788,7 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             style_cell={'width': 70},
             page_size=10
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     if ndaftar and prov == 'daftar':
         return not is_open, isiDaftar

@@ -61,7 +61,14 @@ cont_style = {
 cardgrf_style = {
     'border': '1px solid #fafafa',
     'border-radius': '10px',
-    'padding': '40px',
+    'padding': '10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
+cardtbl_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '20px 10px 60px 10px',
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
@@ -120,7 +127,7 @@ dftrmitraMBKM = html.Div([
                     style_cell={'width': 95},
                     page_size=10,
                 )
-            ], style=cardgrf_style),
+            ], style=cardtbl_style),
         ], width=12)
     ], style={'margin-top': '10px'})
 ], style=cont_style)
@@ -185,7 +192,7 @@ jumlmitraMBKM = dbc.Container([
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tbljumlmitrambkm',
         is_open=False
@@ -253,7 +260,7 @@ dosbingMBKM = dbc.Container([
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tbljumldosbingmbkm',
         is_open=False
@@ -321,7 +328,7 @@ mahasiswaMBKM = dbc.Container([
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblmahasiswambkm',
         is_open=False
@@ -389,7 +396,7 @@ reratasksMBKM = dbc.Container([
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tblreratasksmbkm',
         is_open=False
