@@ -1,3 +1,4 @@
+#tbl_MhsIpk button.export,
 #tbl_DosenMhs button.export,
 #tbl_DosenMengajarMhs button.export,
 #tbl_KepuasanMhs button.export,
@@ -39,7 +40,8 @@
 #tbl_mahasiswambkm button.export,
 #tbl_reratasksmbkm button.export,
 #tbl_dosbingmbkm button.export,
-#tbl_jumlmitrambkm button.export
+#tbl_jumlmitrambkm button.export,
+#tbl_mhsrasio button.export
 {
     width: 120px;
     height: 30px;
@@ -75,8 +77,3 @@
     right: 50%;
     font-type: sans-serif;
 }
-
-
-
-
-

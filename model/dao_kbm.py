@@ -10,6 +10,13 @@ def getDataFrameFromDB(query):
 def getDataFrameFromDBwithParams(query,parameter):
     return pd.read_sql(query,con,params=parameter)
 
+def getIpkMahasiswa():
+    return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, avg(ipk) as "Rata-Rata"
+from fact_mahasiswa_status fms 
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+group by ds.tahun_ajaran, ds.semester_nama
+order by ds.tahun_ajaran, ds.semester_nama''',con)
 
 def getMatkulKurikulumBaru():
     return pd.read_sql('''select kode_matakuliah Kode, kelompok_matakuliah 'Kelompok Matakuliah', 

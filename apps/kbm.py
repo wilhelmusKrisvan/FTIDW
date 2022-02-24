@@ -8,6 +8,7 @@ from appConfig import app, server
 import model.dao_kbm as data
 from datetime import date
 
+tbl_IpkMahasiswa = data.getIpkMahasiswa()
 tbl_matkulBaru = data.getMatkulKurikulumBaru()
 tbl_MatkulBatal = data.getMatkulBatal()
 tbl_matkulTawar = data.getMatkulTawar()
@@ -107,6 +108,8 @@ button_style = {
     'color': 'white',
     'background-color': '#2780e3',
     'right': '0',
+    'position': 'absolute',
+    'margin': '-50px 25px 10px 10px',
 }
 
 ipkmahasiswa = dbc.Container([
@@ -142,9 +145,34 @@ ipkmahasiswa = dbc.Container([
                     ]),
                 ], width=6),
             ]),
-            dcc.Graph(id='grf_ipkMahasiswa')
+            dbc.CardBody([
+                dcc.Graph(id='grf_ipkMahasiswa'),
+                dbc.Button('Lihat Tabel', id='cll_grfipkMahasiswa', n_clicks=0,
+                           style=button_style),
+            ])
         ])
-    ], style=cardgrf_style)
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card([
+            dt.DataTable(
+                id='tbl_MhsIpk',
+                columns=[
+                    {'name': i, 'id': i} for i in tbl_IpkMahasiswa.columns
+                ],
+                data=tbl_IpkMahasiswa.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'padding': '10px', 'overflowX': 'auto'},
+                style_header={'font-size': '80%', 'textAlign': 'center'},
+                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 95},
+                export_format='xlsx',
+                page_size=10,
+            )
+        ], style=cardtbl_style),
+        id='cll_ipkMahasiswa',
+        is_open=False
+    )
 ], style=cont_style)
 
 mahasiswa = dbc.Container([
@@ -342,8 +370,10 @@ tingkatKepuasan = dbc.Container([
                 ]),
             ], width=6),
         ], style={'padding': '15px'}),
-        dcc.Graph(id='grf_KepuasanMhs'),
-        dbc.Button('Lihat Tabel', id='cll_grfKepuasanMhs', n_clicks=0, style=button_style),
+        dbc.CardBody([
+            dcc.Graph(id='grf_KepuasanMhs'),
+            dbc.Button('Lihat Tabel', id='cll_grfKepuasanMhs', n_clicks=0, style=button_style),
+        ])
     ], style=cardgrf_style
     ),
     dbc.Collapse(
@@ -520,6 +550,17 @@ layout = html.Div([
 
 
 # CALLBACK COLLAPSE
+@app.callback(
+    Output('cll_ipkMahasiswa', 'is_open'),
+    Input('cll_grfipkMahasiswa', 'n_clicks'),
+    State('cll_ipkMahasiswa', 'is_open')
+)
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
 @app.callback(
     Output('cll_tblmahasiswa', 'is_open'),
     Output('cll_tblmahasiswa', 'children'),
@@ -804,9 +845,9 @@ order by nama asc,tahun_ajaran asc, semester_nama asc''', {'TA': thnAjar, 'Smt':
     fig = px.bar(df, x=df['Rata-rata'], y=df['Nama Dosen'], color=df['Predikat'], orientation='h',
                  hover_name=df['Nama Dosen'],
                  color_discrete_map={
-                     'SANGAT BAIK': 'green',
-                     'BAIK': 'orange',
-                     'CUKUP BAIK': 'yellow',
+                     'SANGAT BAIK': 'rgb(0, 130, 10)',
+                     'BAIK': 'rgb(225, 210, 0)',
+                     'CUKUP BAIK': 'orange',
                      'KURANG BAIK': 'red'
                  })
     return fig

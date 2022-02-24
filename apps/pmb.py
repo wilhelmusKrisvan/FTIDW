@@ -118,6 +118,8 @@ button_style = {
     'color': 'white',
     'background-color': '#2780e3',
     'right': '0',
+    'position': 'absolute',
+    'margin': '-50px 25px 10px 10px',
 }
 
 mhsseleksi = dbc.Container([
