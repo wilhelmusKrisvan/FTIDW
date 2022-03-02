@@ -14,6 +14,7 @@ con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawareh
 
 dfpersendosens3 = data.getDosenS3()
 dfjabfung = data.getJabfungperTahun()
+dfpersenjabfungAkumulasi = data.getPersenJabfungAkumulasiperTahun()
 dfpersenjabfung = data.getPersenJabfungperTahun()
 dfdosentetapinf = data.getDosenTetapINF()
 dfdosenindustri = data.getDosenIndustriPraktisi()
@@ -58,6 +59,13 @@ cardgrf_style = {
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
+cardtbl_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '20px 10px 60px 10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
 card_style = {
     'border': '1px solid #fafafa',
     'border-radius': '10px',
@@ -70,17 +78,43 @@ ttlgrf_style = {
     'color': 'black'
 }
 
+buttonLink_style = {
+    'position': 'fixed',
+    'width': '60px',
+    'height': '60px',
+    'bottom': '40px',
+    'right': '40px',
+    'background-color': '#2780e3',
+    'color': 'white',
+    'border-radius': '50px',
+    'text-align': 'center',
+    'box-shadow': '5px 10px 20px #ebedeb',
+}
+
+button_style = {
+    'width': '120px',
+    'height': '50px',
+    'border-radius': '10px',
+    'box-shadow': '5px 10px 20px #ebedeb',
+    'border': '1px solid #fafafa',
+    'color': 'white',
+    'background-color': '#2780e3',
+    'right': '0',
+    'position': 'absolute',
+    'margin': '-50px 25px 10px 10px',
+}
+
 dosens3 = dbc.Container([
     dbc.Card([
         html.H5('Dosen S3',
                 style=ttlgrf_style),
-        dbc.CardLink(
-            dbc.CardBody(
-                dcc.Graph(id='grf_dosens3')
-            ),
-            id='cll_grfdosens3',
-            n_clicks=0
-        ),
+        dbc.CardBody([
+            dcc.Graph(id='grf_dosens3'),
+            dbc.Button('Lihat Tabel',
+                       id='cll_grfdosens3',
+                       n_clicks=0, style=button_style
+                       ),
+        ]),
     ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
@@ -106,13 +140,13 @@ jumljabfungDosen = dbc.Container([
     dbc.Card([
         html.H5('Jumlah Jabfung Dosen per Tahun',
                 style=ttlgrf_style),
-        dbc.CardLink(
-            dbc.CardBody(
-                dcc.Graph(id='grf_jabfungth')
-            ),
-            id='cll_grfjabfungth',
-            n_clicks=0
-        ),
+        dbc.CardBody([
+            dcc.Graph(id='grf_jabfungth'),
+            dbc.Button('Lihat Tabel',
+                       id='cll_grfjabfungth',
+                       n_clicks=0, style=button_style
+                       ),
+        ]),
     ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
@@ -127,7 +161,7 @@ jumljabfungDosen = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
+            ), style=cardtbl_style
         ),
         id='cll_tbljabfungth',
         is_open=False
@@ -138,16 +172,16 @@ persenjabfungthDosen = dbc.Container([
     dbc.Card([
         html.H5('Persentase Jabfung Dosen per Tahun',
                 style=ttlgrf_style),
-        dbc.CardLink(
-            dbc.CardBody(
-                dcc.Graph(id='grf_persenjabfungth')
-            ),
-            id='cll_grfpersenjabfungth',
-            n_clicks=0
-        ),
+        dbc.CardBody([
+            dcc.Graph(id='grf_persenjabfungth'),
+            dbc.Button('Lihat Tabel',
+                       id='cll_grfpersenjabfungth',
+                       n_clicks=0, style=button_style
+                       ),
+        ]),
     ], style=cardgrf_style),
     dbc.Collapse(
-        dbc.Card(
+        dbc.Card([
             dt.DataTable(
                 id='tbl_persenjabfungth',
                 columns=[{"name": i, "id": i} for i in dfpersenjabfung.columns],
@@ -159,8 +193,8 @@ persenjabfungthDosen = dbc.Container([
                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 page_size=10,
                 export_format='xlsx'
-            ), style=cardgrf_style
-        ),
+            ),
+        ], style=cardgrf_style),
         id='cll_tblpersenjabfungth',
         is_open=False
     )
@@ -169,7 +203,8 @@ persenjabfungthDosen = dbc.Container([
 dosentetapinf = html.Div([
     dbc.Row([
         dbc.Col([
-                html.H5('Daftar Dosen Tetap Informatika', style=ttlgrf_style),
+            html.H5('Daftar Dosen Tetap Informatika', style=ttlgrf_style),
+            dbc.Card([
                 dt.DataTable(
                     id='tbl_dosentetapinf',
                     columns=[
@@ -185,6 +220,7 @@ dosentetapinf = html.Div([
                     page_size=10,
                     export_format='xlsx'
                 )
+            ], style=cardtbl_style)
         ], width=12),
     ])
 ], style={'margin-top': '50px', 'width': '100%'})
@@ -192,7 +228,8 @@ dosentetapinf = html.Div([
 dosentetapindustri = html.Div([
     dbc.Row([
         dbc.Col([
-                html.H5('Daftar Dosen Industri Praktisi', style=ttlgrf_style),
+            html.H5('Daftar Dosen Industri Praktisi', style=ttlgrf_style),
+            dbc.Card([
                 dt.DataTable(
                     id='tbl_dosenindustriinf',
                     columns=[
@@ -208,6 +245,7 @@ dosentetapindustri = html.Div([
                     page_size=10,
                     export_format='xlsx'
                 )
+            ], style=cardtbl_style)
         ], width=12),
     ])
 ], style={'margin-top': '50px', 'width': '100%'})
@@ -237,12 +275,23 @@ dosen = dbc.Container([
 ], style=cont_style)
 
 layout = html.Div([
+    html.Div(html.H1('Analisis Profil Dosen Prodi Informatika',
+                     style={'margin-top': '30px', 'textAlign': 'center'}
+                     )
+             ),
+    html.A(className='name'),
     html.Div([
         dosen
-    ], style={'margin-bottom': '50px'})
+    ], style={'margin-bottom': '50px'}),
+    dbc.Container([
+        dcc.Link([
+            dbc.Button('^', style=buttonLink_style),
+        ], href='#name'),
+    ], style={'margin-left': '90%'}),
 ], style={'justify-content': 'center'})
 
-#CONTROL COLLAPSE
+
+# CONTROL COLLAPSE
 @app.callback(
     Output("cll_tbldosens3", "is_open"),
     [Input("cll_grfdosens3", "n_clicks")],
@@ -251,6 +300,7 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
 
 @app.callback(
     Output("cll_tbljabfungth", "is_open"),
@@ -261,6 +311,7 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+
 @app.callback(
     Output("cll_tblpersenjabfungth", "is_open"),
     [Input("cll_grfpersenjabfungth", "n_clicks")],
@@ -270,38 +321,50 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
-#GRAPH COLLAPSE
-#Jumlah Dosen S3 : Seluruh Dosen
+
+# GRAPH COLLAPSE
+# Jumlah Dosen S3 : Seluruh Dosen
 @app.callback(
-    Output('grf_dosens3','figure'),
-    Input('grf_dosens3','id')
+    Output('grf_dosens3', 'figure'),
+    Input('grf_dosens3', 'id')
 )
 def grafDosenS3(id):
-    df=px.dfpersendosens3.tips()
-    fig=px.pie(df,values='tips',names='Jumlah')
+    df = data.getDataFrameFromDB('''
+    select count(data.id_dosen) jumlah, data.tingkat_pendidikan "Tingkat Pendidikan" from
+    (select dim_dosen.id_dosen,nama, max(tingkat_pendidikan) tingkat_pendidikan from fact_pendidikan_dosen
+        inner join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
+        where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null 
+        and year(tanggal_masuk)<=year(now())
+        group by dim_dosen.id_dosen, nama
+        order by nama) data
+        group by tingkat_pendidikan
+        ''')
+    fig = px.pie(df, values=df['jumlah'], names=df['Tingkat Pendidikan'])
     return fig
 
-#Jumlah Jabfung L LK per Tahun
+
+# Jumlah Jabfung L LK per Tahun
 @app.callback(
     Output('grf_jabfungth', 'figure'),
     Input('grf_jabfungth', 'id')
 )
 def grafJumlJabfungth(id):
-    df=dfjabfung
-    fig=px.line(df, x=df['Tahun'], y=df['Jumlah Pejabat'], labels=dict(x='Tahun', y='Jumlah Dosen'))
-    fig.add_bar(x=df['Tahun'], y=df['Total Dosen'], name='Total Dosen')
+    df = dfpersenjabfungAkumulasi
+    fig = px.line(df, x=df['Tahun'], y=df['persentase'], labels=dict(x='Tahun', y='Jumlah Dosen'))
+    fig.update_traces(mode='lines+markers')
+    # fig.add_bar(x=df['Tahun'], y=df['Total Dosen'],
+    #             hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
     return fig
 
-#Persentase Jabfung L LK per Tahun
+
+# Persentase Jabfung L LK per Tahun
 @app.callback(
     Output('grf_persenjabfungth', 'figure'),
     Input('grf_persenjabfungth', 'id')
 )
 def grafPersenJabfungth(id):
-    df=dfpersenjabfung
-    fig=px.line(df, x=df['Tahun'], y=df['%'], color='Jabatan')
+    df = dfpersenjabfung
+    fig = px.line(df, x=df['Tahun'], y=df['persentase'], color='Jabatan')
     fig.update_traces(mode='lines+markers')
     fig.update_xaxes(categoryorder='category ascending')
     return fig
-
-

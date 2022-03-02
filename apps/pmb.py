@@ -1204,6 +1204,7 @@ from
        group by tahun_ajaran) y
 order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
     fig = px.line(df, x=df['Tahun Ajaran'], y=df['Pertumbuhan'].apply(pd.to_numeric))
+    fig.update_layout(yaxis_title="Pertumbuhan")
     fig.update_traces(mode='lines+markers')
     fig.update_yaxes(categoryorder='category ascending')
     return fig
