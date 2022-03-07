@@ -133,8 +133,7 @@ def navBarPage(input1):
                                 dbc.Col(dbc.NavbarBrand('DASHBOARD'))
                             ], align="center", ),
                             href='/'
-                        ),
-                        dbc.NavLink('Page 1', href='/home'),
+                        )
                     ], className='navbar-nav mr-auto'),
                     dbc.DropdownMenu(
                         right=True,
@@ -195,5 +194,5 @@ def navBarPage(input1):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=False)
-    app.run_server(host='0.0.0.0',debug=False)
+    app.run_server(debug=False)
+    # app.run_server(host='0.0.0.0',debug=False)

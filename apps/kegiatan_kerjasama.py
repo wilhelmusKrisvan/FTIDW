@@ -86,6 +86,33 @@ ttlgrf_style = {
     'color': 'black'
 }
 
+buttonLink_style = {
+    'position': 'fixed',
+    'width': '60px',
+    'height': '60px',
+    'bottom': '40px',
+    'right': '40px',
+    'background-color': '#2780e3',
+    'color': 'white',
+    'border-radius': '50px',
+    'text-align': 'center',
+    'box-shadow': '5px 10px 20px #ebedeb',
+    'border': '1px solid #fafafa'
+}
+
+button_style = {
+    'width': '120px',
+    'height': '50px',
+    'border-radius': '10px',
+    'box-shadow': '5px 10px 20px #ebedeb',
+    'border': '1px solid #fafafa',
+    'color': 'white',
+    'background-color': '#2780e3',
+    'right': '0',
+    'position': 'absolute',
+    'margin': '-50px 25px 10px 10px',
+}
+
 kegiatan_dosen = dbc.Container([
     dbc.Card([
         html.H5('DOSEN',

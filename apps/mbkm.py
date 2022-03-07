@@ -95,6 +95,7 @@ buttonLink_style = {
     'border-radius': '50px',
     'text-align': 'center',
     'box-shadow': '5px 10px 20px #ebedeb',
+    'border': '1px solid #fafafa'
 }
 
 button_style = {

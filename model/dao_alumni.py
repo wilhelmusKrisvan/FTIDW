@@ -13,9 +13,10 @@ def getDataFrameFromDBwithParams(query, parameter):
 
 
 def getMasaTunggu():
-    return pd.read_sql('''select data2.*, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
+    return pd.read_sql('''
+    select data2.*, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
  (
-    select tahun_lulus,
+    select tahun_lulus 'Tahun Lulus',
     SUM(IF( waktu_tunggu = "KURANG 6 BULAN", data.jumlah, 0)) AS "<6 BULAN",
     SUM(IF( waktu_tunggu = "6 - 18 BULAN", data.jumlah, 0)) AS "6-18 BULAN",
     SUM(IF( waktu_tunggu = "LEBIH 18 BULAN", data.jumlah, 0)) AS ">18 BULAN",
@@ -35,13 +36,13 @@ left join (
     from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
     from fact_yudisium) data
     group by tahun_lulus
-)lulusan on lulusan.tahun_lulus = data2.tahun_lulus
+)lulusan on lulusan.tahun_lulus = data2.`Tahun Lulus`
 left join(
     select count(id_mahasiswa) as jumlah, tahun_lulus
     from dim_lulusan
     group by tahun_lulus
-)terlacak on terlacak.tahun_lulus = data2.tahun_lulus
-order by tahun_lulus''', con)
+)terlacak on terlacak.tahun_lulus = data2.`Tahun Lulus`
+order by data2.`Tahun Lulus`;''', con)
 
 
 def getBidangKerja():
@@ -113,7 +114,7 @@ left join(
 order by terlacak.tahun_lulus''', con)
 
 def getKepuasanLayanan():
-    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'persentase', kepuasan.Nilai  from
+    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'Persen %', kepuasan.Nilai  from
 (select sum(Jumlah) Semua,Nilai,1 gabung from
 (select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
 from fact_kepuasan_pengguna_mahasiswa
@@ -317,10 +318,10 @@ order by nomor''', con)
 def getMasaTungguperGol():
     return pd.read_sql('''
         select count(waktu_tunggu) Jumlah, waktu_tunggu Waktu,tahun_lulus Tahun from fact_tracer_study fts
-inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
-where waktu_tunggu is not null
-group by waktu_tunggu,tahun_lulus
-order by tahun_lulus asc
+        inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+        where waktu_tunggu is not null
+        group by waktu_tunggu,tahun_lulus
+        order by tahun_lulus asc
     ''', con)
 
 def getGajiLulusan():

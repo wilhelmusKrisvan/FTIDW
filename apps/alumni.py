@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from appConfig import app, server
 from dash import html, dcc
+from datetime import date
 import model.dao_alumni as data
 
 dfmasatunggu = data.getMasaTunggu()
@@ -59,67 +60,109 @@ cardgrf_style = {
     'box-shadow': '5px 10px 30px #ebedeb'
 }
 
+cardtbl_style = {
+    'border': '1px solid #fafafa',
+    'border-radius': '10px',
+    'padding': '20px 10px 60px 10px',
+    'box-shadow': '5px 10px 30px #ebedeb'
+}
+
 ttlgrf_style = {
     'textAlign': 'center',
     'padding': '10px',
     'color': 'black'
 }
 
+buttonLink_style = {
+    'position': 'fixed',
+    'width': '60px',
+    'height': '60px',
+    'bottom': '40px',
+    'right': '40px',
+    'background-color': '#2780e3',
+    'color': 'white',
+    'border-radius': '50px',
+    'text-align': 'center',
+    'box-shadow': '5px 10px 20px #ebedeb',
+    'border': '1px solid #fafafa'
+}
+
+button_style = {
+    'width': '120px',
+    'height': '50px',
+    'border-radius': '10px',
+    'box-shadow': '5px 10px 20px #ebedeb',
+    'border': '1px solid #fafafa',
+    'color': 'white',
+    'background-color': '#2780e3',
+    'right': '0',
+    'position': 'absolute',
+    'margin': '-50px 25px 10px 10px',
+}
+
+listDropdownTA = []
+for x in range(0, 5):
+    counter = x + 1
+    listDropdownTA.append(
+        str(int(date.today().strftime('%Y')) - 5 + x) + '/' + str(int(date.today().strftime('%Y')) - 4 + x))
+
+listDropdownTh = []
+for x in range(0, 5):
+    counter = x + 1
+    listDropdownTh.append(str(int(date.today().strftime('%Y')) - 5 + x))
+
 masatunggu = dbc.Container([
     dbc.Card([
         html.H5('Masa Tunggu Lulusan',
                 style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Start :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrMasaStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Awal',
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('End :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrMasaEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Akhir',
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
         dcc.Tabs([
-            dcc.Tab(label='Jumlah Lulusan Dengan Waktu Tunggu mendapat Pekerjaan', value='MsTgglulusan',
+            dcc.Tab(label='Masa Tunggu & Jumlah Lulusan', value='MsTgglulusan',
                     children=[
-                        # dbc.CardLink([
-                        #     dcc.Graph(id='grf_MsTgglulusan')
-                        # ], id='cll_MsTgglulusan',
-                        #     n_clicks=0),
-                        dt.DataTable(
-                            id='tbl_MsTgglulusan',
-                            columns=[
-                                {'name': i, 'id': i} for i in dfmasatunggu.columns
-                            ],
-                            data=dfmasatunggu.to_dict('records'),
-                            sort_action='native',
-                            sort_mode='multi',
-                            style_table={'padding': '10px', 'overflowX': 'auto'},
-                            style_header={'textAlign': 'center'},
-                            style_data={'font-size': '80%', 'textAlign': 'center'},
-                            style_cell={'width': 95},
-                            page_size=10,
-                            export_format='xlsx'
-                        )
+                        html.Div([
+                            dcc.Graph(id='grf_MsTgglulusan'),
+                            dbc.Button('Lihat Tabel', id='cll_MsTgglulusan', n_clicks=0,
+                                       style=button_style)
+                        ])
+                    ], style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Rata-rata Masa Tunggu', value='rateGol',
+                    children=[
+                        html.Div([
+                            dcc.Graph(id='grf_rateGol'),
+                            dbc.Button('Lihat Tabel', id='cll_rateGol', n_clicks=0,
+                                       style=button_style)
+                        ])
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Rata-rata Masa Tunggu Lulusan di Tiap Tahun', value='rateGol',
-                    children=[
-                        dbc.CardLink([
-                            dcc.Graph(id='grf_rateGol')
-                        ], id='cll_rateGol',
-                            n_clicks=0),
-                        # dt.DataTable(
-                        #     id='tbl_rateGol',
-                        #     columns=[
-                        #         {'name': i, 'id': i} for i in dfmasaTungguGol.columns
-                        #     ],
-                        #     data=dfmasaTungguGol.to_dict('records'),
-                        #     sort_action='native',
-                        #     sort_mode='multi',
-                        #     style_table={'padding': '10px', 'overflowX': 'auto'},
-                        #     style_header={'textAlign': 'center'},
-                        #     style_data={'font-size': '80%', 'textAlign': 'center'},
-                        #     style_cell={'width': 95},
-                        #     page_size=10,
-                        #     export_format='xlsx'
-                        # )
-                    ],
-                    style=tab_style, selected_style=selected_style),
-        ], style=tabs_styles, id='masatunggu', value='MsTgglulusan'),
+        ], style=tabs_styles, id='tab_masatunggu', value='rateGol'),
     ], style=cardgrf_style),
     dbc.Collapse(
-        id='cll_masatunggu',
+        id='cll_tblmasatunggu',
         is_open=False
     )
 ], style=cont_style)
@@ -128,78 +171,109 @@ lulusan = dbc.Container([
     dbc.Card([
         html.H5('Lulusan',
                 style=ttlgrf_style),
-        dcc.Tabs([
-            dcc.Tab(label='Jumlah Lulusan Berdasarkan Tingkat Kesesuaian Bidang Kerja', value='bidangKerja',
-                    children=[
-                        # dbc.CardLink([
-                        #     dcc.Graph(id='grf_bidangKerja')
-                        # ], id='cll_grfbidangKerja',
-                        #     n_clicks=0),
-                        dt.DataTable(
-                            id='tbl_bidangKerja',
-                            columns=[
-                                {'name': i, 'id': i} for i in dfbidangkerja.columns
-                            ],
-                            data=dfbidangkerja.to_dict('records'),
-                            sort_action='native',
-                            sort_mode='multi',
-                            style_table={'padding': '10px', 'overflowX': 'auto'},
-                            style_header={'textAlign': 'center'},
-                            style_data={'font-size': '80%', 'textAlign': 'center'},
-                            style_cell={'width': 95},
-                            page_size=10,
-                            export_format='xlsx'
-                        )
-                    ],
-                    style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Jumlah Lulusan yang Berwirausaha', value='wirausaha',
-                    children=[
-                        # dbc.CardLink([
-                        #     dcc.Graph(id='grf_wirausaha')
-                        # ], id='cll_grfwirausaha',
-                        #     n_clicks=0),
-                        dt.DataTable(
-                            id='tbl_wirausaha',
-                            columns=[
-                                {'name': i, 'id': i} for i in dfwirausaha.columns
-                            ],
-                            data=dfwirausaha.to_dict('records'),
-                            sort_action='native',
-                            sort_mode='multi',
-                            style_table={'padding': '10px', 'overflowX': 'auto'},
-                            style_header={'textAlign': 'center'},
-                            style_data={'font-size': '80%', 'textAlign': 'center'},
-                            style_cell={'width': 95},
-                            page_size=10,
-                            export_format='xlsx'
-                        )
-                    ],
-                    style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Rata-rata Gaji Alumni yang Mendapatkan Pekerjaan < 6 Bulan',
-                    value='gaji',
-                    children=[
-                        dbc.CardLink([
-                            dcc.Graph(id='grf_gaji')
-                        ], id='cll_grfgaji',
-                            n_clicks=0),
-                        # dt.DataTable(
-                        #     id='tbl_gaji',
-                        #     columns=[
-                        #         {'name': i, 'id': i} for i in dfGaji.columns
-                        #     ],
-                        #     data=dfGaji.to_dict('records'),
-                        #     sort_action='native',
-                        #     sort_mode='multi',
-                        #     style_table={'padding': '10px', 'overflowX': 'auto'},
-                        #     style_header={'textAlign': 'center'},
-                        #     style_data={'font-size': '80%', 'textAlign': 'center'},
-                        #     style_cell={'width': 95},
-                        #     page_size=10,
-                        #     export_format='xlsx'
-                        # )
-                    ],
-                    style=tab_style, selected_style=selected_style),
-        ], style=tabs_styles, id='lulusan', value='bidangKerja'),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Start :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrLulusanStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Awal',
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('End :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrLulusanEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Akhir',
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        html.Div([
+            dcc.Tabs([
+                dcc.Tab(label='Jumlah Lulusan Berdasarkan Tingkat Kesesuaian Bidang Kerja', value='bidangKerja',
+                        children=[
+                            html.Div([
+                                dcc.Graph(id='grf_bidangKerja'),
+                                dbc.Button('Lihat Tabel', id='cll_grfbidangKerja', n_clicks=0,
+                                           style=button_style)
+                            ]),
+                            # dt.DataTable(
+                            #     id='tbl_bidangKerja',
+                            #     columns=[
+                            #         {'name': i, 'id': i} for i in dfbidangkerja.columns
+                            #     ],
+                            #     data=dfbidangkerja.to_dict('records'),
+                            #     sort_action='native',
+                            #     sort_mode='multi',
+                            #     style_table={'padding': '10px', 'overflowX': 'auto'},
+                            #     style_header={'textAlign': 'center'},
+                            #     style_data={'font-size': '80%', 'textAlign': 'center'},
+                            #     style_cell={'width': 95},
+                            #     page_size=10,
+                            #     export_format='xlsx'
+                            # )
+                        ],
+                        style=tab_style, selected_style=selected_style),
+                dcc.Tab(label='Jumlah Lulusan yang Berwirausaha', value='wirausaha',
+                        children=[
+                            # dbc.CardLink([
+                            #     dcc.Graph(id='grf_wirausaha')
+                            # ], id='cll_grfwirausaha',
+                            #     n_clicks=0),
+                            html.Div([
+                                dt.DataTable(
+                                    id='tbl_wirausaha',
+                                    columns=[
+                                        {'name': i, 'id': i} for i in dfwirausaha.columns
+                                    ],
+                                    data=dfwirausaha.to_dict('records'),
+                                    sort_action='native',
+                                    sort_mode='multi',
+                                    style_table={'padding': '10px', 'overflowX': 'auto'},
+                                    style_header={'textAlign': 'center'},
+                                    style_data={'font-size': '80%', 'textAlign': 'center'},
+                                    style_cell={'width': 95},
+                                    page_size=10,
+                                    export_format='xlsx'
+                                )
+                            ],style=cardtbl_style)
+                        ],
+                        style=tab_style, selected_style=selected_style),
+                dcc.Tab(label='Rata-rata Gaji Alumni yang Mendapatkan Pekerjaan < 6 Bulan',
+                        value='gaji',
+                        children=[
+                            html.Div([
+                                dcc.Graph(id='grf_gaji')
+                            ], id='cll_grfgaji',
+                                n_clicks=0),
+                            # dt.DataTable(
+                            #     id='tbl_gaji',
+                            #     columns=[
+                            #         {'name': i, 'id': i} for i in dfGaji.columns
+                            #     ],
+                            #     data=dfGaji.to_dict('records'),
+                            #     sort_action='native',
+                            #     sort_mode='multi',
+                            #     style_table={'padding': '10px', 'overflowX': 'auto'},
+                            #     style_header={'textAlign': 'center'},
+                            #     style_data={'font-size': '80%', 'textAlign': 'center'},
+                            #     style_cell={'width': 95},
+                            #     page_size=10,
+                            #     export_format='xlsx'
+                            # )
+                        ],
+                        style=tab_style, selected_style=selected_style),
+            ], style=tabs_styles, id='lulusan', value='bidangKerja')
+        ])
     ], style=cardgrf_style),
     dbc.Collapse(
         id='cll_lulusan',
@@ -211,37 +285,41 @@ kepuasan = dbc.Container([
     dbc.Card([
         html.H5('Kepuasan Pengguna Lulusan',
                 style=ttlgrf_style),
-        dcc.Tabs([
-            dcc.Tab(label='Tingkat Kepuasan Mahasiswa Terhadap Layanan UKDW', value='Layanan',
-                    children=[
-                        dbc.CardLink([
-                            dcc.Graph(id='grf_Layanan')
-                        ], id='cll_grfLayanan',
-                            n_clicks=0),
-                    ],
-                    style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Tingkat Kepuasan Pengguna Lulusan Berdasarkan Jenis Kemampuan Lulusan', value='skill',
-                    children=[
-                        dcc.Dropdown(
-                            id='drpdwn_skill',
-                            options=[{'label': 'INTEGRITAS', 'value': 'integritas'},
-                                     {'label': 'KEAHLIAN BIDANG ILMU', 'value': 'keahlian_bidang_ilmu'},
-                                     {'label': 'KEMAMPUAN BAHASA ASING', 'value': 'kemampuan_bahasa_asing'},
-                                     {'label': 'PENGGUNAAN TEKNOLOGI INFORMASI', 'value': 'penggunaan_teknologi'},
-                                     {'label': 'KOMUNIKASI', 'value': 'komunikasi'},
-                                     {'label': 'KERJASAMA TIM', 'value': 'kerjasama_tim'},
-                                     {'label': 'PENGEMBANGAN DIRI', 'value': 'pengembangan_diri'}, ],
-                            value='integritas',
-                            style={'color': 'black'},
-                            clearable=False,
-                        ),
-                        dbc.CardLink([
-                            dcc.Graph(id='grf_skill')
-                        ], id='cll_grfskill',
-                            n_clicks=0),
-                    ],
-                    style=tab_style, selected_style=selected_style),
-        ], style=tabs_styles, id='tab_kepuasan', value='Layanan'),
+        html.Div([
+            dcc.Tabs([
+                dcc.Tab(label='Tingkat Kepuasan Mahasiswa Terhadap Layanan UKDW', value='Layanan',
+                        children=[
+                            html.Div([
+                                dcc.Graph(id='grf_Layanan'),
+                                dbc.Button('Lihat Tabel', id='cll_grfLayanan', n_clicks=0,
+                                           style=button_style)
+                            ]),
+                        ],
+                        style=tab_style, selected_style=selected_style),
+                dcc.Tab(label='Tingkat Kepuasan Pengguna Lulusan Berdasarkan Jenis Kemampuan Lulusan', value='skill',
+                        children=[
+                            dcc.Dropdown(
+                                id='drpdwn_skill',
+                                options=[{'label': 'INTEGRITAS', 'value': 'integritas'},
+                                         {'label': 'KEAHLIAN BIDANG ILMU', 'value': 'keahlian_bidang_ilmu'},
+                                         {'label': 'KEMAMPUAN BAHASA ASING', 'value': 'kemampuan_bahasa_asing'},
+                                         {'label': 'PENGGUNAAN TEKNOLOGI INFORMASI', 'value': 'penggunaan_teknologi'},
+                                         {'label': 'KOMUNIKASI', 'value': 'komunikasi'},
+                                         {'label': 'KERJASAMA TIM', 'value': 'kerjasama_tim'},
+                                         {'label': 'PENGEMBANGAN DIRI', 'value': 'pengembangan_diri'}, ],
+                                value='integritas',
+                                style={'color': 'black'},
+                                clearable=False,
+                            ),
+                            html.Div([
+                                dcc.Graph(id='grf_skill'),
+                                dbc.Button('Lihat Tabel', id='cll_grfskill', n_clicks=0,
+                                           style=button_style)
+                            ]),
+                        ],
+                        style=tab_style, selected_style=selected_style),
+            ], style=tabs_styles, id='tab_kepuasan', value='Layanan'),
+        ])
     ], style=cardgrf_style),
     dbc.Collapse(
         id='cll_kepuasan',
@@ -256,11 +334,66 @@ layout = html.Div([
              ),
     html.Div([masatunggu]),
     html.Div([lulusan]),
-    html.Div([kepuasan], style={'margin-bottom': '50px'})
+    html.Div([kepuasan], style={'margin-bottom': '50px'}),
+    dbc.Container([
+        dcc.Link([
+            dbc.Button('^', style=buttonLink_style),
+        ], href='#name')
+    ], style={'margin-left': '90%'})
 ], style={'justify-content': 'center'})
 
 
 # CONTROL COLLAPSE
+@app.callback(
+    Output('cll_tblmasatunggu', 'is_open'),
+    Output('cll_tblmasatunggu', 'children'),
+    [Input('cll_MsTgglulusan', 'n_clicks'),
+     Input('cll_rateGol', 'n_clicks'),
+     Input('tab_masatunggu', 'value')],
+    [State('cll_tblmasatunggu', 'is_open')]
+)
+def toggle_collapse(mstgg, msrerata, n, is_open):
+    isiMasaTunggu = dbc.Card(
+        dt.DataTable(
+            id='tbl_MsTgglulusan',
+            columns=[
+                {'name': i, 'id': i} for i in dfmasatunggu.columns
+            ],
+            data=dfmasatunggu.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ),style=cardtbl_style
+    ),
+    isiRerataMasaTunggu = dbc.Card(
+        dt.DataTable(
+            id='tbl_rateGol',
+            columns=[
+                {'name': i, 'id': i} for i in dfmasaTungguGol.columns
+            ],
+            data=dfmasaTungguGol.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if n and mstgg == 'MsTgglulusan':
+        return not is_open, isiMasaTunggu
+    elif n and msrerata == 'rateGol':
+        return not is_open, isiRerataMasaTunggu
+    return is_open, None
+
+
 @app.callback(
     Output('cll_kepuasan', 'is_open'),
     Output('cll_kepuasan', 'children'),
@@ -269,35 +402,39 @@ layout = html.Div([
      Input("tab_kepuasan", "value")],
     [State("cll_kepuasan", "is_open")])
 def toggle_collapse(nlayanan, nskill, puas, is_open):
-    isiLayanan = dt.DataTable(
-        id='tbl_Layanan',
-        columns=[
-            {'name': i, 'id': i} for i in dfKepuasanPelayanan.columns
-        ],
-        data=dfKepuasanPelayanan.to_dict('records'),
-        sort_action='native',
-        sort_mode='multi',
-        style_table={'padding': '10px', 'overflowX': 'auto'},
-        style_header={'textAlign': 'center'},
-        style_data={'font-size': '80%', 'textAlign': 'center'},
-        style_cell={'width': 95},
-        page_size=10,
-        export_format='xlsx'
+    isiLayanan = dbc.Card(
+        dt.DataTable(
+            id='tbl_Layanan',
+            columns=[
+                {'name': i, 'id': i} for i in dfKepuasanPelayanan.columns
+            ],
+            data=dfKepuasanPelayanan.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
     )
-    isiSkill = dt.DataTable(
-        id='tbl_skill',
-        columns=[
-            {'name': i, 'id': i} for i in dfskill.columns
-        ],
-        data=dfskill.to_dict('records'),
-        sort_action='native',
-        sort_mode='multi',
-        style_table={'padding': '10px', 'overflowX': 'auto'},
-        style_header={'textAlign': 'center'},
-        style_data={'font-size': '80%', 'textAlign': 'center'},
-        style_cell={'width': 95},
-        page_size=10,
-        export_format='xlsx'
+    isiSkill = dbc.Card(
+        dt.DataTable(
+            id='tbl_skill',
+            columns=[
+                {'name': i, 'id': i} for i in dfskill.columns
+            ],
+            data=dfskill.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
     )
     if nlayanan and puas == 'Layanan':
         return not is_open, isiLayanan
@@ -307,15 +444,66 @@ def toggle_collapse(nlayanan, nskill, puas, is_open):
 
 
 @app.callback(
-    Output('grf_rateGol', 'figure'),
-    Input('grf_rateGol', 'id')
+    Output('grf_MsTgglulusan', 'figure'),
+    Input('fltrMasaStart', 'value'),
+    Input('fltrMasaEnd', 'value')
 )
-def graphRateGol(id):
-    df = dfmasaTungguGol
-    fig = px.line(df, x=df['Tahun'], y=df['Jumlah'], color=df['Waktu'])
+def graphMSLulusan(tglstart, tglend):
+    df = data.getDataFrameFromDBwithParams('''
+    select data2."<6 BULAN", "6-18 BULAN", ">18 BULAN", LAINNYA, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
+     (
+        select tahun_lulus 'Tahun Lulus',
+        SUM(IF( 'Waktu Tunggu' = "KURANG 6 BULAN", data.jumlah, 0)) AS "<6 BULAN",
+        SUM(IF( 'Waktu Tunggu' = "6 - 18 BULAN", data.jumlah, 0)) AS "6-18 BULAN",
+        SUM(IF( 'Waktu Tunggu' = "LEBIH 18 BULAN", data.jumlah, 0)) AS ">18 BULAN",
+        SUM(IF( 'Waktu Tunggu' = "LAINNYA", data.jumlah, 0)) AS "LAINNYA"
+        from (
+            select count(*) as jumlah, ifnull('Waktu Tunggu',"LAINNYA") as 'Waktu Tunggu',tahun_lulus
+            from fact_tracer_study fact
+            inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+            group by `Waktu Tunggu` ,tahun_lulus
+            order by tahun_lulus desc
+        ) data
+        group by tahun_lulus
+        order by tahun_lulus
+    ) data2
+    left join (
+        select count(id_mahasiswa) as jumlah, tahun_lulus
+        from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
+        from fact_yudisium) data
+        group by tahun_lulus
+    )lulusan on lulusan.tahun_lulus = data2.`Tahun Lulus`
+    left join(
+        select count(id_mahasiswa) as jumlah, tahun_lulus
+        from dim_lulusan
+        group by tahun_lulus
+    )terlacak on terlacak.tahun_lulus = data2.`Tahun Lulus`
+    where data2.`Tahun Lulus` between %(start)s and %(end)s
+    order by data2.`Tahun Lulus`;
+    ''', {'start': tglstart, 'end': tglend})
+    fig = px.line(df, x=df['Tahun Lulus'], y=df['Waktu Tunggu'])
+    fig.add_bar(df, x=df['Tahun Lulus'], y=df['Lulusan'])
+    fig.add_bar(df, x=df['Tahun Lulus'], y=df['Lulusan Terlacak'])
     fig.update_traces(mode='lines+markers')
     return fig
 
+
+@app.callback(
+    Output('grf_rateGol', 'figure'),
+    Input('fltrMasaStart', 'value'),
+    Input('fltrMasaEnd', 'value')
+)
+def graphRataMS(tglstart, tglend):
+    df = data.getDataFrameFromDBwithParams('''
+    select count(waktu_tunggu) Jumlah, waktu_tunggu Waktu,tahun_lulus Tahun from fact_tracer_study fts
+        inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+        where waktu_tunggu is not null and (tahun_lulus between %(start)s and %(end)s)
+        group by waktu_tunggu,tahun_lulus
+        order by tahun_lulus asc
+    ''', {'start': tglstart, 'end': tglend})
+    fig = px.line(df, x=df['Tahun'], y=df['Jumlah'], color=df['Waktu'])
+    fig.update_traces(mode='lines+markers')
+    return fig
 
 # @app.callback(
 #     Output('grf_wirausaha', 'figure'),
@@ -328,7 +516,6 @@ def graphRateGol(id):
 #     fig.add_bar(x=df['Tahun Lulus'],y=df['Rendah'])
 #     fig.add_bar(x=df['Tahun Lulus'], y=df['Lainnya'])
 #     return fig
-
 
 @app.callback(
     Output('grf_gaji', 'figure'),
@@ -347,7 +534,7 @@ def graphGaji(id):
 )
 def graphLayanan(id):
     df = dfKepuasanPelayanan
-    fig = px.pie(df, values=df['persentase'], names=df['Nilai'])
+    fig = px.pie(df, values=df['Persen %'], names=df['Nilai'])
     return fig
 
 
@@ -383,30 +570,31 @@ def graphSkill(id, valueDropDown, labelSkill):
     fig = go.Figure(data=[go.Pie(labels=label, values=values)])
     return fig
 
-# @app.callback(
-#     Output('grf_bidangkerja', 'figure'),
-#     Input('grf_bidangkerja', 'id')
-# )
-# def graphBidangKerja(id):
-#     df = pd.read_sql('''select count(*) as Jumlah,
-#     ifnull(tingkat_kesesuaian_bidang_kerja,"LAINNYA") as "Kesesuaian Bidang Kerja",
-#     ifnull(lulusan.jumlah,0) as "Jumlah Lulusan", dim_lulusan.tahun_lulus as "Tahun Lulus"
-#         from fact_tracer_study fact
-#         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
-# left join(
-#     select count(id_mahasiswa) as jumlah, tahun_lulus
-#     from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
-#     from fact_yudisium) data
-#     group by tahun_lulus
-# )lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
-# group by dim_lulusan.tahun_lulus,`Kesesuaian Bidang Kerja`,`Jumlah Lulusan`
-#         order by dim_lulusan.tahun_lulus asc''', con)
-#     fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"], barmode='stack',
-#                  labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
-#     fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
-#                     hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
-#     return fig
 
+@app.callback(
+    Output('grf_bidangkerja', 'figure'),
+    Input('grf_bidangkerja', 'id')
+)
+def graphBidangKerja(id):
+    df = pd.read_sql('''
+    select count(*) as Jumlah,
+    ifnull(tingkat_kesesuaian_bidang_kerja,"LAINNYA") as "Kesesuaian Bidang Kerja",
+    ifnull(lulusan.jumlah,0) as "Jumlah Lulusan", dim_lulusan.tahun_lulus as "Tahun Lulus"
+        from fact_tracer_study fact
+        inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+    left join(
+        select count(id_mahasiswa) as jumlah, tahun_lulus
+        from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
+        from fact_yudisium) data
+        group by tahun_lulus
+    )lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
+    group by dim_lulusan.tahun_lulus,`Kesesuaian Bidang Kerja`,`Jumlah Lulusan`
+    order by dim_lulusan.tahun_lulus asc''')
+    fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"], barmode='stack',
+                 labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
+    fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
+                    hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+    return fig
 
 # @app.callback(
 #     Output('grf_tempatkerja', 'figure'),

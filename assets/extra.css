@@ -8,6 +8,8 @@
 #tbl_lulusan button.export,
 #tbl_dosbing button.export,
 #tbl_seleksi button.export,
+#tbl_lulusanall button.export,
+#tbl_lulusanot button.export,
 #tbl_mhsrasio button.export,
 #tbl_mhssmasmk button.export,
 #tbl_mhsasing button.export,
@@ -42,6 +44,27 @@
 #tbl_dosbingmbkm button.export,
 #tbl_jumlmitrambkm button.export,
 #tbl_mhsrasio button.export
+#tbl_jumlmitrambkm button.export,
+#tbl_pkmDosenMhs button.export,
+#tbl_telitiDosenMhs button.export,
+#tbl_kerjaTeliti button.export,
+#tbl_kerjaPKM button.export,
+#tbl_Sitasi button.export,
+#tbl_HKIDosen button.export,
+#tbl_TTGUDosen button.export,
+#tbl_BukuDosen button.export,
+#tbl_pubMhs button.export,
+#tbl_ttguMhs button.export,
+#tbl_HKIMhs button.export,
+#tbl_reTelitiDosen button.export,
+#rePubDosen button.export,
+#tbl_MsTgglulusan button.export,
+#tbl_wirausaha button.export,
+#tbl_bidangKerja button.export,
+#tbl_MsTgglulusan button.export,
+#tbl_rateGol button.export,
+#tbl_Layanan button.export,
+#tbl_skill button.export
 {
     width: 120px;
     height: 30px;
