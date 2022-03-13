@@ -114,7 +114,7 @@ left join(
 order by terlacak.tahun_lulus''', con)
 
 def getKepuasanLayanan():
-    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'Persen %', kepuasan.Nilai  from
+    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'Persen', kepuasan.Nilai  from
 (select sum(Jumlah) Semua,Nilai,1 gabung from
 (select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
 from fact_kepuasan_pengguna_mahasiswa
