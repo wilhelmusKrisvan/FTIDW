@@ -978,7 +978,7 @@ def toggle_collapse(ontime, total, persen, is_open):
 def graphPersenMHSLulus(thstart, thend):
     dfOnTime = data.getDataFrameFromDBwithParams('''
     select tahun_ajaran 'Tahun Ajaran',lls.tahun_angkatan 'Tahun Angkatan',lls.jml as 'Jumlah Lulusan',
-        mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 '%' from
+        mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 'Persen' from
     (select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium,semester_nama, tahun_angkatan from fact_yudisium fy
     inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
     inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
@@ -999,7 +999,7 @@ def graphPersenMHSLulus(thstart, thend):
     figOnTime = px.bar(dfOnTime, y=dfOnTime['Jumlah KP'], x=dfOnTime['Tahun Ajaran'], color=dfOnTime['Semester'], barmode='group')
     dfTotal = data.getDataFrameFromDBwithParams('''
     select lulus.tahun_angkatan 'Angkatan', lulus.jumlah 'Jumlah Lulusan', 
-        total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 "%"
+        total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 'Persen'
     from (
              select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
              from fact_yudisium fy
@@ -1263,3 +1263,4 @@ def graphMitra(start,end):
     ''',{'start':start,'end':end}).groupby(['Semester','Tingkat Wilayah'])
     fig = px.bar(df, y=df['Jumlah Mitra'], x=df['Tahun Ajaran'], barmode='group')
     return fig
+

@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
-connect='mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/operasional'
+connect='mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/operasional'
 engine = create_engine(connect,pool_size=20, max_overflow=0)
 
 class User(db.Model):

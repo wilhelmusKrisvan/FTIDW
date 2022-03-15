@@ -1,11 +1,12 @@
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-from appConfig import app, server
+from appConfig import app
 from dash.dependencies import Input, Output
 from flask_login import logout_user, current_user
 from apps import pmb,kbm,kegiatan_kerjasama,tgsakhir,alumni,ppp,mbkm,dosen
-import login, home, user_profile, admin
+import user_profile
+from control import admin, home, login
 
 navBar = dbc.Navbar(
     children=[
@@ -195,4 +196,4 @@ def navBarPage(input1):
 
 if __name__ == '__main__':
     app.run_server(debug=False)
-    # app.run_server(host='0.0.0.0',debug=False)
+    #app.run_server(host='0.0.0.0',debug=False)
