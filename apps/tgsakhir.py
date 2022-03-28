@@ -12,7 +12,8 @@ from appConfig import app
 from datetime import date
 import model.dao_tgsakhir as data
 
-con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+#con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
 
 dfdosbing = data.getMahasiswaBimbinganSkripsi()
 dflulusan = data.getIPK()

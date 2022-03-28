@@ -13,7 +13,8 @@ import configparser
 from model.user import User
 
 warnings.filterwarnings("ignore")
-connect = 'mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/operasional'
+#connect = 'mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/operasional'
+connect = 'mysql+pymysql://admin:admin@localhost:3333/ftidw'
 
 db = SQLAlchemy()
 

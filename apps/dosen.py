@@ -201,6 +201,35 @@ persenjabfungthDosen = dbc.Container([
     )
 ], style=cont_style)
 
+dosenINF = dbc.Container([
+    dbc.Card([
+        html.H5('Dosen Tetap Informatika',
+                style=ttlgrf_style),
+        dcc.Tabs([
+            dcc.Tab(label='Dosen Informatika Nomor Induk', value='DosenTetapInfNomorInduk',
+                    children=[
+                        dbc.CardBody([
+                            dcc.Graph(id='grf_DosenTetapInfInduk'),
+                            dbc.Button('Lihat Tabel', id='cll_grfDosenTetapInfInduk', n_clicks=0, style=button_style),
+                        ])
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Dosen Informatika Bersertif', value='DosenTetapInfSertif',
+                    children=[
+                        dbc.CardBody([
+                            dcc.Graph(id='grf_DosenTetapInfSertif'),
+                            dbc.Button('Lihat Tabel', id='cll_grfDosenTetapInfSertif', n_clicks=0, style=button_style),
+                        ])
+                    ],
+                    style=tab_style, selected_style=selected_style)
+        ], id='tab_DosenTetapInf', value='DosenTetapInfNomorInduk')
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_tblDosenTetapInf',
+        is_open=False,
+    )
+], style=cont_style)
+
 dosentetapinf = html.Div([
     dbc.Row([
         dbc.Col([
@@ -267,7 +296,7 @@ dosen = dbc.Container([
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Status', value='status',
                     children=[
-                        dosentetapinf,
+                        dosenINF,
                         dosentetapindustri
                     ],
                     style=tab_style, selected_style=selected_style)
@@ -323,6 +352,38 @@ def toggle_collapse(n, is_open):
     return is_open
 
 
+@app.callback(
+    Output("cll_tblDosenTetapInf", "is_open"),
+    Output("cll_tblDosenTetapInf", "children"),
+    [Input("cll_grfDosenTetapInfInduk", "n_clicks"),
+     Input("cll_grfDosenTetapInfSertif", "n_clicks"),
+     Input('tab_DosenTetapInf', 'value')],
+    [State("cll_tblDosenTetapInf", "is_open")])
+def toggle_collapse(ninduk, nsertif, dsn, is_open):
+    isiDosenTetap = dbc.Card(
+        dt.DataTable(
+            id='tbl_dosentetapinf',
+            columns=[
+                {'name': i, 'id': i} for i in dfdosentetapinf.columns
+            ],
+            data=dfdosentetapinf.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if ninduk and dsn == 'DosenTetapInfNomorInduk':
+        return not is_open, isiDosenTetap
+    if nsertif and dsn == 'DosenTetapInfSertif':
+        return not is_open, isiDosenTetap
+    return is_open, None
+
+
 # GRAPH COLLAPSE
 # Jumlah Dosen S3 : Seluruh Dosen
 @app.callback(
@@ -368,4 +429,39 @@ def grafPersenJabfungth(id):
     fig = px.line(df, x=df['Tahun'], y=df['persentase'], color='Jabatan')
     fig.update_traces(mode='lines+markers')
     fig.update_xaxes(categoryorder='category ascending')
+    return fig
+
+
+@app.callback(
+    Output('grf_DosenTetapInfInduk', 'figure'),
+    Input('grf_DosenTetapInfInduk', 'id')
+)
+def graphDosenInfInduk(id):
+    df = data.getDataFrameFromDB('''
+    select count(nomor_induk) Jumlah,
+    tipe_nomor_induk 'Tipe Nomor Induk' from dim_dosen
+    where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
+    group by tipe_nomor_induk
+    ''')
+    fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Nomor Induk'],color=df['Tipe Nomor Induk'])
+    return fig
+
+
+@app.callback(
+    Output('grf_DosenTetapInfSertif', 'figure'),
+    Input('grf_DosenTetapInfSertif', 'id')
+)
+def graphDosenInfSertif(id):
+    df = data.getDataFrameFromDB('''
+    select count(no_sertifikat) Jumlah, 'Sertif' as 'Tipe Sertif'
+    from dim_dosen
+    where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
+    and no_sertifikat is not null
+    union all 
+    select sum(if(no_sertifikat is null,1,0)) Jumlah, 'Non Sertif' as 'Tipe Sertif'
+    from dim_dosen
+    where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
+    and no_sertifikat is null
+    ''')
+    fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Sertif'],color=df['Tipe Sertif'])
     return fig

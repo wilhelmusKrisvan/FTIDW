@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 
 #con = create_engine('mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/datawarehouse')
 #con = create_engine('mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/datawarehouse_dev')
-con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
+#con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
+con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
 
 def getDataFrameFromDB(query):
     return pd.read_sql(query, con)
@@ -37,12 +38,12 @@ order by kode_kurikulum,kelompok_matakuliah desc''', con)
 def getMatkulBatal():
     return pd.read_sql('''
     select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, 
-    dd.nik NIK, dd.nama Nama, dm.kode_matakuliah Kode, dm.nama_matakuliah Matakuliah
+    dd.nama Nama, dm.nama_matakuliah Matakuliah,dm.kelompok_matakuliah
 from fact_dosen_mengajar
 inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
 inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
 inner join dim_matakuliah dm on dm.id_matakuliah = fact_dosen_mengajar.id_matakuliah
-where is_batal = 1
+where is_batal = 1 and ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 order by ds.tahun_ajaran, ds.semester, dd.nama''', con)
 
 
@@ -52,7 +53,7 @@ def getMatkulTawar():
 from fact_registrasi_matakuliah
 inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
 inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
-where ds.tahun_ajaran
+where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 order by ds.tahun_ajaran, ds.semester, kelompok_matakuliah, nama_matakuliah''', con)
 
 
@@ -278,7 +279,7 @@ inner join
       from dim_semester ds
       where ds.tahun_ajaran between 
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and 
-        substr(ds.tahun_ajaran,1,4)=%(year)s and semester_nama=%(smt)s) smt
+        ds.tahun_ajaran=%(year)s and semester_nama=%(smt)s) smt
 on smt.sahun=dosen.tahun
 UNION ALL
 select substr(ds.tahun_ajaran,1,4) as sahun,concat(ds.semester_nama,' ',ds.tahun_ajaran),
@@ -290,7 +291,7 @@ select substr(ds.tahun_ajaran,1,4) as sahun,concat(ds.semester_nama,' ',ds.tahun
       where (status = 'AK' or status='CS' or status='TA')
         and ds.tahun_ajaran between 
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and 
-        substr(ds.tahun_ajaran,1,4)=%(year)s and semester_nama=%(smt)s
+        ds.tahun_ajaran=%(year)s and semester_nama=%(smt)s
       group by ds.semester_nama,ds.tahun_ajaran,sahun
     ''',con,params={'year': tahun, 'smt': smt})
 
@@ -302,7 +303,7 @@ select substr(ds.tahun_ajaran,1,4) 'tahun', concat(ds.semester_nama,' ',ds.tahun
     from fact_dosen_mengajar fdm
         inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
         inner join dim_semester ds on fdm.id_semester = ds.id_semester
-    where substr(kode_semester,1,4)>=year(now())-5 and substr(ds.tahun_ajaran,1,4)=%(year)s and ds.semester_nama=%(smt)s
+    where substr(kode_semester,1,4)>=year(now())-5 and ds.tahun_ajaran=%(year)s and ds.semester_nama=%(smt)s
     group by tahun,semester,semester_nama,tahun_ajaran
 UNION ALL
 select substr(ds.tahun_ajaran,1,4) tahun, 
@@ -313,10 +314,55 @@ select substr(ds.tahun_ajaran,1,4) tahun,
                inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
                inner join dim_semester ds on fms.id_semester= ds.id_semester
       where (status = 'AK' or status='CS' or status='TA')
-        and substr(ds.kode_semester,1,4)>=year(now())-5 and substr(ds.tahun_ajaran,1,4)=%(year)s and ds.semester_nama=%(smt)s
+        and substr(ds.kode_semester,1,4)>=year(now())-5 and ds.tahun_ajaran=%(year)s and ds.semester_nama=%(smt)s
       group by ds.semester_nama,ds.tahun_ajaran,tahun,semester
     ''',con,params={'year': tahun, 'smt': smt})
 
 def getKurikulum():
     return pd.read_sql('select kode_kurikulum from dim_kurikulum '
                        'where id_kurikulum in (select id_kurikulum from fact_matakuliah_kurikulum)',con)
+
+def dfBatalTawar(tahun,smt):
+    return pd.read_sql('''
+select data.Semester, kode_semester, sum(Jumlah) Jumlah, Tipe from
+    (select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester,
+    ds.kode_semester,
+    count(dm.kode_matakuliah) Jumlah,
+    'TAWAR' Tipe
+    from fact_registrasi_matakuliah
+    inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
+    inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
+    where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+    and dm.id_matakuliah not in (280,242,245,5,3,189,188,371,513,512,514,516,283,523,525,519,520,522,524,216)
+    and dm.id_prodi=9
+    and ds.tahun_ajaran between %(From)s and %(To)s and id_prodi=9 
+    group by Semester,ds.kode_semester
+union all
+    select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester,
+    ds.kode_semester,
+    count(distinct dm.kode_matakuliah) Jumlah,
+    'TAWAR' Tipe
+    from fact_registrasi_matakuliah
+    inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
+    inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
+    where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+    and dm.id_matakuliah = 280 and dm.id_prodi=9
+    and ds.tahun_ajaran between %(From)s and %(To)s and id_prodi=9 
+    group by Semester,ds.kode_semester
+union all
+    select batal.* from
+    (select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester, 
+    ds.kode_semester,
+    count(dm.kode_matakuliah) Jumlah, 
+    'BATAL' Tipe
+    from fact_dosen_mengajar
+    inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
+    inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
+    inner join dim_matakuliah dm on dm.id_matakuliah = fact_dosen_mengajar.id_matakuliah
+    where is_batal = 1 and dm.id_matakuliah not in (242,245,5,3,189,188,371,513,512,514,516,283,523,525,519,520,522,524,216)
+    and ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+    and ds.tahun_ajaran between %(From)s and %(To)s
+    group by Semester,ds.kode_semester) batal    
+    )data
+    group by data.kode_semester,data.Tipe,data.Semester
+    ''',con,params={'From': tahun, 'To': smt})
