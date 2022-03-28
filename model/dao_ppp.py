@@ -1,7 +1,9 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
+# con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+# con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 
 
 def getDataFrameFromDB(query):
@@ -11,25 +13,27 @@ def getDataFrameFromDB(query):
 def getDataFrameFromDBwithParams(query, parameter):
     return pd.read_sql(query, con, params=parameter)
 
+def getDosen(): return pd.read_sql('select nama from dim_dosen where id_prodi=9',con)
 
 # jumlah judul
 def getJumlahPPP(): return pd.read_sql('''
-select Tahun, Nama, max(Penelitian) Penelitian, max(pkm) as PKM , max(publikasi) as "Publikasi Penelitan dan PKM", max(LuaranLainnya) as "Luaran Lainnya" from (
+select Tahun, Nama, max(Penelitian) Penelitian, max(pkm) as PKM , max(publikasi) as "Publikasi Penelitan dan PKM", max(LuaranLainnya) as "Luaran Lainnya" from 
+(
    ( select nama, dim_dosen.id_dosen, tahun, count(*) as Penelitian, null as pkm, null as publikasi, null as LuaranLainnya from fact_penelitian fact
-    inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
-    inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
-    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
-    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-    group by nama,dim_dosen.id_dosen, tahun
-    order by nama, tahun)
-    union 
+        inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
+        inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
+        inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
+        inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+        group by nama,dim_dosen.id_dosen, tahun
+        order by nama, tahun)
+        union 
     (select nama, dim_dosen.id_dosen, tahun, null as Penelitian, count(*) as pkm , null as publikasi, null as LuaranLainnya  from fact_pkm fact
-    inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
-    inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
-    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
-    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-    group by dim_dosen.id_dosen, nama, tahun
-    order by nama, tahun)
+        inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
+        inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
+        inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
+        inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+        group by dim_dosen.id_dosen, nama, tahun
+        order by nama, tahun)
     union
     (select nama, dimdos.id_dosen, tahun_publikasi as tahun, null as Penelitian, null as pkm, count(*) as publikasi, null as LuaranLainnya from fact_publikasi fact
         inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
@@ -49,7 +53,7 @@ select Tahun, Nama, max(Penelitian) Penelitian, max(pkm) as PKM , max(publikasi)
         inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
         group by  nama, dim_dosen.id_dosen, tahun)
 ) data
-where tahun >2014
+where tahun>year(now())-5
 group by nama, tahun
 order by nama, tahun''', con)
 
@@ -69,8 +73,8 @@ order by tahun, judul_penelitian''', con)
 def getPKMDana(): return pd.read_sql('''
 select  
     Tahun, judul_pkm "Judul PkM",
-    jumlah_Dosen "Jumlah Dosen", GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ')  "Nama Dosen",
-     jumlah_mahasiswa "Jumlah Mahasiswa", GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') "Nama Mahasiswa"
+    jumlah_Dosen "Jumlah Dosen", 
+     jumlah_mahasiswa "Jumlah Mahasiswa"
 from fact_pkm fact
 inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
 inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
@@ -83,27 +87,27 @@ order by tahun, judul_pkm''', con)
 
 
 # mahasiswa
-def getPenelitianMhs(): return pd.read_sql('''
-select 
-    tahun 'Tahun', fact.judul_penelitian 'Judul Penelitian', 
-    jumlah_Dosen, GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ') 'Nama Dosen', 
-    jumlah_mahasiswa 'Jumlah Mahasiswa', GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') 'Nama Mahasiswa'  
-from fact_penelitian fact
-inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
-inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
-    inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
-    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
-    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-    inner join br_pp_mahasiswa on fact.id_penelitian = br_pp_mahasiswa.id_penelitian_pkm
-    inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa 
-    group by fact.id_penelitian, jumlah_Dosen,judul_penelitian, jumlah_mahasiswa, tahun''', con)
+# def getPenelitianMhs(): return pd.read_sql('''
+# select
+#     tahun 'Tahun', fact.judul_penelitian 'Judul Penelitian',
+#     jumlah_Dosen 'Jumlah Dosen', GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ') 'Nama Dosen',
+#     jumlah_mahasiswa 'Jumlah Mahasiswa', GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') 'Nama Mahasiswa'
+# from fact_penelitian fact
+# inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
+# inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
+#     inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
+#     inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
+#     inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+#     inner join br_pp_mahasiswa on fact.id_penelitian = br_pp_mahasiswa.id_penelitian_pkm
+#     inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa
+#     group by fact.id_penelitian, jumlah_Dosen,judul_penelitian, jumlah_mahasiswa, tahun''', con)
 
 
 def getPKMMhs(): return pd.read_sql('''
 select 
     Tahun, judul_pkm "Judul PkM",
-    jumlah_Dosen "Jumlah Dosen", GROUP_CONCAT(distinct dim_dosen.nama  SEPARATOR', ')  "Nama Dosen", 
-    jumlah_mahasiswa "Jumlah Mahasiswa", GROUP_CONCAT(distinct dim_mahasiswa.nama  SEPARATOR', ') "Nama Mahasiswa" 
+    jumlah_Dosen "Jumlah Dosen",
+    jumlah_mahasiswa "Jumlah Mahasiswa"
 from fact_pkm fact
 inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
 inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
@@ -176,8 +180,8 @@ select ddselesai.tahun 'Tahun Selesai',
        CASE WHEN dm.wilayah = '1' THEN 'LOKAL'
             WHEN dm.wilayah = '2' THEN 'REGIONAL'
 		    WHEN dm.wilayah = '3' THEN 'NASIONAL'
-            WHEN dm.wilayah = '3' THEN 'INTERNASIONAL'
-		    ELSE 'NONE' END AS wilayah_mitra,
+            WHEN dm.wilayah = '4' THEN 'INTERNASIONAL'
+		    ELSE 'NONE' END AS 'Wilayah Mitra',
 	   dm.jenis_mitra 'Jenis Mitra', dm.nama_mitra 'Nama Mitra'
 from br_pp_perjanjian
 inner join dim_penelitian_pkm dpp on br_pp_perjanjian.id_penelitian_pkm = dpp.id_penelitian_pkm
@@ -197,7 +201,7 @@ select ddselesai.tahun as 'Tahun Selesai',
 		    WHEN dm.wilayah = '2' THEN 'REGIONAL'
 		    WHEN dm.wilayah = '3' THEN 'NASIONAL'
             WHEN dm.wilayah = '3' THEN 'INTERNASIONAL'
-		    ELSE 'NONE' END AS wilayah_mitra,
+		    ELSE 'NONE' END AS 'Wilayah Mitra',
        dm.jenis_mitra 'Jenis Mitra', dm.nama_mitra 'Nama Mitra'
 from br_pp_perjanjian
 inner join dim_penelitian_pkm dpp on br_pp_perjanjian.id_penelitian_pkm = dpp.id_penelitian_pkm
@@ -217,7 +221,7 @@ def getKISitasi3th():
             sum(jumlah_sitasi) 'Jumlah Sitasi'
     from fact_publikasi_sitasi fps
              inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
-    where tahun_sitasi >= year(now()) - 3
+    where tahun_sitasi >= year(now()) - 5
     group by tahun_sitasi, fps.id_publikasi, dp.judul_karya
     order by tahun_sitasi desc, 'Jumlah Sitasi' desc;
     ''', con)

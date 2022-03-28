@@ -682,7 +682,7 @@ def toggle_collapse(n, is_open):
 )
 def FillIpkMahasiswa(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, avg(ipk) as "Rata-Rata"
-from fact_mahasiswa_status fms 
+from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
 where ds.tahun_ajaran between %(From)s and %(To)s and fms.status = 'AK'
 group by ds.tahun_ajaran, ds.semester_nama
@@ -698,7 +698,7 @@ order by ds.tahun_ajaran, ds.semester_nama''', {'From': valueFrom, 'To': valueTo
     Input('Todrpdwn_mhs', 'value'),
 )
 def FillAktif(valueFrom, valueTo):
-    df = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, 
+    df = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester,
     count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
 where fms.status = 'AK' and ds.tahun_ajaran between %(From)s and %(To)s
@@ -717,7 +717,7 @@ order by ds.tahun_ajaran, ds.semester_nama
 )
 def FillAsing(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''
-    select ds.tahun_ajaran 'Tahun Ajaran', 
+    select ds.tahun_ajaran 'Tahun Ajaran',
     count(*) as 'Jumlah Mahasiswa Asing' from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
 inner join dim_mahasiswa dm on dm.id_mahasiswa = fms.id_mahasiswa
@@ -733,8 +733,8 @@ order by tahun_ajaran ''', {'From': valueFrom, 'To': valueTo})
     Input('Angkatandrpdwn_MhsTA', 'value')
 )
 def MhsTA(valueAngkatan):
-    df = data.getDataFrameFromDBwithParams('''select ak.tahun_angkatan 'Tahun Angkatan', 
-    ak.tahun_ajaran, 
+    df = data.getDataFrameFromDBwithParams('''select ak.tahun_angkatan 'Tahun Angkatan',
+    ak.tahun_ajaran,
     ak.jumlah 'Mahasiswa Aktif',
     concat(if(substr(ak.kode_semester,5,1)='1','Ganjil','Genap')) Semester,
     ifnull(ta.jumlah,0) 'Mahasiswa Tidak Aktif',
@@ -745,7 +745,7 @@ from (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester,count(distinct (dm
                inner join dim_semester ds on fms.id_semester= ds.id_semester
       where tahun_angkatan = %(TA)s
         and (status = 'AK'or status='CS')
-        and ds.tahun_ajaran between 
+        and ds.tahun_ajaran between
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
         and id_prodi=9
       group by ds.tahun_ajaran,tahun_angkatan,ds.kode_semester) ak
@@ -756,7 +756,7 @@ concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1
                inner join dim_semester ds on fms.id_semester= ds.id_semester
       where tahun_angkatan = %(TA)s
         and status = 'TA'
-        and ds.tahun_ajaran between 
+        and ds.tahun_ajaran between
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
         and id_prodi=9
       group by ds.tahun_ajaran,tahun_angkatan, ds.kode_semester) ta
@@ -824,7 +824,7 @@ order by semua.tahun_ajaran asc, semua.semester_nama asc''', {'From': valueFrom,
 )
 def FillKepuasanMhs(thnAjar, Smt):
     df = data.getDataFrameFromDBwithParams(
-        '''select tahun_ajaran 'Tahun Ajaran', semester_nama Semester, nama 'Nama Dosen', 
+        '''select tahun_ajaran 'Tahun Ajaran', semester_nama Semester, nama 'Nama Dosen',
     Rata2 'Rata-rata',
        case
         when round(Rata2)>=0 and round(Rata2)<=25 then 'KURANG BAIK'
@@ -838,7 +838,7 @@ from
 from fact_dosen_mengajar fdm
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
-where ds.tahun_ajaran between 
+where ds.tahun_ajaran between
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and id_prodi=9
 group by tahun_ajaran,semester_nama,nama) kepuasan
 where kepuasan.tahun_ajaran=%(TA)s and kepuasan.semester_nama LIKE %(Smt)s

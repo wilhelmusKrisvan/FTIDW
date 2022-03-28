@@ -32,8 +32,8 @@ dfttgumhs = data.getTTGU()
 dfpersen_mhsLulus = data.getMahasiswaLulus()
 dfpersen_mhsLulusAngkt = data.getMahasiswaLulusBandingTotal()
 
-Fillsemester = pd.read_sql('select tahun_ajaran from dim_semester', con)
-semester = Fillsemester['tahun_ajaran'].dropna().unique()
+# Fillsemester = pd.read_sql('select tahun_ajaran from dim_semester', con)
+# semester = Fillsemester['tahun_ajaran'].dropna().unique()
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -406,34 +406,50 @@ persen_mhsLulus = dbc.Container([
         html.H5('Persentase Mahasiswa Lulus',
                 style=ttlgrf_style),
         html.Div([
-            dbc.Row([
-                dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
-                    dcc.Dropdown(
-                        id='fltrPersenMHSLulusStart',
-                        options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[0],
-                        style={'color': 'black'},
-                        clearable=False
-                    )
-                ]),
-                dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
-                    dcc.Dropdown(
-                        id='fltrPersenMHSLulusEnd',
-                        options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[3],
-                        style={'color': 'black'},
-                        clearable=False
-                    )
-                ])
-            ])
-        ]),
-        html.Div([
             dcc.Tabs([
                 dcc.Tab(label='Tepat Waktu per Tahun Ajaran', value='llsontime',
                         children=[
                             html.Div([
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.P('Start :', style={'marginBottom': 0}),
+                                        dcc.Dropdown(
+                                            id='fltrLulusOTStart',
+                                            options=[{'label': i, 'value': i} for i in listDropdownTA],
+                                            value=listDropdownTA[0],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ]),
+                                    dbc.Col([
+                                        html.P('End :', style={'marginBottom': 0}),
+                                        dcc.Dropdown(
+                                            id='fltrLulusOTEnd',
+                                            options=[{'label': i, 'value': i} for i in listDropdownTA],
+                                            value=listDropdownTA[3],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ])
+                                ])
+                            ]),
+                            html.Div([
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                                        dcc.RadioItems(
+                                            id='radio_llsnot',
+                                            options=[{'label': 'Jumlah', 'value': 'jumlot'},
+                                                     {'label': 'Persetase Lulusan OT : Mahasiswa', 'value': 'persenot'}
+                                                     ],
+                                            value='jumlot',
+                                            style={'width': '100%', 'padding': '0px', },
+                                            className='card-body',
+                                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                                        'margin-right': '10%', 'margin-top': '5px'}
+                                        )
+                                    ], style={'padding-left': '5%'})
+                                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
                                 dcc.Graph(id='grf_llsontime'),
                                 dbc.Button('Lihat Tabel', id='cll_grfllsontime', n_clicks=0,
                                             style=button_style)
@@ -442,6 +458,46 @@ persen_mhsLulus = dbc.Container([
                 dcc.Tab(label='per Total Jumlah Mahasiswa', value='llstotal',
                         children=[
                             html.Div([
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.P('Start :', style={'marginBottom': 0}),
+                                        dcc.Dropdown(
+                                            id='fltrLulusTotStart',
+                                            options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                            value=listDropdownTh[0],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ]),
+                                    dbc.Col([
+                                        html.P('End :', style={'marginBottom': 0}),
+                                        dcc.Dropdown(
+                                            id='fltrLulusTotEnd',
+                                            options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                            value=listDropdownTh[3],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ])
+                                ])
+                            ]),
+                            html.Div([
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                                        dcc.RadioItems(
+                                            id='radio_llsntot',
+                                            options=[{'label': 'Jumlah', 'value': 'jumltot'},
+                                                     {'label': 'Persetase Lulusan : Mahasiswa', 'value': 'persentot'}
+                                                     ],
+                                            value='jumltot',
+                                            style={'width': '100%', 'padding': '0px', },
+                                            className='card-body',
+                                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                                        'margin-right': '10%', 'margin-top': '5px'}
+                                        )
+                                    ], style={'padding-left': '5%'})
+                                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
                                 dcc.Graph(id='grf_llstotal'),
                                 dbc.Button('Lihat Tabel', id='cll_grfllstotal', n_clicks=0,
                                             style=button_style),
@@ -513,7 +569,6 @@ ipk_lulusan = dbc.Container([
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
                         value=listDropdownTA[0],
                         style={'color': 'black'},
-                        placeholder='Pilih Tahun Awal',
                         clearable=False
                     )
                 ]),
@@ -524,7 +579,6 @@ ipk_lulusan = dbc.Container([
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
                         value=listDropdownTA[3],
                         style={'color': 'black'},
-                        placeholder='Pilih Tahun Akhir',
                         clearable=False
                     )
                 ])
@@ -577,7 +631,7 @@ juml_lulusan = dbc.Container([
                         dcc.Dropdown(
                             id='fltrLulusanEnd',
                             options=[{'label': i, 'value': i} for i in listDropdownTA],
-                            value=listDropdownTA[0],
+                            value=listDropdownTA[3],
                             style={'color': 'black'},
                             clearable=False
                         )
@@ -608,7 +662,7 @@ juml_lulusan = dbc.Container([
 
 masa_studi = dbc.Container([
     dbc.Card([
-        html.H5('Grafik Masa Studi Lulusan per Tahun Anjaran', style=ttlgrf_style),
+        html.H5('Grafik Masa Studi Lulusan per Tahun Ajaran', style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
@@ -626,7 +680,7 @@ masa_studi = dbc.Container([
                     dcc.Dropdown(
                         id='fltrMSEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[0],
+                        value=listDropdownTA[3],
                         style={'color': 'black'},
                         clearable=False
                     )
@@ -655,15 +709,15 @@ masa_studi = dbc.Container([
 
 mitra = dbc.Container([
     dbc.Card([
-        html.H5('Mitra yang Terlibat per Tingkat Wilayah per Semester',style=ttlgrf_style),
+        html.H5('Mitra yang Terlibat KP-Skripsi-Yudisium',style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
                     html.P('Start: ', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMitraStart',
-                        options=[{'label': i, 'value': i} for i in listDropdownTh],
-                        value=listDropdownTh[0],
+                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                        value=listDropdownTA[0],
                         style={'color': 'black'},
                         clearable=False
                     )
@@ -672,8 +726,8 @@ mitra = dbc.Container([
                     html.P('End: ', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMitraEnd',
-                        options=[{'label': i, 'value': i} for i in listDropdownTh],
-                        value=listDropdownTh[3],
+                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                        value=listDropdownTA[3],
                         style={'color': 'black'},
                         clearable=False
                     )
@@ -681,10 +735,27 @@ mitra = dbc.Container([
             ])
         ]),
         html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                    dcc.RadioItems(
+                        id='radio_mitrakp',
+                        options=[{'label': 'Top 10 Mitra (KP Terbanyak)', 'value': 'top'},
+                                 {'label': 'Jenis Mitra', 'value': 'jenis'},
+                                 {'label': 'Wilayah Mitra', 'value': 'wilayah'}
+                                 ],
+                        value='top',
+                        style={'width': '100%', 'padding': '0px', },
+                        className='card-body',
+                        labelStyle={'display': 'block', 'display': 'inline-block',
+                                    'margin-right': '10%', 'margin-top': '5px'}
+                    )
+                ], style={'padding-left': '5%'}),
+            ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
             dcc.Graph(id='grf_mitra'),
             dbc.Button('Lihat Tabel', id='cll_grfmitra', n_clicks=0,
-                        style=button_style)
-        ])
+                       style=button_style)
+        ], style={'textAlign': 'center'})
     ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
@@ -946,7 +1017,7 @@ def toggle_collapse(ontime, total, persen, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             export_format='xlsx',
             page_size=5
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     isiTotal = dbc.Card(
         dt.DataTable(
@@ -961,7 +1032,7 @@ def toggle_collapse(ontime, total, persen, is_open):
             style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
             export_format='xlsx',
             page_size=3
-        ), style=cardgrf_style
+        ), style=cardtbl_style
     ),
     if ontime and persen == 'llsontime':
         return not is_open, isiOntime
@@ -969,53 +1040,130 @@ def toggle_collapse(ontime, total, persen, is_open):
         return not is_open, isiTotal
     return is_open, None
 
+
 @app.callback(
     Output('grf_llsontime', 'figure'),
-    Output('grf_llstotal', 'figure'),
-    Input('fltrPersenMHSLulusStart', 'value'),
-    Input('fltrPersenMHSLulusEnd', 'value')
+    Input('fltrLulusOTStart', 'value'),
+    Input('fltrLulusOTEnd', 'value'),
+    Input('radio_llsnot','value')
 )
-def graphPersenMHSLulus(thstart, thend):
-    dfOnTime = data.getDataFrameFromDBwithParams('''
-    select tahun_ajaran 'Tahun Ajaran',lls.tahun_angkatan 'Tahun Angkatan',lls.jml as 'Jumlah Lulusan',
-        mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 '%' from
-    (select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium,semester_nama, tahun_angkatan from fact_yudisium fy
-    inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
-    inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
-    where convert(substr(tahun_ajaran,6,4),int)-4=convert(tahun_angkatan,int) and semester_nama='GENAP'
-    group by tahun_ajaran_yudisium, tahun_angkatan, semester_nama
-    order by tahun_ajaran_yudisium desc, semester_nama desc) lls,
-    (select ds.tahun_ajaran, dm.tahun_angkatan,
-           count(distinct dm.id_mahasiswa) jml
-    from fact_mahasiswa_status ms
-    inner join dim_mahasiswa dm on ms.id_mahasiswa = dm.id_mahasiswa
-    inner join dim_semester ds on ms.id_semester=ds.id_semester
-    where kode_semester>='20161' and (status='AK' or status='UD' or status='CS')
-    group by tahun_ajaran,tahun_angkatan
-    order by tahun_ajaran desc) mhs
-    where mhs.tahun_ajaran=lls.tahun_ajaran_yudisium and mhs.tahun_angkatan=lls.tahun_angkatan
-    order by tahun_ajaran asc
-    ''', {'start': thstart, 'end': thend})
-    figOnTime = px.bar(dfOnTime, y=dfOnTime['Jumlah KP'], x=dfOnTime['Tahun Ajaran'], color=dfOnTime['Semester'], barmode='group')
-    dfTotal = data.getDataFrameFromDBwithParams('''
-    select lulus.tahun_angkatan 'Angkatan', lulus.jumlah 'Jumlah Lulusan', 
-        total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 "%"
-    from (
-             select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
-             from fact_yudisium fy
-                      inner join dim_mahasiswa dm on dm.id_mahasiswa = fy.id_mahasiswa
-                      inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
-             group by tahun_angkatan
-         ) lulus,
-         (
-             select tahun_angkatan, count(distinct id_mahasiswa) 'jumlah'
-             from dim_mahasiswa dm
-             group by tahun_angkatan
-         )total
-    where lulus.tahun_angkatan=total.tahun_angkatan
-    order by lulus.tahun_angkatan asc''', {'start': thstart, 'end': thend})
-    figTotal= px.bar(dfTotal, y=dfTotal['Jumlah KP'], x=dfTotal['Tahun Ajaran'])
-    return figOnTime, figTotal
+def graphPersenMHSLulusOT(start, end, radio):
+    if radio=='jumlot':
+        dfOnTimeLlsn= data.getDataFrameFromDBwithParams(f'''
+            select tahun_ajaran              'Tahun Ajaran',
+                   lls.tahun_angkatan        'Tahun Angkatan',
+                   lls.jml as                'Jumlah Lulusan',
+                   mhs.jml as                'Jumlah Mahasiswa',
+                   (lls.jml / mhs.jml) * 100 'Persentase'
+            from (select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium, semester_nama, tahun_angkatan
+                  from fact_yudisium fy
+                           inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
+                           inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+                  where convert(substr(tahun_ajaran, 6, 4), int) - 4 = convert(tahun_angkatan, int)
+                    and semester_nama = 'GENAP'
+                  group by tahun_ajaran_yudisium, tahun_angkatan, semester_nama
+                  order by tahun_ajaran_yudisium desc, semester_nama desc) lls,
+                 (select ds.tahun_ajaran,
+                         dm.tahun_angkatan,
+                         count(distinct dm.id_mahasiswa) jml
+                  from fact_mahasiswa_status ms
+                           inner join dim_mahasiswa dm on ms.id_mahasiswa = dm.id_mahasiswa
+                           inner join dim_semester ds on ms.id_semester = ds.id_semester
+                  where kode_semester >= '20161'
+                    and (status = 'AK' or status = 'UD' or status = 'CS')
+                  group by tahun_ajaran, tahun_angkatan
+                  order by tahun_ajaran desc) mhs
+            where mhs.tahun_ajaran = lls.tahun_ajaran_yudisium
+              and mhs.tahun_angkatan = lls.tahun_angkatan
+              and tahun_ajaran between %(start)s and %(end)s
+            order by tahun_ajaran asc;
+            ''', {'start': start, 'end': end})
+        figOnTime = px.bar(dfOnTimeLlsn, y=dfOnTimeLlsn.columns[2:4], x=dfOnTimeLlsn['Tahun Ajaran'], barmode='group')
+        return figOnTime
+    elif radio=='persenot':
+        dfPersenOTLulusan = data.getDataFrameFromDBwithParams(f'''
+        select tahun_ajaran                     'Tahun Ajaran',
+                   (lls.jml / mhs.jml) * 100    'Persentase'
+            from (select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium, semester_nama, tahun_angkatan
+                  from fact_yudisium fy
+                           inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
+                           inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+                  where convert(substr(tahun_ajaran, 6, 4), int) - 4 = convert(tahun_angkatan, int)
+                    and semester_nama = 'GENAP'
+                  group by tahun_ajaran_yudisium, tahun_angkatan, semester_nama
+                  order by tahun_ajaran_yudisium desc, semester_nama desc) lls,
+                 (select ds.tahun_ajaran,
+                         dm.tahun_angkatan,
+                         count(distinct dm.id_mahasiswa) jml
+                  from fact_mahasiswa_status ms
+                           inner join dim_mahasiswa dm on ms.id_mahasiswa = dm.id_mahasiswa
+                           inner join dim_semester ds on ms.id_semester = ds.id_semester
+                  where kode_semester >= '20161'
+                    and (status = 'AK' or status = 'UD' or status = 'CS')
+                  group by tahun_ajaran, tahun_angkatan
+                  order by tahun_ajaran desc) mhs
+            where mhs.tahun_ajaran = lls.tahun_ajaran_yudisium
+              and mhs.tahun_angkatan = lls.tahun_angkatan
+              and tahun_ajaran between %(start)s and %(end)s
+            order by tahun_ajaran asc;
+        ''',{'start': start, 'end': end})
+        figPersenOT = px.line(dfPersenOTLulusan, y=dfPersenOTLulusan['Persentase'], x=dfPersenOTLulusan['Tahun Ajaran'])
+        return figPersenOT
+
+
+@app.callback(
+    Output('grf_llstotal', 'figure'),
+    Input('fltrLulusTotStart', 'value'),
+    Input('fltrLulusTotEnd', 'value'),
+    Input('radio_llsntot','value')
+)
+def graphPersenMHSLulusOT(start, end, radio):
+    if radio == 'jumltot':
+        dftot = data.getDataFrameFromDBwithParams(f'''
+        select lulus.tahun_angkatan                'Angkatan',
+               lulus.jumlah                        'Jumlah Lulusan',
+               total.jumlah                        'Total Mahasiswa',
+               (lulus.jumlah / total.jumlah) * 100 "Persentase"
+        from (
+                 select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
+                 from fact_yudisium fy
+                          inner join dim_mahasiswa dm on dm.id_mahasiswa = fy.id_mahasiswa
+                          inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+                 group by tahun_angkatan
+             ) lulus,
+             (
+                 select tahun_angkatan, count(distinct id_mahasiswa) 'jumlah'
+                 from dim_mahasiswa dm
+                 group by tahun_angkatan
+             ) total
+        where lulus.tahun_angkatan = total.tahun_angkatan 
+        order by lulus.tahun_angkatan desc;
+        ''',{'start':start, 'end':end})
+        figtot = px.bar(dftot, y=dftot.columns[2:4], x=dftot['Angkatan'])
+        return figtot
+    elif radio == 'persentot':
+        dftotpersen = data.getDataFrameFromDBwithParams(f'''
+        select lulus.tahun_angkatan                'Angkatan',
+               (lulus.jumlah / total.jumlah) * 100 'Persentase'
+        from (
+                 select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
+                 from fact_yudisium fy
+                          inner join dim_mahasiswa dm on dm.id_mahasiswa = fy.id_mahasiswa
+                          inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+                 group by tahun_angkatan
+             ) lulus,
+             (
+                 select tahun_angkatan, count(distinct id_mahasiswa) 'jumlah'
+                 from dim_mahasiswa dm
+                 group by tahun_angkatan
+             ) total
+        where lulus.tahun_angkatan = total.tahun_angkatan
+            and lulus.tahun_angkatan between %(start)s and %(end)s
+        order by lulus.tahun_angkatan desc;
+        ''',{'start':start, 'end':end})
+        figtotpersen = px.line(dftotpersen, y=dftotpersen['Persentase'], x=dftotpersen['Angkatan'])
+        return figtotpersen
+
 
 @app.callback(
     Output("cll_tbllulusan", "is_open"),
@@ -1185,9 +1333,9 @@ def toggle_collapse(all, rerata, masa, is_open):
             page_size=5
         ), style=cardgrf_style
     ),
-    if all and masa == 'all':
+    if all and masa == 'rerata':
         return not is_open, isiAll
-    if rerata and masa == 'rerata':
+    if rerata and masa == 'all':
         return not is_open, isiRerata
     return is_open, None
 
@@ -1198,27 +1346,35 @@ def toggle_collapse(all, rerata, masa, is_open):
 )
 def graphMSLulusan(start, end):
     df = data.getDataFrameFromDBwithParams('''
-    select  from 
-    (select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as 'Tahun Masuk',
-    SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
-    SUM(case when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan <42 then 1 else 0 end) as '3 - 3.5 Tahun',
-    SUM(case when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan <54  then 1 else 0 end) as '3.5 - 4.5 Tahun',
-    SUM(case when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <=84 then 1 else 0 end) as '4.5 - 7 Tahun',
-    SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 tahun'
-    from fact_yudisium
-    inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa=fact_yudisium.id_mahasiswa
-    group by `Tahun Masuk`
-    order by `Tahun Masuk`) lulusan
-    left join (
-        select count(id_mahasiswa) 'Jumlah Mahasiswa', tahun_ajaran 'Tahun Ajaran' from fact_pmb
-        inner join dim_semester on dim_semester.id_semester=fact_pmb.id_semester AND id_prodi_diterima = 9
-        where tahun_ajaran between %(start)s and %(end)s
+    select *
+    from (select concat(dim_mahasiswa.tahun_angkatan, '/',
+                        cast(dim_mahasiswa.tahun_angkatan + 1 as char(4)))                                      as 'Tahun Masuk',
+                 SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end)                                   as '< 3 Tahun',
+                 SUM(case
+                         when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan < 42 then 1
+                         else 0 end)                                                                            as '3 - 3.5 Tahun',
+                 SUM(case
+                         when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan < 54 then 1
+                         else 0 end)                                                                            as '3.5 - 4.5 Tahun',
+                 SUM(case
+                         when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <= 84 then 1
+                         else 0 end)                                                                            as '4.5 - 7 Tahun',
+                 SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end)                                  as '> 7 tahun'
+          from fact_yudisium
+                   inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_yudisium.id_mahasiswa
+          group by `Tahun Masuk`
+          order by `Tahun Masuk`) lulusan
+             left join (
+        select count(id_mahasiswa) 'Jumlah Mahasiswa', tahun_ajaran 'Tahun Ajaran'
+        from fact_pmb
+                 inner join dim_semester on dim_semester.id_semester = fact_pmb.id_semester AND id_prodi_diterima = 9
         group by tahun_ajaran
         order by tahun_ajaran desc
     ) mhsditerima on mhsditerima.`Tahun Ajaran` = `Tahun Masuk`
+    order by `Tahun Masuk` desc
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['TA Yudisium'], color=px.Constant('Jumlah Mahasiswa'),
-                 labels=dict(x="TA Yudisium", y="Jumlah Mahasiswa", color="Keterangan"))
+    fig = px.bar(df, x=df['Tahun Masuk'], y=df.columns[1:6],
+                 labels=dict(x="TA Yudisium", y="Masa Studi (Bulan)", color="Keterangan"))
     return fig
 
 @app.callback(
@@ -1233,7 +1389,7 @@ def graphMSLulusan(start, end):
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by tahun_ajaran_yudisium
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, y=df['Masa Studi (Bulanan)'], x=df['TA Yudisium'], color=px.Constant('Jumlah Mahasiswa'),
+    fig = px.bar(df, y=df['Masa Studi (Bulanan)'], x=df['TA Yudisium'], color=px.Constant('Masa Studi (Bulanan)'),
                  labels=dict(x="TA Yudisium", y="Masa Studi (Bulanan)", color="Keterangan"))
     return fig
 
@@ -1247,19 +1403,66 @@ def toggle_collapse(n, is_open):
     return is_open
 
 @app.callback(
-    Output('grf_mitra','figure'),
-    Input('fltrMitraStart','value'),
-    Input('fltrMitraEnd','value')
+    Output('grf_mitra', 'figure'),
+    Input('fltrMitraStart', 'value'),
+    Input('fltrMitraEnd', 'value'),
+    Input('radio_mitrakp', 'value')
 )
-def graphMitra(start,end):
-    df =  data.getDataFrameFromDBwithParams('''
-    select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', wilayah 'Tingkat Wilayah', count(distinct fk.id_mitra) as 'Jumlah Mitra'
-    from fact_kp fk
-    inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-    inner join dim_semester ds on fk.id_semester = ds.id_semester
-    where tahun_ajaran between %(start)s and %(end)s
-    group by  semester_nama, tahun_ajaran, wilayah
-    order by tahun_ajaran, semester_nama, wilayah
-    ''',{'start':start,'end':end}).groupby(['Semester','Tingkat Wilayah'])
-    fig = px.bar(df, y=df['Jumlah Mitra'], x=df['Tahun Ajaran'], barmode='group')
-    return fig
+def PKMDM(start, end, radiomitrakp):
+    if radiomitrakp == 'top':
+        dfsumkp = data.getDataFrameFromDBwithParams(f'''
+        select nama_mitra 'Nama Mitra', count(id_kp) Jumlah
+        from fact_kp fk
+            inner join dim_semester ds on fk.id_semester = ds.id_semester
+            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+        where tahun_ajaran between %(start)s and %(end)s
+        group by nama_mitra
+        order by Jumlah desc
+        limit 10;
+        ''',{'start':start,'end':end})
+        figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
+        return figkpsummitra
+    elif radiomitrakp == 'jenis':
+        dfjeniskp = data.getDataFrameFromDBwithParams(f'''
+        select tahun_ajaran 'Tahun Ajaran',
+               case
+                   when jenis_mitra = 'ORGANISASI' then 'ORGANISASI'
+                   when jenis_mitra = 'PEMERINTAH' then 'PEMERINTAH'
+                   when jenis_mitra = 'BISNIS' then 'BISNIS'
+                   when jenis_mitra = 'GEREJA' then 'GEREJA'
+                   when jenis_mitra = 'PENDIDIKAN' then 'PENDIDIKAN'
+                   else 'LAINNYA'
+                   end as      'Jenis Mitra',
+               count(id_kp)    'Jumlah KP'
+        from fact_kp fk
+            inner join dim_semester ds on fk.id_semester = ds.id_semester
+            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+        where tahun_ajaran between %(start)s and %(end)s
+        group by tahun_ajaran, `Jenis Mitra`
+        order by tahun_ajaran desc, `Jenis Mitra`;
+        ''',{'start':start, 'end':end})
+        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Tahun Ajaran'], y=dfjeniskp['Jumlah KP'], color=dfjeniskp['Jenis Mitra'])
+        figjenis.update_layout(barmode='group', yaxis_title='Jumlah KP', xaxis_title='Tahun, Jenis Mitra',
+                               legend_title='Mitra')
+        return figjenis
+    elif radiomitrakp == 'wilayah':
+        dfkpwilayah = data.getDataFrameFromDBwithParams(f'''
+        select tahun_ajaran 'Tahun Ajaran',
+               case
+                   when dm.wilayah = '1' then 'LOKAL'
+                   when dm.wilayah = '2' then 'REGIONAL'
+                   when dm.wilayah = '3' then 'NASIONAL'
+                   when dm.wilayah = '4' then 'INTERNASIONAL'
+                   else 'NONE' end as 'Wilayah Mitra',
+               count(id_kp) 'Jumlah KP'
+        from fact_kp fk
+            inner join dim_semester ds on fk.id_semester = ds.id_semester
+            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+        where tahun_ajaran between %(start)s and %(end)s
+        group by tahun_ajaran, `Wilayah Mitra`
+        order by tahun_ajaran, `Wilayah Mitra`
+        ''', {'start': start, 'end': end})
+        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Tahun Ajaran'], y=dfkpwilayah['Jumlah KP'], color=dfkpwilayah['Wilayah Mitra'])
+        figwilayah.update_layout(barmode='group', yaxis_title='Jumlah KP', xaxis_title='Tahun, Wilayah Mitra',
+                               legend_title='Mitra')
+        return figwilayah

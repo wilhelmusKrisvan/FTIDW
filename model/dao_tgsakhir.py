@@ -1,8 +1,9 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-
-con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
+# con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+# con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 
 def getDataFrameFromDB(query):
     return pd.read_sql(query,con)
@@ -108,12 +109,13 @@ group by semester_nama, tahun_ajaran
 order by tahun_ajaran asc,semester_nama asc''',con)
 
 def getMitraKP():
-    return pd.read_sql('''select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', wilayah 'Tingkat Wilayah', count(distinct fk.id_mitra) as 'Jumlah Mitra'
-from fact_kp fk
-inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-inner join dim_semester ds on fk.id_semester = ds.id_semester
-group by  semester_nama, tahun_ajaran, wilayah
-order by tahun_ajaran asc,semester_nama asc''',con)
+    return pd.read_sql('''
+    select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', wilayah 'Tingkat Wilayah', count(distinct fk.id_mitra) as 'Jumlah Mitra'
+    from fact_kp fk
+    inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+    inner join dim_semester ds on fk.id_semester = ds.id_semester
+    group by  semester_nama, tahun_ajaran, wilayah
+    order by tahun_ajaran asc,semester_nama asc''',con)
 
 def getTTGU():
     return pd.read_sql('''select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', count(distinct id_mahasiswa) as 'Jumlah Mahasiswa'
@@ -124,39 +126,41 @@ group by semester_nama, tahun_ajaran
 order by tahun_ajaran asc,semester_nama asc''',con)
 
 def getMahasiswaLulus():
-    return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran',lls.tahun_angkatan 'Tahun Angkatan',lls.jml as 'Jumlah Lulusan',
-    mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 'Persentase' from
-(select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium,semester_nama, tahun_angkatan from fact_yudisium fy
-inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
-inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
-where convert(substr(tahun_ajaran,6,4),int)-4=convert(tahun_angkatan,int) and semester_nama='GENAP'
-group by tahun_ajaran_yudisium, tahun_angkatan, semester_nama
-order by tahun_ajaran_yudisium desc, semester_nama desc) lls,
-(select ds.tahun_ajaran, dm.tahun_angkatan,
-       count(distinct dm.id_mahasiswa) jml
-from fact_mahasiswa_status ms
-inner join dim_mahasiswa dm on ms.id_mahasiswa = dm.id_mahasiswa
-inner join dim_semester ds on ms.id_semester=ds.id_semester
-where kode_semester>='20161' and (status='AK' or status='UD' or status='CS')
-group by tahun_ajaran,tahun_angkatan
-order by tahun_ajaran desc) mhs
-where mhs.tahun_ajaran=lls.tahun_ajaran_yudisium and mhs.tahun_angkatan=lls.tahun_angkatan
-order by tahun_ajaran asc''',con)
+    return pd.read_sql('''
+    select tahun_ajaran 'Tahun Ajaran',lls.tahun_angkatan 'Tahun Angkatan',lls.jml as 'Jumlah Lulusan',
+            mhs.jml as 'Jumlah Mahasiswa',(lls.jml/mhs.jml) * 100 'Persentase' from
+    (select count(dm.id_mahasiswa) jml, tahun_ajaran_yudisium,semester_nama, tahun_angkatan from fact_yudisium fy
+    inner join dim_mahasiswa dm on fy.id_mahasiswa = dm.id_mahasiswa
+    inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+    where convert(substr(tahun_ajaran,6,4),int)-4=convert(tahun_angkatan,int) and semester_nama='GENAP'
+    group by tahun_ajaran_yudisium, tahun_angkatan, semester_nama
+    order by tahun_ajaran_yudisium desc, semester_nama desc) lls,
+    (select ds.tahun_ajaran, dm.tahun_angkatan,
+           count(distinct dm.id_mahasiswa) jml
+    from fact_mahasiswa_status ms
+    inner join dim_mahasiswa dm on ms.id_mahasiswa = dm.id_mahasiswa
+    inner join dim_semester ds on ms.id_semester=ds.id_semester
+    where kode_semester>='20161' and (status='AK' or status='UD' or status='CS')
+    group by tahun_ajaran,tahun_angkatan
+    order by tahun_ajaran desc) mhs
+    where mhs.tahun_ajaran=lls.tahun_ajaran_yudisium and mhs.tahun_angkatan=lls.tahun_angkatan
+    order by tahun_ajaran asc''',con)
 
 def getMahasiswaLulusBandingTotal():
-    return pd.read_sql('''select lulus.tahun_angkatan 'Angkatan', lulus.jumlah 'Jumlah Lulusan', 
-    total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 "persentase"
-from (
-         select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
-         from fact_yudisium fy
-                  inner join dim_mahasiswa dm on dm.id_mahasiswa = fy.id_mahasiswa
-                  inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
-         group by tahun_angkatan
-     ) lulus,
-     (
-         select tahun_angkatan, count(distinct id_mahasiswa) 'jumlah'
-         from dim_mahasiswa dm
-         group by tahun_angkatan
-     )total
-where lulus.tahun_angkatan=total.tahun_angkatan
-order by lulus.tahun_angkatan asc''',con)
+    return pd.read_sql('''
+    select lulus.tahun_angkatan 'Angkatan', lulus.jumlah 'Jumlah Lulusan', 
+        total.jumlah 'Total Mahasiswa', (lulus.jumlah / total.jumlah)*100 "persentase"
+    from (
+             select tahun_angkatan, count(distinct fy.id_mahasiswa) 'jumlah'
+             from fact_yudisium fy
+                      inner join dim_mahasiswa dm on dm.id_mahasiswa = fy.id_mahasiswa
+                      inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+             group by tahun_angkatan
+         ) lulus,
+         (
+             select tahun_angkatan, count(distinct id_mahasiswa) 'jumlah'
+             from dim_mahasiswa dm
+             group by tahun_angkatan
+         )total
+    where lulus.tahun_angkatan=total.tahun_angkatan
+    order by lulus.tahun_angkatan asc''',con)

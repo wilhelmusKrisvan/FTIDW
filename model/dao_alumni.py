@@ -1,8 +1,9 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-
+con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
+# con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+# con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 
 def getDataFrameFromDB(query):
     return pd.read_sql(query, con)
@@ -14,15 +15,15 @@ def getDataFrameFromDBwithParams(query, parameter):
 
 def getMasaTunggu():
     return pd.read_sql('''
-    select data2.*, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
+    select data2.*, lulusan.jumlah as 'Lulusan', terlacak.jumlah as 'Lulusan Terlacak' from
  (
     select tahun_lulus 'Tahun Lulus',
-    SUM(IF( waktu_tunggu = "KURANG 6 BULAN", data.jumlah, 0)) AS "<6 BULAN",
-    SUM(IF( waktu_tunggu = "6 - 18 BULAN", data.jumlah, 0)) AS "6-18 BULAN",
-    SUM(IF( waktu_tunggu = "LEBIH 18 BULAN", data.jumlah, 0)) AS ">18 BULAN",
-    SUM(IF( waktu_tunggu = "LAINNYA", data.jumlah, 0)) AS "LAINNYA"
+    SUM(IF( waktu_tunggu = 'KURANG 6 BULAN', data.jumlah, 0)) AS '<6 BULAN',
+    SUM(IF( waktu_tunggu = '6 - 18 BULAN', data.jumlah, 0)) AS '6-18 BULAN',
+    SUM(IF( waktu_tunggu = 'LEBIH 18 BULAN', data.jumlah, 0)) AS '>18 BULAN',
+    SUM(IF( waktu_tunggu = 'LAINNYA', data.jumlah, 0)) AS 'LAINNYA'
     from (
-        select count(*) as jumlah, ifnull(waktu_tunggu,"LAINNYA") as waktu_tunggu,tahun_lulus
+        select count(*) as jumlah, ifnull(waktu_tunggu,'LAINNYA') as waktu_tunggu,tahun_lulus
         from fact_tracer_study fact
         inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
         group by waktu_tunggu ,tahun_lulus
@@ -81,7 +82,7 @@ left join(
 order by data2.tahun_lulus''', con)
 
 
-def getWirausaha():
+def getTracer():
     return pd.read_sql('''
 select data2.tahun_lulus as 'Tahun Lulus', Lokal+Regional as 'Lokal/Regional', Nasional, Internasional, lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" from
  (
@@ -114,7 +115,7 @@ left join(
 order by terlacak.tahun_lulus''', con)
 
 def getKepuasanLayanan():
-    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'Persen %', kepuasan.Nilai  from
+    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'Persen', kepuasan.Nilai 'Nilai' from
 (select sum(Jumlah) Semua,Nilai,1 gabung from
 (select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
 from fact_kepuasan_pengguna_mahasiswa
@@ -325,12 +326,24 @@ def getMasaTungguperGol():
     ''', con)
 
 def getGajiLulusan():
-    return pd.read_sql('''select tahun_lulus 'Tahun',ceiling(avg(pendapatan_utama)) Pendapatan from fact_tracer_study fts
+    return pd.read_sql('''select tahun_lulus 'Tahun',ceiling(avg(pendapatan_utama)) 'Rerata Pendapatan' from fact_tracer_study fts
 inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
 where waktu_tunggu like 'KURANG 6 BULAN'
 group by tahun_lulus
 order by tahun_lulus''',con)
 
+def getWirausaha():
+    return pd.read_sql('''
+    select tahun_lulus 'Tahun LUlus', nama 'Nama Alumni', nama_organisasi 'Nama Usaha'
+from fact_tracer_study fts
+         inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+         inner join dim_organisasi_pengguna_lulusan dopl
+                    on dl.id_organisasi_pengguna_lulusan = dopl.id_organisasi_pengguna_lulusan
+         inner join dim_mahasiswa dm on dl.id_mahasiswa = dm.id_mahasiswa
+where jenis_organisasi = 'WIRASWASTA'
+group by tahun_lulus, nama, nama_organisasi
+order by tahun_lulus desc;
+    ''',con)
 
 # # NONE
 # def getJabatan():

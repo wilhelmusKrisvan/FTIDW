@@ -64,7 +64,10 @@
 #tbl_MsTgglulusan button.export,
 #tbl_rateGol button.export,
 #tbl_Layanan button.export,
-#tbl_skill button.export
+#tbl_skill button.export,
+#tbl_persen_mhsLulus button.export,
+#tbl_persen_mhsLulusAngkt button.export,
+#tbl_pppDs button.export
 {
     width: 120px;
     height: 30px;
