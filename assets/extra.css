@@ -43,7 +43,7 @@
 #tbl_reratasksmbkm button.export,
 #tbl_dosbingmbkm button.export,
 #tbl_jumlmitrambkm button.export,
-#tbl_mhsrasio button.export
+#tbl_mhsrasio button.export,
 #tbl_jumlmitrambkm button.export,
 #tbl_pkmDosenMhs button.export,
 #tbl_telitiDosenMhs button.export,
@@ -67,7 +67,15 @@
 #tbl_skill button.export,
 #tbl_persen_mhsLulus button.export,
 #tbl_persen_mhsLulusAngkt button.export,
-#tbl_pppDs button.export
+#tbl_pppDs button.export,
+#tbl_mitraeksternal button.export,
+#tbl_mitrainternal button.export,
+#tbl_rekognisiDosen button.export,
+#tbl_kegiatanDosen button.export,
+#tbl_prestasiMhs button.export,
+#tbl_NonprestasiMhs button.export,
+#tbl_kulummou button.export,
+#tbl_pesertaKulum button.export
 {
     width: 120px;
     height: 30px;

@@ -24,6 +24,8 @@ dfmitrambkm = data.getMitraMBKM()
 dfjumlmitrambkm = data.getJumlMitraMBKMperSemester()
 dfdosbingmbkm = data.getDosbingMBKMperSemester()
 dfreratasksmbkm = data.getRerataSKSMBKMperSemester()
+dfTabelMitraInternal = data.getTableMitraInternal()
+dfTabelMitraEksternal = data.getTableMitraEksternal()
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -75,7 +77,11 @@ cardtbl_style = {
 card_style = {
     'border': '1px solid #fafafa',
     'border-radius': '10px',
-    'padding': '10px'
+    'margin-top': '10px',
+    'padding': '10px',
+    'justify-content': 'center',
+    'width': '100%',
+    'box-shadow': '5px 10px 30px #ebedeb'
 }
 
 ttlgrf_style = {
@@ -95,7 +101,6 @@ buttonLink_style = {
     'border-radius': '50px',
     'text-align': 'center',
     'box-shadow': '5px 10px 20px #ebedeb',
-    'border': '1px solid #fafafa'
 }
 
 button_style = {
@@ -107,31 +112,303 @@ button_style = {
     'color': 'white',
     'background-color': '#2780e3',
     'right': '0',
+    'position': 'absolute',
+    'margin': '-50px 25px 10px 10px',
 }
 
 dftrmitraMBKM = html.Div([
+    dbc.Container(),
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                html.H5('Daftar Mitra MBKM', style=ttlgrf_style),
-                dt.DataTable(
-                    id='dfmitrambkm',
-                    columns=[
-                        {'name': i, 'id': i} for i in dfmitrambkm.columns
-                    ],
-                    data=dfmitrambkm.to_dict('records'),
-                    sort_action='native',
-                    sort_mode='multi',
-                    style_table={'padding': '10px', 'overflowX': 'auto'},
-                    style_header={'textAlign': 'center'},
-                    style_data={'font-size': '80%', 'textAlign': 'center'},
-                    style_cell={'width': 95},
-                    page_size=10,
-                )
-            ], style=cardtbl_style),
+                dbc.Container([
+                    html.Br(),
+                    html.H5('Top 5 Mitra Internal',
+                            style=ttlgrf_style),
+                    dbc.Row([
+                        dbc.Col([
+                            html.H6('Dari:'),
+                            html.Div([
+                                dcc.Dropdown(
+                                    options=[{'label': i, 'value': i} for i in listDropdown],
+                                    value=listDropdown[0],
+                                    id='Fromdrpdwn_jumlmitrainternal',
+                                    style={'color': 'black'},
+                                    clearable=False,
+                                    placeholder='-',
+                                ),
+                            ]),
+                        ], width=3),
+                        dbc.Col([
+                            html.H6('Sampai:'),
+                            html.Div([
+                                dcc.Dropdown(
+                                    options=[{'label': i, 'value': i} for i in listDropdown],
+                                    value=listDropdown[4],
+                                    id='Todrpdwn_jumlmitrainternal',
+                                    style={'color': 'black'},
+                                    clearable=False,
+                                    placeholder='-',
+                                ),
+                            ]),
+                        ], width=3)
+                    ]),
+                    dbc.CardLink(
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='grf_mitrainternal1'
+                            ),
+                            dbc.Button('Lihat Tabel',
+                                       id='cll_grfmitrainternal',
+                                       n_clicks=0,
+                                       style=button_style)
+                        ]),
+                        id='cll_grfmitrainternal',
+                        n_clicks=0
+                    ),
+                    dbc.Collapse(
+                        dbc.Card(
+                            dt.DataTable(
+                                id='tbl_mitrainternal',
+                                columns=[
+                                    {'name': i, 'id': i} for i in dfTabelMitraInternal.columns
+                                ],
+                                data=dfTabelMitraInternal.to_dict('records'),
+                                sort_action='native',
+                                sort_mode='multi',
+                                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                                             'margin-top': '25px'},
+                                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                                style_cell={'width': 95},
+                                page_size=10,
+                                export_format='xlsx'
+                            ), style=cardtbl_style
+                        ),
+                        id='cll_tblmitrainternal',
+                        is_open=False
+                    )
+                ],style=cont_style)
+            ],style=cardgrf_style),
+
+            dbc.Card([
+                dbc.Container([
+                    html.Br(),
+                    html.H5('Top 5 Mitra Eksternal',
+                            style=ttlgrf_style),
+                    dbc.Row([
+                        dbc.Col([
+                            html.H6('Dari:'),
+                            html.Div([
+                                dcc.Dropdown(
+                                    options=[{'label': i, 'value': i} for i in listDropdown],
+                                    value=listDropdown[0],
+                                    id='Fromdrpdwn_jumlmitraeksternal',
+                                    style={'color': 'black'},
+                                    clearable=False,
+                                    placeholder='-',
+                                ),
+                            ]),
+                        ], width=3),
+                        dbc.Col([
+                            html.H6('Sampai:'),
+                            html.Div([
+                                dcc.Dropdown(
+                                    options=[{'label': i, 'value': i} for i in listDropdown],
+                                    value=listDropdown[4],
+                                    id='Todrpdwn_jumlmitraeksternal',
+                                    style={'color': 'black'},
+                                    clearable=False,
+                                    placeholder='-',
+                                ),
+                            ]),
+                        ], width=3)
+                    ]),
+                    dbc.CardLink(
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='grf_mitraeksternal'
+                            ),
+                            dbc.Button('Lihat Tabel',
+                                       id='cll_grfmitraeksternal',
+                                       n_clicks=0,
+                                       style=button_style)
+                        ]),
+                        id='cll_grfmitraeksternal',
+                        n_clicks=0
+                    ),
+                    dbc.Collapse(
+                        dbc.Card(
+                            dt.DataTable(
+                                id='tbl_mitraeksternal',
+                                columns=[
+                                    {'name': i, 'id': i} for i in dfTabelMitraEksternal.columns
+                                ],
+                                data=dfTabelMitraEksternal.to_dict('records'),
+                                sort_action='native',
+                                sort_mode='multi',
+                                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                                             'margin-top': '25px'},
+                                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                                style_cell={'width': 95},
+                                page_size=10,
+                                export_format='xlsx'
+                            ), style=cardtbl_style
+                        ),
+                        id='cll_tblmitraeksternal',
+                        is_open=False
+                    )
+                ], style=cont_style)
+            ], style=cardgrf_style),
         ], width=12)
     ], style={'margin-top': '10px'})
 ], style=cont_style)
+
+
+# +grafcollapse
+dftrmitraMBKMInternal = dbc.Container([
+    dbc.Card([
+        html.H5('Top 5 Mitra Internal',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                        html.H6('Dari:'),
+                        html.Div([
+                            dcc.Dropdown(
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[0],
+                                id='Fromdrpdwn_jumlmitrainternal',
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='-',
+                            ),
+                        ]),
+                    ], width=3),
+                    dbc.Col([
+                        html.H6('Sampai:'),
+                        html.Div([
+                            dcc.Dropdown(
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[4],
+                                id='Todrpdwn_jumlmitrainternal',
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='-',
+                            ),
+                        ]),
+                    ], width=3)
+                ]),
+                dcc.Graph(
+                    id='grf_mitrainternal1'
+                ),
+                dbc.Button('Lihat Tabel',
+                           id='cll_grfmitrainternal',
+                           n_clicks=0,
+                           style=button_style)
+            ]),
+            id='cll_grfmitrainternal',
+            n_clicks=0
+        )
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_mitrainternal',
+                columns=[
+                    {'name': i, 'id': i} for i in dfTabelMitraInternal.columns
+                ],
+                data=dfTabelMitraInternal.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                             'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 95},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardtbl_style
+        ),
+        id='cll_tblmitrainternal',
+        is_open=False
+    )
+
+],style=cont_style)
+
+# +grafcollapse
+dftrmitraMBKMEksternal = dbc.Container([
+    dbc.Card([
+        html.H5('Top 5 Mitra Eksternal',
+                style=ttlgrf_style),
+        dbc.CardLink(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                        html.H6('Dari:'),
+                        html.Div([
+                            dcc.Dropdown(
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[0],
+                                id='Fromdrpdwn_jumlmitraeksternal',
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='-',
+                            ),
+                        ]),
+                    ], width=3),
+                    dbc.Col([
+                        html.H6('Sampai:'),
+                        html.Div([
+                            dcc.Dropdown(
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[4],
+                                id='Todrpdwn_jumlmitraeksternal',
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='-',
+                            ),
+                        ]),
+                    ], width=3)
+                ]),
+                dcc.Graph(
+                    id='grf_mitraeksternal'
+                ),
+                dbc.Button('Lihat Tabel',
+                           id='cll_grfmitraeksternal',
+                           n_clicks=0,
+                           style=button_style)
+            ]),
+            id='cll_grfmitraeksternal',
+            n_clicks=0
+        )
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_mitraeksternal',
+                columns=[
+                    {'name': i, 'id': i} for i in dfTabelMitraEksternal.columns
+                ],
+                data=dfTabelMitraEksternal.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                             'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 95},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardtbl_style
+        ),
+        id='cll_tblmitraeksternal',
+        is_open=False
+    )
+
+],style=cont_style)
 
 # +grafcollapse
 jumlmitraMBKM = dbc.Container([
@@ -187,9 +464,10 @@ jumlmitraMBKM = dbc.Container([
                 data=dfjumlmitrambkm.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'padding': '10px', 'overflowX': 'auto'},
-                style_header={'textAlign': 'center'},
-                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                             'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
@@ -197,7 +475,8 @@ jumlmitraMBKM = dbc.Container([
         ),
         id='cll_tbljumlmitrambkm',
         is_open=False
-    )
+    ),
+
 ], style=cont_style)
 
 # +grafcollapse
@@ -323,9 +602,10 @@ mahasiswaMBKM = dbc.Container([
                 data=dfmahasiswambkm.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'padding': '10px', 'overflowX': 'auto'},
-                style_header={'textAlign': 'center'},
-                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                             'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
@@ -391,9 +671,10 @@ reratasksMBKM = dbc.Container([
                 data=dfreratasksmbkm.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
-                style_table={'padding': '10px', 'overflowX': 'auto'},
-                style_header={'textAlign': 'center'},
-                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                             'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                 style_cell={'width': 95},
                 page_size=10,
                 export_format='xlsx'
@@ -423,8 +704,10 @@ mbkm = dbc.Container([
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Mitra', value='mitra',
                     children=[
-                        jumlmitraMBKM,
-                        dftrmitraMBKM
+                        #jumlmitraMBKM,
+                        #dftrmitraMBKM
+                        dftrmitraMBKMInternal,
+                        dftrmitraMBKMEksternal
                     ],
                     style=tab_style, selected_style=selected_style)
         ], style=tabs_styles, value='mahasiswa'),
@@ -482,6 +765,24 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+
+@app.callback(
+    Output("cll_tblmitraeksternal", "is_open"),
+    [Input("cll_grfmitraeksternal", "n_clicks")],
+    [State("cll_tblmitraeksternal", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output("cll_tblmitrainternal", "is_open"),
+    [Input("cll_grfmitrainternal", "n_clicks")],
+    [State("cll_tblmitrainternal", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
 
 # GRAPH CALLBACK
 @app.callback(
@@ -584,4 +885,59 @@ def grafMitraMBKM(valueFrom, valueTo):
     order by ds.kode_semester
     ''', {'From': valueFrom, 'To': valueTo})
     fig = px.bar(df, x=df['Semester'], y=df['Jumlah Mitra'])
+    return fig
+
+
+@app.callback(
+    Output('grf_mitrainternal1', 'figure'),
+    Input('Fromdrpdwn_jumlmitrainternal', 'value'),
+    Input('Todrpdwn_jumlmitrainternal', 'value'),
+)
+def grafMitraInternal(valueFrom, valueTo):
+    # df=dfmahasiswambkm
+    print(valueFrom)
+    print('satno')
+    df = data.getDataFrameFromDBwithParams('''
+    select mitra 'Top Mitra',count(kode_matakuliah) 'Jumlah Kerjasama Mitra',
+       concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika')
+and ds.tahun_ajaran between 
+    %(From)s and %(To)s
+group by mitra,semester
+order by 'Jumlah Kerjasama Mitra' desc
+limit 5
+    ''', {'From': valueFrom, 'To': valueTo})
+    fig = px.bar(df, x=df['Semester'], y=df['Jumlah Kerjasama Mitra'],color=df['Top Mitra'])
+    fig.update_layout(barmode='group')
+    return fig
+
+
+@app.callback(
+    Output('grf_mitraeksternal', 'figure'),
+    Input('Fromdrpdwn_jumlmitraeksternal', 'value'),
+    Input('Todrpdwn_jumlmitraeksternal', 'value'),
+    # Input('grf_mahasiswambkm','id')
+)
+def grafMitraEksternal(valueFrom, valueTo):
+    # df=dfmahasiswambkm
+    print(valueFrom)
+    print('satno2')
+    df = data.getDataFrameFromDBwithParams('''
+    select mitra 'Top Mitra',count(kode_matakuliah) 'Jumlah Kerjasama Mitra',
+       concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+where mitra not in
+          (select distinct mitra from mbkm_matkul_monev
+              where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'))
+and ds.tahun_ajaran between 
+    %(From)s and %(To)s
+group by mitra,semester
+order by 'Jumlah Kerjasama Mitra' desc
+limit 5
+    ''', {'From': valueFrom, 'To': valueTo})
+    fig = px.bar(df, x=df['Semester'], y=df['Jumlah Kerjasama Mitra'],color=df['Top Mitra'])
+    fig.update_layout(barmode='group')
     return fig

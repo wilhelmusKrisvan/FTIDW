@@ -1,10 +1,10 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+#con = create_engine('mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/datawarehouse')
+#con = create_engine('mysql+pymysql://wilhelmus:TAhug0r3ng!@localhost:3333/datawarehouse_dev')
+#con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
-# con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-# con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
-
 
 def getDataFrameFromDB(query):
     return pd.read_sql(query, con)

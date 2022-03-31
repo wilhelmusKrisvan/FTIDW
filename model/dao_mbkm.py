@@ -1,9 +1,10 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+#con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+#con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse_dev')
+#con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
-# con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-# con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 
 
 def getDataFrameFromDB(query):
@@ -75,3 +76,26 @@ def getRerataSKSMBKMperSemester():
          inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
     group by mbm.kode_semester, Semester
     order by mbm.kode_semester;''', con)
+
+
+def getTableMitraInternal():
+    return pd.read_sql('''
+    select CONCAT(semester_nama,' ',tahun_ajaran) Semester,
+       nama_matakuliah,
+       mitra
+from mbkm_matkul_monev mmm
+inner join dim_semester ds on mmm.kode_semester = ds.kode_semester
+inner join dim_matakuliah mm on mmm.kode_matakuliah = mm.kode_matakuliah
+where mmm.mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika');''', con)
+
+def getTableMitraEksternal():
+    return pd.read_sql('''
+    select CONCAT(semester_nama,' ',tahun_ajaran) Semester,
+       nama_matakuliah,
+       mitra
+from mbkm_matkul_monev mmm
+inner join dim_semester ds on mmm.kode_semester = ds.kode_semester
+inner join dim_matakuliah mm on mmm.kode_matakuliah = mm.kode_matakuliah
+where mmm.mitra not in
+          (select distinct mitra from mbkm_matkul_monev
+              where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'));''', con)

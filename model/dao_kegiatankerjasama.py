@@ -1,9 +1,11 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+
+#con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
+#con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
+#con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse_dev')
 con = create_engine('mysql+pymysql://admin:admin@localhost:3333/ftidw')
-# con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-# con = create_engine('mysql+pymysql://user1:Ul0HenorahF1oyeo@localhost:3333/datawarehouse_dev')
 
 def getDataFrameFromDB(query):
     return pd.read_sql(query,con)
@@ -16,6 +18,7 @@ def getKegiatanDosen():
 inner join dim_kegiatan dk on fkd.id_kegiatan = dk.id_kegiatan
 inner join dim_date dd on dd.id_date=dk.id_tanggal_mulai
 inner join dim_dosen d on fkd.id_dosen = d.id_dosen
+where d.id_prodi = 9
 group by tahun,nama
 order by tahun desc, nama asc''',con)
 
@@ -53,7 +56,7 @@ order by tahun desc, nama asc''',con)
 
 def getPrestasiRekognisiDosen():
     return pd.read_sql('''
-    select nama,tahun,judul_rekognisi,
+    select nama as 'Nama Dosen',tahun as 'Tahun',judul_rekognisi as 'Judul Rekognisi',
        case
            when wilayah=1 then 'Regional'
            when wilayah=2 then 'Nasional'
@@ -67,12 +70,12 @@ group by nama,tahun, judul_rekognisi, wilayah
 order by tahun desc''',con)
 
 def getPrestasiAkademik():
-    return pd.read_sql('''select  nama_kegiatan, tahun, 
+    return pd.read_sql('''select  nama_kegiatan as 'Nama Kegiatan', tahun as 'Tahun', 
     if(wilayah_nama='LOKAL','v','') as Lokal,
     if(wilayah_nama='REGIONAL','v','') as Regional,
     if(wilayah_nama='NASIONAL','v','') as Nasional,
     if(wilayah_nama='INTERNASIONAL','v','') as Internasional,
-prestasi from(
+prestasi as 'Prestasi' from(
     select distinct nama_kegiatan, tahun, fact.wilayah_nama, replace(jenis_partisipasi, 'L', 'I') as prestasi
     from fact_kegiatan_mahasiswa fact
     inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
@@ -82,12 +85,12 @@ prestasi from(
 order by tahun, nama_kegiatan''',con)
 
 def getPrestasiNonAkademik():
-    return pd.read_sql('''select nama_kegiatan, tahun, 
+    return pd.read_sql('''select nama_kegiatan as 'Nama Kegiatan', tahun as 'Tahun', 
     if(wilayah_nama='LOKAL','v','') as Lokal,
     if(wilayah_nama='REGIONAL','v','') as Regional,
     if(wilayah_nama='NASIONAL','v','') as Nasional,
     if(wilayah_nama='INTERNASIONAL','v','') as Internasional,
-prestasi from(
+prestasi as 'Prestasi' from(
     select distinct nama_kegiatan, tahun, fact.wilayah_nama, replace(jenis_partisipasi, 'L', 'I') as prestasi
     from fact_kegiatan_mahasiswa fact
     inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
@@ -98,7 +101,7 @@ order by tahun''', con)
 
 def getKegKulUmMOU():
     return pd.read_sql('''
-    select ddselesai.tahun, count(dim_kegiatan.nama_kegiatan) as jumlah_kuliah_umum
+    select ddselesai.tahun as 'Tahun', count(dim_kegiatan.nama_kegiatan) as 'Jumlah Kuliah Umum'
      -- , ddmulai.tanggal as tanggal_mulai, ddselesai.tanggal as tanggal_selesai
         from dim_kegiatan
             inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
@@ -205,3 +208,16 @@ inner join br_mitra_perjanjian bmp on dp.id_perjanjian = bmp.id_perjanjian
 inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
 inner join dim_date ddselesai on ddselesai.id_date = dpp.id_tanggal_selesai
 inner join dim_date ddmulai on ddmulai.id_date = dpp.id_tanggal_mulai''', con)
+
+
+def getRekognisiDosen():
+    return pd.read_sql('''select tahun as 'Tahun',count(judul_rekognisi) as 'Jumlah Rekognisi'
+from fact_rekognisi_dosen frd
+inner join dim_date dd on dd.id_date=frd.id_tanggal_mulai
+inner join dim_dosen d on frd.id_dosen = d.id_dosen
+where d.id_prodi = 9
+  and tahun in (2015,2016,2017,2018,2019,2020)
+  and wilayah = 4
+group by tahun
+order by tahun asc''', con)
+
