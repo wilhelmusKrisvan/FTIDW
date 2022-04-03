@@ -17,10 +17,23 @@ layout = html.Div([
                 dbc.CardBody([
                     html.Div([
                         html.Label('Username', htmlFor='floatingInput'),
-                        dcc.Input(type='text', className='form-control', id='usernameBox', n_submit=0,style={'border-radius':'10px'}),
-                    ], className='form-floating'),
+                    ]),
                     html.Div([
+                        #html.Label('Username', htmlFor='floatingInput'),
+                        dcc.Input(
+                            type='text',
+                            className='form-control',
+                            id='usernameBox',
+                            placeholder='Username',
+                            n_submit=0,style={'border-radius':'10px'}),
+                    ], className='form-floating'),
+                    html.Br(),
+                    html.Div([
+                        #html.H6('Password'),
                         html.Label('Password', htmlFor='floatingInput'),
+                    ]),
+                    html.Div([
+
                         dcc.Input(type='password', className='form-control', id='passwordBox', n_submit=0,style={'border-radius':'10px'}),
                     ], className='form-floating'),
                     html.Label(id='errorText',className='text-danger'),
