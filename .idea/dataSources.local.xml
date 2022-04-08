@@ -21,5 +21,26 @@
         <ssh-config-id>e3d06cb7-fbd1-4f32-a547-7901abbaa854</ssh-config-id>
       </ssh-properties>
     </data-source>
+    <data-source name="ftidw@localhost" uuid="ba776242-0d31-4157-a534-b764bb011de6">
+      <database-info product="MariaDB" version="10.5.15-MariaDB-1:10.5.15+maria~focal" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="2.7.3" dbms="MARIADB" exact-version="10.5.15" exact-driver-version="2.7">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>admin</user-name>
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="schema">
+            <name qname="@" />
+            <name qname="ftidw" />
+          </node>
+        </introspection-scope>
+      </schema-mapping>
+      <ssh-properties>
+        <enabled>true</enabled>
+        <ssh-config-id>ec3beb04-abb0-4bfd-8dbb-790fb37f850b</ssh-config-id>
+      </ssh-properties>
+    </data-source>
   </component>
 </project>

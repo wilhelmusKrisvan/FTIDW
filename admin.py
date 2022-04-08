@@ -9,7 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 users = show_users()
-uname = users
 options = [
     {'label': 'Admin', 'value': 'admin'},
     {'label': 'Dekanat', 'value': 'dekanat'},
@@ -99,7 +98,7 @@ layout = dbc.Container([
 
             ], md=4)
         ]),
-    ], className='jumbotron',style={'border-radius':'10px'}),
+    ], className='jumbotron',style={'border-radius':'10px','padding':'2.5%','margin':'2.5%'}),
 
     dbc.Card([
         html.H3('Manage Users'),
@@ -111,7 +110,7 @@ layout = dbc.Container([
                     columns=[{'name': 'Username', 'id': 'username'},
                              {'name': 'Email', 'id': 'email'},
                              {'name': 'Role', 'id': 'role'}],
-                    data=show_users(),
+                    page_size=10
                 ),
             ], md=12),
         ]),
@@ -119,7 +118,7 @@ layout = dbc.Container([
         dbc.Row([
             dbc.Col([
                 dbc.Label('Username: '),
-                dcc.Dropdown(options=[{'label': i['username'], 'value': i['username']} for i in uname], id='uname',style={'border-radius':'10px'})
+                dcc.Dropdown(id='uname',style={'border-radius':'10px'})
             ], width=4),
             dbc.Col([
                 dbc.Label('Role: '),
@@ -157,7 +156,7 @@ layout = dbc.Container([
                 html.Div(id='deleteUserSuccess')
             ], width=2),
         ]),
-    ], className='jumbotron',style={'border-radius':'10px'})
+    ], className='jumbotron',style={'border-radius':'10px','padding':'2.5%','margin':'2.5%'})
 ], style={'margin-top': '25px'})
 
 
@@ -307,3 +306,15 @@ def switchButton(Fillusername, Fillrole):
         return True, False
     else:
         return True, True
+
+@app.callback(
+    Output('users','data'),
+    # Output('uname','options'),
+    Input('createUserButton','n_click'),
+    State('users','data')
+)
+def updateTable(btnCreate,data):
+    if(btnCreate):
+        return show_users()
+    else:
+        return show_users()

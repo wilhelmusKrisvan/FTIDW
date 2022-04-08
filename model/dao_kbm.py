@@ -298,8 +298,8 @@ concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1
 
 def dfRasioDosenMengajarBar(tahun,smt):
     return pd.read_sql('''
-select substr(ds.tahun_ajaran,1,4) 'tahun', concat(ds.semester_nama,' ',ds.tahun_ajaran) semester,
-    count(distinct fdm.id_dosen) jumlah,'Dosen' as Tipe
+select substr(ds.tahun_ajaran,1,4) 'Tahun', concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+    count(distinct fdm.id_dosen) Jumlah,'Dosen' as Tipe
     from fact_dosen_mengajar fdm
         inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
         inner join dim_semester ds on fdm.id_semester = ds.id_semester

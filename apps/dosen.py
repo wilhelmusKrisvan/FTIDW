@@ -110,8 +110,10 @@ dosens3 = dbc.Container([
         html.H5('Dosen S3',
                 style=ttlgrf_style),
         dbc.CardBody([
-            dcc.Graph(id='grf_dosens3'),
-            dbc.Button('Lihat Tabel',
+            dcc.Loading([
+                dcc.Graph(id='grf_dosens3'),
+            ], type='default'),
+            dbc.Button('Lihat Semua Data',
                        id='cll_grfdosens3',
                        n_clicks=0, style=button_style
                        ),
@@ -142,8 +144,10 @@ jumljabfungDosen = dbc.Container([
         html.H5('Jumlah Jabfung Dosen per Tahun',
                 style=ttlgrf_style),
         dbc.CardBody([
-            dcc.Graph(id='grf_jabfungth'),
-            dbc.Button('Lihat Tabel',
+            dcc.Loading([
+                dcc.Graph(id='grf_jabfungth'),
+            ], type='default'),
+            dbc.Button('Lihat Semua Data',
                        id='cll_grfjabfungth',
                        n_clicks=0, style=button_style
                        ),
@@ -174,8 +178,10 @@ persenjabfungthDosen = dbc.Container([
         html.H5('Persentase Jabfung Dosen per Tahun',
                 style=ttlgrf_style),
         dbc.CardBody([
-            dcc.Graph(id='grf_persenjabfungth'),
-            dbc.Button('Lihat Tabel',
+            dcc.Loading([
+                dcc.Graph(id='grf_persenjabfungth'),
+            ], type='default'),
+            dbc.Button('Lihat Semua Data',
                        id='cll_grfpersenjabfungth',
                        n_clicks=0, style=button_style
                        ),
@@ -209,16 +215,20 @@ dosenINF = dbc.Container([
             dcc.Tab(label='Dosen Informatika Nomor Induk', value='DosenTetapInfNomorInduk',
                     children=[
                         dbc.CardBody([
-                            dcc.Graph(id='grf_DosenTetapInfInduk'),
-                            dbc.Button('Lihat Tabel', id='cll_grfDosenTetapInfInduk', n_clicks=0, style=button_style),
+                            dcc.Loading([
+                                dcc.Graph(id='grf_DosenTetapInfInduk'),
+                            ], type='default'),
+                            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfInduk', n_clicks=0, style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Dosen Informatika Bersertif', value='DosenTetapInfSertif',
                     children=[
                         dbc.CardBody([
-                            dcc.Graph(id='grf_DosenTetapInfSertif'),
-                            dbc.Button('Lihat Tabel', id='cll_grfDosenTetapInfSertif', n_clicks=0, style=button_style),
+                            dcc.Loading([
+                                dcc.Graph(id='grf_DosenTetapInfSertif'),
+                            ], type='default'),
+                            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfSertif', n_clicks=0, style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style)
@@ -230,30 +240,30 @@ dosenINF = dbc.Container([
     )
 ], style=cont_style)
 
-dosentetapinf = html.Div([
-    dbc.Row([
-        dbc.Col([
-            html.H5('Daftar Dosen Tetap Informatika', style=ttlgrf_style),
-            dbc.Card([
-                dt.DataTable(
-                    id='tbl_dosentetapinf',
-                    columns=[
-                        {'name': i, 'id': i} for i in dfdosentetapinf.columns
-                    ],
-                    data=dfdosentetapinf.to_dict('records'),
-                    sort_action='native',
-                    sort_mode='multi',
-                    style_table={'padding': '10px', 'overflowX': 'auto'},
-                    style_header={'textAlign': 'center'},
-                    style_data={'font-size': '80%', 'textAlign': 'center'},
-                    style_cell={'width': 95},
-                    page_size=10,
-                    export_format='xlsx'
-                )
-            ], style=cardtbl_style)
-        ], width=12),
-    ])
-], style={'margin-top': '50px', 'width': '100%'})
+# dosentetapinf = html.Div([
+#     dbc.Row([
+#         dbc.Col([
+#             html.H5('Daftar Dosen Tetap Informatika', style=ttlgrf_style),
+#             dbc.Card([
+#                 dt.DataTable(
+#                     id='tbl_dosentetapinf',
+#                     columns=[
+#                         {'name': i, 'id': i} for i in dfdosentetapinf.columns
+#                     ],
+#                     data=dfdosentetapinf.to_dict('records'),
+#                     sort_action='native',
+#                     sort_mode='multi',
+#                     style_table={'padding': '10px', 'overflowX': 'auto'},
+#                     style_header={'textAlign': 'center'},
+#                     style_data={'font-size': '80%', 'textAlign': 'center'},
+#                     style_cell={'width': 95},
+#                     page_size=10,
+#                     export_format='xlsx'
+#                 )
+#             ], style=cardtbl_style)
+#         ], width=12),
+#     ])
+# ], style={'margin-top': '50px', 'width': '100%'})
 
 dosentetapindustri = html.Div([
     dbc.Row([
@@ -392,7 +402,7 @@ def toggle_collapse(ninduk, nsertif, dsn, is_open):
 )
 def grafDosenS3(id):
     df = data.getDataFrameFromDB('''
-    select count(data.id_dosen) jumlah, data.tingkat_pendidikan "Tingkat Pendidikan" from
+    select count(data.id_dosen) Jumlah, data.tingkat_pendidikan "Tingkat Pendidikan" from
     (select dim_dosen.id_dosen,nama, max(tingkat_pendidikan) tingkat_pendidikan from fact_pendidikan_dosen
         inner join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
         where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null 
@@ -401,8 +411,14 @@ def grafDosenS3(id):
         order by nama) data
         group by tingkat_pendidikan
         ''')
-    fig = px.pie(df, values=df['jumlah'], names=df['Tingkat Pendidikan'])
-    return fig
+    if (len(df['Jumlah']) != 0):
+        fig = px.pie(df, values=df['Jumlah'], names=df['Tingkat Pendidikan'])
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 # Jumlah Jabfung L LK per Tahun
@@ -412,11 +428,17 @@ def grafDosenS3(id):
 )
 def grafJumlJabfungth(id):
     df = dfpersenjabfungAkumulasi
-    fig = px.line(df, x=df['Tahun'], y=df['persentase'], labels=dict(x='Tahun', y='Jumlah Dosen'))
-    fig.update_traces(mode='lines+markers')
-    # fig.add_bar(x=df['Tahun'], y=df['Total Dosen'],
-    #             hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
-    return fig
+    if (len(df['Tahun']) != 0):
+        fig = px.line(df, x=df['Tahun'], y=df['persentase'], labels=dict(x='Tahun', y='Jumlah Dosen'))
+        fig.update_traces(mode='lines+markers')
+        # fig.add_bar(x=df['Tahun'], y=df['Total Dosen'],
+        #             hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 # Persentase Jabfung L LK per Tahun
@@ -426,10 +448,16 @@ def grafJumlJabfungth(id):
 )
 def grafPersenJabfungth(id):
     df = dfpersenjabfung
-    fig = px.line(df, x=df['Tahun'], y=df['persentase'], color='Jabatan')
-    fig.update_traces(mode='lines+markers')
-    fig.update_xaxes(categoryorder='category ascending')
-    return fig
+    if (len(df['Tahun']) != 0):
+        fig = px.line(df, x=df['Tahun'], y=df['persentase'], color='Jabatan')
+        fig.update_traces(mode='lines+markers')
+        fig.update_xaxes(categoryorder='category ascending')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -443,8 +471,14 @@ def graphDosenInfInduk(id):
     where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
     group by tipe_nomor_induk
     ''')
-    fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Nomor Induk'],color=df['Tipe Nomor Induk'])
-    return fig
+    if (len(df['Jumlah']) != 0):
+        fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Nomor Induk'], color=df['Tipe Nomor Induk'])
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -463,5 +497,11 @@ def graphDosenInfSertif(id):
     where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
     and no_sertifikat is null
     ''')
-    fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Sertif'],color=df['Tipe Sertif'])
-    return fig
+    if (len(df['Jumlah']) != 0):
+        fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Sertif'], color=df['Tipe Sertif'])
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig

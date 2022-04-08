@@ -157,8 +157,10 @@ mhsseleksi = dbc.Container([
                         ]),
                     ], width=6),
                 ]),
-                dcc.Graph(id='grf_mhsseleksi'),
-                dbc.Button('Lihat Tabel', id='cll_grfseleksi',
+                dcc.Loading([
+                    dcc.Graph(id='grf_mhsseleksi'),
+                ], type="default"),
+                dbc.Button('Lihat Semua Data', id='cll_grfseleksi',
                            n_clicks=0, style=button_style)
             ]),
         ),
@@ -219,24 +221,30 @@ mhsasing = dbc.Container([
             dcc.Tab(label='FTI', value='all',
                     children=[
                         dbc.CardBody([
-                            dcc.Graph(id='grf_mhsasing'),
-                            dbc.Button('Lihat Tabel', id='cll_grfasing', n_clicks=0, style=button_style),
+                            dcc.Loading([
+                                dcc.Graph(id='grf_mhsasing'),
+                            ], type="default"),
+                            dbc.Button('Lihat Semua Data', id='cll_grfasing', n_clicks=0, style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='INF', value='INF',
                     children=[
                         dbc.CardBody([
-                            dcc.Graph(id='grf_mhsasingINF'),
-                            dbc.Button('Lihat Tabel', id='cll_grfasingINF', n_clicks=0, style=button_style),
+                            dcc.Loading([
+                                dcc.Graph(id='grf_mhsasingINF'),
+                            ], type="default"),
+                            dbc.Button('Lihat Semua Data', id='cll_grfasingINF', n_clicks=0, style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='SI', value='SI',
                     children=[
                         dbc.CardBody([
-                            dcc.Graph(id='grf_mhsasingSI'),
-                            dbc.Button('Lihat Tabel', id='cll_grfasingSI', n_clicks=0, style=button_style),
+                            dcc.Loading([
+                                dcc.Graph(id='grf_mhsasingSI'),
+                            ], type="default"),
+                            dbc.Button('Lihat Semua Data', id='cll_grfasingSI', n_clicks=0, style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style)
@@ -281,8 +289,10 @@ mhsrasio = dbc.Container([
                     ]),
                 ], width=6),
             ]),
-            dcc.Graph(id='grf_mhsrasio'),
-            dbc.Button('Lihat Tabel', id='cll_grfrasio', n_clicks=0, style=button_style),
+            dcc.Loading([
+                dcc.Graph(id='grf_mhsrasio'),
+            ], type="default"),
+            dbc.Button('Lihat Semua Data', id='cll_grfrasio', n_clicks=0, style=button_style),
         ])
     ], style=cardgrf_style),
     dbc.Collapse(
@@ -339,8 +349,10 @@ mhsasmasmk = dbc.Container([
                     ]),
                 ], width=6),
             ]),
-            dcc.Graph(id='grf_mhssmasmk'),
-            dbc.Button('Lihat Tabel', id='cll_grfsmasmk', n_clicks=0, style=button_style),
+            dcc.Loading([
+                dcc.Graph(id='grf_mhssmasmk'),
+            ], type="default"),
+            dbc.Button('Lihat Semua Data', id='cll_grfsmasmk', n_clicks=0, style=button_style),
         ])
     ], style=cardgrf_style),
     dbc.Collapse(
@@ -418,8 +430,10 @@ mhsprovinsi = dbc.Container([
                                     ]),
                                 ]),
                                 dbc.CardBody([
-                                    dcc.Graph(id='grf_mhsprovdaftar'),
-                                    dbc.Button('Lihat Tabel', id='cll_grfmhsprovdaftar', n_clicks=0,
+                                    dcc.Loading([
+                                        dcc.Graph(id='grf_mhsprovdaftar'),
+                                    ], type="default"),
+                                    dbc.Button('Lihat Semua Data', id='cll_grfmhsprovdaftar', n_clicks=0,
                                                style=button_style),
                                 ]),
                             ], style={'padding': '10px', 'border': 'white'})
@@ -469,8 +483,10 @@ mhsprovinsi = dbc.Container([
                                     ])
                                 ]),
                                 dbc.CardBody([
-                                    dcc.Graph(id='grf_mhsprovlolos'),
-                                    dbc.Button('Lihat Tabel', id='cll_grfmhsprovlolos', n_clicks=0,
+                                    dcc.Loading([
+                                        dcc.Graph(id='grf_mhsprovlolos'),
+                                    ], type="default"),
+                                    dbc.Button('Lihat Semua Data', id='cll_grfmhsprovlolos', n_clicks=0,
                                                style=button_style),
                                 ]),
                             ], style={'padding': '10px', 'border': 'white'})
@@ -521,8 +537,10 @@ mhsprovinsi = dbc.Container([
                                     ]),
                                 ]),
                                 dbc.CardBody([
-                                    dcc.Graph(id='grf_mhsprovregis'),
-                                    dbc.Button('Lihat Tabel', id='cll_grfmhsprovregis', n_clicks=0,
+                                    dcc.Loading([
+                                        dcc.Graph(id='grf_mhsprovregis'),
+                                    ], type="default"),
+                                    dbc.Button('Lihat Semua Data', id='cll_grfmhsprovregis', n_clicks=0,
                                                style=button_style),
                                 ]),
                             ], style={'padding': '10px', 'border': 'white'})
@@ -570,8 +588,10 @@ mhsKembangJml = dbc.Container([
                     ]),
                 ], width=6)
             ]),
-            dcc.Graph(id='grf_mhsJml'),
-            dbc.Button('Lihat Tabel', id='cll_grfJml', n_clicks=0, style=button_style),
+            dcc.Loading([
+                dcc.Graph(id='grf_mhsJml'),
+            ], type="default"),
+            dbc.Button('Lihat Semua Data', id='cll_grfJml', n_clicks=0, style=button_style),
         ])
     ], style=cardgrf_style),
     dbc.Collapse(
@@ -628,8 +648,10 @@ mhsPersenNaik = dbc.Container([
                     ]),
                 ], width=6),
             ]),
-            dcc.Graph(id='grf_mhsPersenNaik'),
-            dbc.Button('Lihat Tabel', id='cll_grfPersenNaik',
+            dcc.Loading([
+                dcc.Graph(id='grf_mhsPersenNaik'),
+            ], type="default"),
+            dbc.Button('Lihat Semua Data', id='cll_grfPersenNaik',
                        n_clicks=0, style=button_style),
         ])
     ], style=cardgrf_style),
@@ -857,26 +879,32 @@ group by tahun_ajaran
 )aktif on aktif.tahun_ajaran = tahun_aka
 where tahun_ajaran between 
 %(From)s and %(To)s''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Daya Tampung'], color=px.Constant('Daya Tampung'),
-                 labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
-    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',
-                    hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Lolos Seleksi'], name='Lolos Seleksi',
-                    line=dict(color='rgb(228, 245, 0)'),
-                    hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Reguler'], name='Baru Reguler',
-                    line=dict(color='rgb(0, 143, 245)'),
-                    hovertemplate="Jenis Pendaftar=Baru Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Transfer'], name='Baru Transfer',
-                    line=dict(color='rgb(35, 68, 145)'),
-                    hovertemplate="Jenis Pendaftar=Baru Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Reguler'], name='Aktif Reguler',
-                    line=dict(color='rgb(54, 235, 54)'),
-                    hovertemplate="Jenis Pendaftar=Aktif Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Transfer'], name='Aktif Transfer',
-                    line=dict(color='rgb(35, 145, 35)'),
-                    hovertemplate="Jenis Pendaftar=Aktif Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-    return fig
+    if(len(df['Daya Tampung'])!=0):
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Daya Tampung'], color=px.Constant('Daya Tampung'),
+                     labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',
+                        hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Lolos Seleksi'], name='Lolos Seleksi',
+                        line=dict(color='rgb(228, 245, 0)'),
+                        hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Reguler'], name='Baru Reguler',
+                        line=dict(color='rgb(0, 143, 245)'),
+                        hovertemplate="Jenis Pendaftar=Baru Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Transfer'], name='Baru Transfer',
+                        line=dict(color='rgb(35, 68, 145)'),
+                        hovertemplate="Jenis Pendaftar=Baru Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Reguler'], name='Aktif Reguler',
+                        line=dict(color='rgb(54, 235, 54)'),
+                        hovertemplate="Jenis Pendaftar=Aktif Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Transfer'], name='Aktif Transfer',
+                        line=dict(color='rgb(35, 145, 35)'),
+                        hovertemplate="Jenis Pendaftar=Aktif Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -898,13 +926,19 @@ inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND se
 where tahun_ajaran between 
 %(From)s and %(To)s
 order by tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
-                 labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
-    fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
-                    hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-    fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
-                    hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-    return fig
+    if(len(df['Tahun Semester'])!=0):
+        fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
+                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+        fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                        hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+        fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+                        hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -926,13 +960,19 @@ inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND se
 where tahun_ajaran between 
 %(From)s and %(To)s
 order by nama_prodi, tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
-                 labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
-    fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
-                    hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-    fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
-                    hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-    return fig
+    if(len(df['Tahun Semester'])!=0):
+        fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
+                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+        fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                        hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+        fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+                        hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -954,13 +994,19 @@ inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND se
 where tahun_ajaran between 
 %(From)s and %(To)s
 order by nama_prodi, tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
-                 labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
-    fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
-                    hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-    fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
-                    hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-    return fig
+    if(len(df['Tahun Semester'])!=0):
+        fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
+                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+        fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                        hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+        fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+                        hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -993,16 +1039,23 @@ where ds.tahun_ajaran between
 %(From)s and %(To)s
 group by ds.tahun_ajaran 
 order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df_dayaTampung, x=df_dayaTampung['Tahun Ajaran'], y=df_dayaTampung['Jumlah Daya Tampung'],
-                 color=px.Constant('Daya Tampung'), labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
-    fig.add_scatter(x=df_pendaftarRegistrasi['Tahun Ajaran'], y=df_pendaftarRegistrasi['Jumlah Pendaftar'],
-                    name='Teregistrasi',
-                    hovertemplate="Jenis Pendaftar=Teregistrasi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
-    fig.add_scatter(x=df_lolosSeleksi['Tahun Ajaran'], y=df_lolosSeleksi['Jumlah Pendaftar'], name='Lolos Seleksi',
-                    hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
-    fig.add_scatter(x=df_pendaftar['Tahun Ajaran'], y=df_pendaftar['Jumlah Pendaftar'], name='Pendaftar',
-                    hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
-    return fig
+    if(len(df_dayaTampung['Tahun Ajaran'])!=0 and len(df_pendaftarRegistrasi['Tahun Ajaran'])!=0 and len(df_lolosSeleksi['Tahun Ajaran'])!=0 and len(df_pendaftar['Tahun Ajaran'])!=0):
+        fig = px.bar(df_dayaTampung, x=df_dayaTampung['Tahun Ajaran'], y=df_dayaTampung['Jumlah Daya Tampung'],
+                     color=px.Constant('Daya Tampung'),
+                     labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
+        fig.add_scatter(x=df_pendaftarRegistrasi['Tahun Ajaran'], y=df_pendaftarRegistrasi['Jumlah Pendaftar'],
+                        name='Teregistrasi',
+                        hovertemplate="Jenis Pendaftar=Teregistrasi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
+        fig.add_scatter(x=df_lolosSeleksi['Tahun Ajaran'], y=df_lolosSeleksi['Jumlah Pendaftar'], name='Lolos Seleksi',
+                        hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
+        fig.add_scatter(x=df_pendaftar['Tahun Ajaran'], y=df_pendaftar['Jumlah Pendaftar'], name='Pendaftar',
+                        hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -1031,34 +1084,6 @@ order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
 
 
 @app.callback(
-    Output('grf_jsonprovdaftar', 'figure'),
-    Output('grf_jsonprovlolos', 'figure'),
-    Output('grf_jsonprovregis', 'figure'),
-    Input('grf_jsonprovdaftar', 'id')
-)
-def graphProvinceJson(id):
-    figdaftar = px.choropleth_mapbox(dfmhsprovdaftar, geojson=province, locations="Provinsi",
-                                     color_continuous_scale="Viridis",
-                                     featureidkey="properties.Propinsi",
-                                     center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
-                                     mapbox_style="carto-positron",
-                                     color='Jumlah Pendaftar')
-    figlolos = px.choropleth_mapbox(dfmhsprovlolos, geojson=province, locations="Provinsi",
-                                    color_continuous_scale="Viridis",
-                                    featureidkey="properties.Propinsi",
-                                    center={"lat": -0.789275, "lon": 113.921327}, zoom=3.5,
-                                    mapbox_style="carto-positron",
-                                    color='Pendaftar Lolos Seleksi')
-    figregis = px.choropleth_mapbox(dfmhsprovregis, geojson=province, locations="Provinsi",
-                                    color_continuous_scale="Viridis",
-                                    featureidkey="properties.Propinsi",
-                                    center={"lat": -0.47399, "lon": 113.29266}, zoom=3.5,
-                                    mapbox_style="carto-positron",
-                                    color='Pendaftar Registrasi Ulang')
-    return figdaftar, figlolos, figregis
-
-
-@app.callback(
     Output('grf_mhsprovdaftar', 'figure'),
     Output('visiFrom_TAdaftar', 'hidden'),
     Output('visiTo_TAdaftar', 'hidden'),
@@ -1078,18 +1103,30 @@ group by ds.tahun_ajaran, dl.provinsi) hitungan
 group by provinsi
 order by provinsi''', {'From': valueFrom, 'To': valueTo})
     if valueRadio == 'bar':
-        bardaftar = px.bar(dfmhsprovdaftar, x=dfmhsprovdaftar['Provinsi'], y=dfmhsprovdaftar['Jumlah Pendaftar'],
-                           color=dfmhsprovdaftar['Tahun Ajaran'], barmode='group')
-        bardaftar.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-        return bardaftar, True, True
+        if(len(dfmhsprovdaftar['Tahun Ajaran'])!=0):
+            bardaftar = px.bar(dfmhsprovdaftar, x=dfmhsprovdaftar['Provinsi'], y=dfmhsprovdaftar['Jumlah Pendaftar'],
+                               color=dfmhsprovdaftar['Tahun Ajaran'], barmode='group')
+            bardaftar.update_layout(xaxis=go.layout.XAxis(tickangle=45))
+            return bardaftar, True, True
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig, True, True
     else:
-        jsondaftar = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
-                                          color_continuous_scale="Viridis",
-                                          featureidkey="properties.Propinsi",
-                                          center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
-                                          mapbox_style="carto-positron",
-                                          color='Jumlah Pendaftar')
-        return jsondaftar, False, False
+        if(len(dfJson['Jumalh Pendaftar'])!=0):
+            jsondaftar = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
+                                              color_continuous_scale="Viridis",
+                                              featureidkey="properties.Propinsi",
+                                              center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
+                                              mapbox_style="carto-positron",
+                                              color='Jumlah Pendaftar')
+            return jsondaftar, False, False
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig, False, False
 
 
 @app.callback(
@@ -1114,18 +1151,30 @@ group by ds.tahun_ajaran, dl.provinsi) hitungan
 group by provinsi
 order by provinsi''', {'From': valueFrom, 'To': valueTo})
     if valueRadio == 'bar':
-        barlolos = px.bar(dfmhsprovlolos, x=dfmhsprovlolos['Provinsi'], y=dfmhsprovlolos['Pendaftar Lolos Seleksi'],
-                          color=dfmhsprovlolos['Tahun Ajaran'], barmode='group')
-        barlolos.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-        return barlolos, True, True
+        if (len(dfmhsprovlolos['Tahun Ajaran']) != 0):
+            barlolos = px.bar(dfmhsprovlolos, x=dfmhsprovlolos['Provinsi'], y=dfmhsprovlolos['Pendaftar Lolos Seleksi'],
+                              color=dfmhsprovlolos['Tahun Ajaran'], barmode='group')
+            barlolos.update_layout(xaxis=go.layout.XAxis(tickangle=45))
+            return barlolos, True, True
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig, True, True
     else:
-        jsonlolos = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
-                                         color_continuous_scale="Viridis",
-                                         featureidkey="properties.Propinsi",
-                                         center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
-                                         mapbox_style="carto-positron",
-                                         color='Pendaftar Lolos Seleksi')
-        return jsonlolos, False, False
+        if (len(dfJson['Jumalh Pendaftar']) != 0):
+            jsonlolos = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
+                                             color_continuous_scale="Viridis",
+                                             featureidkey="properties.Propinsi",
+                                             center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
+                                             mapbox_style="carto-positron",
+                                             color='Pendaftar Lolos Seleksi')
+            return jsonlolos, False, False
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig, False, False
 
 
 @app.callback(
@@ -1150,18 +1199,32 @@ group by ds.tahun_ajaran, dl.provinsi) hitungan
 group by provinsi
 order by provinsi''', {'From': valueFrom, 'To': valueTo})
     if valueRadio == 'bar':
-        barregis = px.bar(dfmhsprovregis, x=dfmhsprovregis['Provinsi'], y=dfmhsprovregis['Pendaftar Registrasi Ulang'],
-                          color=dfmhsprovregis['Tahun Ajaran'], barmode='group')
-        barregis.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-        return barregis, True, True
+        if (len(dfmhsprovregis['Tahun Ajaran']) != 0):
+            barregis = px.bar(dfmhsprovregis, x=dfmhsprovregis['Provinsi'],
+                              y=dfmhsprovregis['Pendaftar Registrasi Ulang'],
+                              color=dfmhsprovregis['Tahun Ajaran'], barmode='group')
+            barregis.update_layout(xaxis=go.layout.XAxis(tickangle=45))
+            return barregis, True, True
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig, True, True
     else:
-        jsonregis = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
-                                         color_continuous_scale="Viridis",
-                                         featureidkey="properties.Propinsi",
-                                         center={"lat": -0.789275, "lon": 113.921327}, zoom=3.25,
-                                         mapbox_style="carto-positron",
-                                         color='Pendaftar Registrasi Ulang')
-        return jsonregis, False, False
+        if (len(dfJson['Jumalh Pendaftar']) != 0):
+            jsonregis = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
+                                             color_continuous_scale="Viridis",
+                                             featureidkey="properties.Propinsi",
+                                             center={"lat": -0.789275, "lon": 113.921327}, zoom=3.25,
+                                             mapbox_style="carto-positron",
+                                             color='Pendaftar Registrasi Ulang')
+            return jsonregis, False, False
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig, False, False
+
 
 
 @app.callback(
@@ -1180,9 +1243,15 @@ def graphPerkembanganJumlahMaba(valueFrom, valueTo):
         where nim like %(TI)s and ds.tahun_ajaran between %(From)s and %(To)s 
         group by tahun_ajaran 
         order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo, 'TI': '71%'})
-    fig = px.line(df, x=df['Tahun Ajaran'], y=df['Jumlah'], )
-    fig.update_traces(mode='lines+markers')
-    return fig
+    if(len(df['Tahun Ajaran'])!=0):
+        fig = px.line(df, x=df['Tahun Ajaran'], y=df['Jumlah'], )
+        fig.update_traces(mode='lines+markers')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -1204,8 +1273,14 @@ from
          where ds.tahun_ajaran between %(From)s and %(To)s
        group by tahun_ajaran) y
 order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-    fig = px.line(df, x=df['Tahun Ajaran'], y=df['Pertumbuhan'].apply(pd.to_numeric))
-    fig.update_layout(yaxis_title="Pertumbuhan")
-    fig.update_traces(mode='lines+markers')
-    fig.update_yaxes(categoryorder='category ascending')
-    return fig
+    if(len(df['Tahun Ajaran'])!=0):
+        fig = px.line(df, x=df['Tahun Ajaran'], y=df['Pertumbuhan'].apply(pd.to_numeric))
+        fig.update_layout(yaxis_title="Pertumbuhan")
+        fig.update_traces(mode='lines+markers')
+        fig.update_yaxes(categoryorder='category ascending')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
