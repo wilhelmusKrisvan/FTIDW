@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 users = show_users()
+uname = users
 options = [
     {'label': 'Admin', 'value': 'admin'},
     {'label': 'Dekanat', 'value': 'dekanat'},
@@ -105,12 +106,14 @@ layout = dbc.Container([
         html.Hr(),
         dbc.Row([
             dbc.Col([
+                dcc.Interval('table-update', interval=1000, n_intervals=0),
                 dt.DataTable(
                     id='users',
                     columns=[{'name': 'Username', 'id': 'username'},
                              {'name': 'Email', 'id': 'email'},
                              {'name': 'Role', 'id': 'role'}],
-                    page_size=10
+                    page_size=10,
+
                 ),
             ], md=12),
         ]),
@@ -118,7 +121,7 @@ layout = dbc.Container([
         dbc.Row([
             dbc.Col([
                 dbc.Label('Username: '),
-                dcc.Dropdown(id='uname',style={'border-radius':'10px'})
+                dcc.Dropdown(options=[{'label': i['username'], 'value': i['username']} for i in uname], id='uname',style={'border-radius':'10px'})
             ], width=4),
             dbc.Col([
                 dbc.Label('Role: '),
@@ -182,6 +185,7 @@ def createUser(n_clicks, usernameSubmit, newPassword1Submit, newPassword2Submit,
                 if len(newPassword1) > 7:
                     try:
                         add_user(newUser, newPassword1, newEmail, admin)
+                        show_users()
                         return html.Div(children=['New User created'], className='text-success')
                     except Exception as e:
                         return html.Div(children=['New User not created: {e}'.format(e=e)], className='text-danger')
@@ -309,12 +313,13 @@ def switchButton(Fillusername, Fillrole):
 
 @app.callback(
     Output('users','data'),
-    # Output('uname','options'),
+    Output('uname','options'),
     Input('createUserButton','n_click'),
+    Input('table-update','n_intervals'),
     State('users','data')
 )
-def updateTable(btnCreate,data):
+def updateTable(btnCreate,data,n):
     if(btnCreate):
-        return show_users()
+        return show_users(),[{'label': i['username'], 'value': i['username']} for i in show_users()]
     else:
-        return show_users()
+        return show_users(),[{'label': i['username'], 'value': i['username']} for i in show_users()]

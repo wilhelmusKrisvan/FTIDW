@@ -39,7 +39,7 @@
       </schema-mapping>
       <ssh-properties>
         <enabled>true</enabled>
-        <ssh-config-id>ec3beb04-abb0-4bfd-8dbb-790fb37f850b</ssh-config-id>
+        <ssh-config-id>86155769-5473-4a35-86ee-4f6c8e350a6d</ssh-config-id>
       </ssh-properties>
     </data-source>
   </component>

@@ -55,7 +55,8 @@ def update_role(username, role):
     engine.dispose()
 
 def delete_user(username):
-    update = userTable.delete.where(userTable.c.username==username)
+    #update = userTable.delete.where(userTable.c.username==username)
+    update = userTable.delete().where(userTable.c.username == username)
 
     conn = engine.connect()
     conn.execute(update)
