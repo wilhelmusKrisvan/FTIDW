@@ -9,6 +9,7 @@ from appConfig import app, server
 from dash import html, dcc
 from datetime import date
 import model.dao_alumni as data
+import time
 
 dfmasatunggu = data.getMasaTunggu()
 dfmasaTungguGol = data.getMasaTungguperGol()
@@ -118,7 +119,7 @@ masatunggu = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
+                    html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMasaStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -129,7 +130,7 @@ masatunggu = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
+                    html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMasaEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -143,19 +144,25 @@ masatunggu = dbc.Container([
         ]),
         dcc.Tabs([
             #ini
-            dcc.Tab(label='Masa Tunggu', value='MsTgglulusan',
+            dcc.Tab(label='Jumlah Lulusan per Kategori', value='MsTgglulusan',
                     children=[
                         html.Div([
-                            dcc.Graph(id='grf_MsTgglulusan'),
-                            dbc.Button('Lihat Tabel', id='cll_MsTgglulusan', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_MsTgglulusan')),
+                            dbc.Button('Lihat Semua Data', id='cll_MsTgglulusan', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Rata-rata Masa Tunggu', value='rateGol',
+            dcc.Tab(label='Rata-rata Jumlah Lulusan per Kategori', value='rateGol',
                     children=[
                         html.Div([
-                            dcc.Graph(id='grf_rateGol'),
-                            dbc.Button('Lihat Tabel', id='cll_rateGol', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_rateGol')),
+                            dbc.Button('Lihat Semua Data', id='cll_rateGol', n_clicks=0,
                                        style=button_style)
                         ])
                     ],
@@ -175,7 +182,7 @@ lulusan = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
+                    html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrLulusanStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -186,7 +193,7 @@ lulusan = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
+                    html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrLulusanEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -202,24 +209,33 @@ lulusan = dbc.Container([
             dcc.Tab(label='Tingkat Kesesuaian Bidang Kerja', value='bidkerja',
                     children=[
                         html.Div([
-                            dcc.Graph(id='grf_bidangKerja'),
-                            dbc.Button('Lihat Tabel', id='cll_bidangKerja', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_bidangKerja')),
+                            dbc.Button('Lihat Semua Data', id='cll_bidangKerja', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Lulusan Berwirausaha', value='wirausaha',
                     children=[
                         html.Div([
-                            dcc.Graph(id='grf_alumniWirausaha'),
-                            dbc.Button('Lihat Tabel', id='cll_alumniWirausaha', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_alumniWirausaha')),
+                            dbc.Button('Lihat Semua Data', id='cll_alumniWirausaha', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Rerata Gaji Alumni Pekerjaan <6 Bulan ', value='gaji6bln',
                     children=[
                         html.Div([
-                            dcc.Graph(id='grf_gaji'),
-                            dbc.Button('Lihat Tabel', id='cll_gaji', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_gaji')),
+                            dbc.Button('Lihat Semua Data', id='cll_gaji', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
@@ -233,15 +249,18 @@ lulusan = dbc.Container([
 
 kepuasan = dbc.Container([
     dbc.Card([
-        html.H5('Kepuasan Pengguna Lulusan',
+        html.H5('Kepuasan',
                 style=ttlgrf_style),
         html.Div([
             dcc.Tabs([
-                dcc.Tab(label='Kepuasan Mahasiswa Terhadap Layanan UKDW', value='layananukdw',
+                dcc.Tab(label='Kepuasan Lulusan Terhadap Layanan UKDW', value='layananukdw',
                         children=[
                             html.Div([
-                                dcc.Graph(id='grf_layananukdw'),
-                                dbc.Button('Lihat Tabel', id='cll_grfLayananUKDW', n_clicks=0,
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_layananukdw')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfLayananUKDW', n_clicks=0,
                                            style=button_style)
                             ]),
                         ],
@@ -262,8 +281,11 @@ kepuasan = dbc.Container([
                                 clearable=False,
                             ),
                             html.Div([
-                                dcc.Graph(id='grf_skill'),
-                                dbc.Button('Lihat Tabel', id='cll_grfSkill', n_clicks=0,
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_skill')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfSkill', n_clicks=0,
                                            style=button_style)
                             ]),
                         ],

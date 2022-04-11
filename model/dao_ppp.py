@@ -54,8 +54,8 @@ select Tahun, Nama, max(Penelitian) Penelitian, max(pkm) as PKM , max(publikasi)
         group by  nama, dim_dosen.id_dosen, tahun)
 ) data
 where tahun>year(now())-5
-group by nama, tahun
-order by nama, tahun''', con)
+group by tahun, nama
+order by tahun desc, nama''', con)
 
 
 # pendanaan
@@ -116,7 +116,7 @@ inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
 inner join br_pp_mahasiswa on fact.id_pkm = br_pp_mahasiswa.id_penelitian_pkm
 inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa 
 group by fact.id_pkm, jumlah_Dosen,judul_pkm, jumlah_mahasiswa, tahun
-order by tahun, judul_pkm''', con)
+order by tahun desc, judul_pkm''', con)
 
 
 def getPublikasiMhs():
@@ -233,13 +233,13 @@ def getLuaranHKIDosenperTh():
     select  tahun Tahun, nama 'Nama Dosen',
             count(dpp.id_penelitian_pkm) 'Jumlah Judul' 
     from dim_penelitian_pkm dpp
-inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-where jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL'
-group by tahun, nama,jenis_luaran
-order by tahun desc
+    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL'
+    group by tahun, nama,jenis_luaran
+    order by tahun desc
     ''', con)
 
 
@@ -249,13 +249,13 @@ def getLuaranTTGUDosenperTh():
             nama 'Nama Dosen',
             count(dpp.id_penelitian_pkm) 'Jumlah Judul' 
     from dim_penelitian_pkm dpp
-inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-where jenis_luaran like 'TEKNOLOGI TEPAT GUNA'
-group by tahun, nama,jenis_luaran
-order by tahun desc
+    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where jenis_luaran like 'TEKNOLOGI TEPAT GUNA'
+    group by tahun, nama,jenis_luaran
+    order by tahun desc
     ''', con)
 
 
@@ -265,13 +265,13 @@ def getLuaranBukuDosenperTh():
             nama 'Nama Dosen',
             count(dpp.id_penelitian_pkm) Jumlah 
     from dim_penelitian_pkm dpp
-inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-where not(jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA')
-group by tahun, nama,jenis_luaran
-order by tahun desc
+    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where not(jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA')
+    group by tahun, nama,jenis_luaran
+    order by tahun desc
     ''', con)
 
 
@@ -293,7 +293,7 @@ def getRerataJumlPenelitianDosenperTh():
           group by dd.tahun) dosen
     where pp.tahun=dosen.tahun
     group by pp.tahun, pp.jumlah, dosen.jumlah, `Rerata`
-    order by pp.tahun;
+    order by pp.tahun desc;
     ''', con)
 
 
@@ -305,4 +305,5 @@ def getRerataJumlPublikasiDosenperTh():
              inner join dim_date dd on dp.tahun_publikasi = dd.tahun
     where dd.tahun
     group by dd.tahun
+    order by dd.tahun desc
     ''', con)

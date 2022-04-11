@@ -23,7 +23,7 @@ def getIPK():
     return pd.read_sql('''select tahun_ajaran_yudisium as 'Tahun Lulus', count(id_mahasiswa) "Jumlah Lulusan",  min(ipk) "Min. IPK", avg(ipk) as 'Rata-rata IPK' ,  max(ipk) "Max. IPK"
 from fact_yudisium
 group by tahun_ajaran_yudisium
-order by tahun_ajaran_yudisium''', con)
+order by tahun_ajaran_yudisium desc''', con)
 
 def getJmlLulusan():
     return pd.read_sql('''select count(*) as 'Jumlah Mahasiswa', tahun_ajaran_yudisium
@@ -47,9 +47,9 @@ def getJumlLulusSkripsiOntime():
 
 def getRateMasaStudi():
     return pd.read_sql('''
-    select 
-        concat(round((masa_studi-mods)/12,0) ," tahun ", mods, " bulan")  as "Masa Studi" , 
-        tahun_ajaran_yudisium as 'TA Yudisium'
+    select  
+        tahun_ajaran_yudisium as 'TA Yudisium',
+        concat(round((masa_studi-mods)/12,0) ," tahun ", mods, " bulan")  as "Masa Studi" 
     from (
     select  mod(masa_studi,12) as mods, masa_studi, tahun_ajaran_yudisium
     from (
@@ -57,28 +57,28 @@ def getRateMasaStudi():
         round(avg(masa_studi_dalam_bulan),0) as "masa_studi", tahun_ajaran_yudisium from fact_yudisium
         group by tahun_ajaran_yudisium) as data_mentah
     ) as data_ready
-    order by tahun_ajaran_yudisium
+    order by tahun_ajaran_yudisium desc
 ''', con)
 
 def getMasaStudi():
     return pd.read_sql('''
-select * from 
-(select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as 'Tahun Masuk',
-SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan <42 then 1 else 0 end) as '3 - 3.5 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan <54  then 1 else 0 end) as '3.5 - 4.5 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <=84 then 1 else 0 end) as '4.5 - 7 Tahun',
-SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 tahun'
-from fact_yudisium
-inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa=fact_yudisium.id_mahasiswa
-group by `Tahun Masuk`
-order by `Tahun Masuk`) lulusan
-left join (
-    select count(id_mahasiswa) 'Jumlah Mahasiswa', tahun_ajaran 'Tahun Ajaran' from fact_pmb
-    inner join dim_semester on dim_semester.id_semester=fact_pmb.id_semester AND id_prodi_diterima = 9
-    group by tahun_ajaran
-    order by tahun_ajaran desc
-) mhsditerima on mhsditerima.`Tahun Ajaran` = `Tahun Masuk`
+    select * from 
+    (select concat(dim_mahasiswa.tahun_angkatan,'/',cast(dim_mahasiswa.tahun_angkatan+1 as char(4))) as 'Tahun Masuk',
+    SUM(case when masa_studi_dalam_bulan < 36 then 1 else 0 end) as '< 3 Tahun',
+    SUM(case when masa_studi_dalam_bulan >= 36 AND masa_studi_dalam_bulan <42 then 1 else 0 end) as '3 - 3.5 Tahun',
+    SUM(case when masa_studi_dalam_bulan >= 42 AND masa_studi_dalam_bulan <54  then 1 else 0 end) as '3.5 - 4.5 Tahun',
+    SUM(case when masa_studi_dalam_bulan >= 54 AND masa_studi_dalam_bulan <=84 then 1 else 0 end) as '4.5 - 7 Tahun',
+    SUM(case when masa_studi_dalam_bulan >= 85 then 1 else 0 end) as '> 7 tahun'
+    from fact_yudisium
+    inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa=fact_yudisium.id_mahasiswa
+    group by `Tahun Masuk`
+    order by `Tahun Masuk`) lulusan
+    left join (
+        select count(id_mahasiswa) 'Jumlah Mahasiswa', tahun_ajaran 'Tahun Ajaran' from fact_pmb
+        inner join dim_semester on dim_semester.id_semester=fact_pmb.id_semester AND id_prodi_diterima = 9
+        group by tahun_ajaran
+        order by tahun_ajaran desc
+    ) mhsditerima on mhsditerima.`Tahun Ajaran` = `Tahun Masuk`
 ''', con)
 
 def getMahasiswaKP():
@@ -87,7 +87,7 @@ select dim_semester.tahun_ajaran 'Tahun Ajaran',  dim_semester.semester_nama 'Se
 inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
 inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
 group by dim_semester.tahun_ajaran, dim_semester.semester_nama
-order by  dim_semester.tahun_ajaran, dim_semester.semester_nama
+order by  dim_semester.tahun_ajaran desc, dim_semester.semester_nama
 ''', con)
 
 def getMahasiswaKPpkm():
@@ -98,7 +98,7 @@ inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester
 inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
 where fact_kp.is_pen_pkm = 1
 group by dim_semester.tahun_ajaran
-order by dim_semester.tahun_ajaran asc''', con)
+order by dim_semester.tahun_ajaran desc''', con)
 
 def getMhahasiswaSkripsipkm():
     return pd.read_sql('''select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', count(distinct fs.id_mahasiswa) as 'Jumlah Mahasiswa'
@@ -106,7 +106,7 @@ from fact_skripsi fs
 inner join dim_semester ds on fs.id_semester = ds.id_semester
 inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
 group by semester_nama, tahun_ajaran
-order by tahun_ajaran asc,semester_nama asc''',con)
+order by tahun_ajaran desc,semester_nama asc''',con)
 
 def getMitraKP():
     return pd.read_sql('''
@@ -115,7 +115,7 @@ def getMitraKP():
     inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
     inner join dim_semester ds on fk.id_semester = ds.id_semester
     group by  semester_nama, tahun_ajaran, wilayah
-    order by tahun_ajaran asc,semester_nama asc''',con)
+    order by tahun_ajaran desc, semester_nama asc''',con)
 
 def getTTGU():
     return pd.read_sql('''select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', count(distinct id_mahasiswa) as 'Jumlah Mahasiswa'
@@ -123,7 +123,7 @@ from fact_kp fk
 inner join dim_semester ds on fk.id_semester = ds.id_semester
 where is_pen_pkm='1'
 group by semester_nama, tahun_ajaran
-order by tahun_ajaran asc,semester_nama asc''',con)
+order by tahun_ajaran desc,semester_nama asc''',con)
 
 def getMahasiswaLulus():
     return pd.read_sql('''
@@ -144,7 +144,7 @@ def getMahasiswaLulus():
     group by tahun_ajaran,tahun_angkatan
     order by tahun_ajaran desc) mhs
     where mhs.tahun_ajaran=lls.tahun_ajaran_yudisium and mhs.tahun_angkatan=lls.tahun_angkatan
-    order by tahun_ajaran asc''',con)
+    order by tahun_ajaran desc''',con)
 
 def getMahasiswaLulusBandingTotal():
     return pd.read_sql('''
@@ -163,4 +163,4 @@ def getMahasiswaLulusBandingTotal():
              group by tahun_angkatan
          )total
     where lulus.tahun_angkatan=total.tahun_angkatan
-    order by lulus.tahun_angkatan asc''',con)
+    order by lulus.tahun_angkatan desc''',con)

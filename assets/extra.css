@@ -76,6 +76,8 @@
 #tbl_NonprestasiMhs button.export,
 #tbl_kulummou button.export,
 #tbl_pesertaKulum button.export
+#tbl_ttgumhs button.export,
+#tbl_skripmhs button.export
 {
     width: 120px;
     height: 30px;

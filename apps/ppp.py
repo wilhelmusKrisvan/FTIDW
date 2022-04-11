@@ -8,6 +8,7 @@ from dash.dependencies import Input, Output, State
 from sqlalchemy import create_engine
 from appConfig import app, server
 from datetime import date
+import time
 import model.dao_ppp as data
 
 dfdosen = data.getDosen()
@@ -170,8 +171,11 @@ pppDs = dbc.Container([
             ])
         ]),
         dbc.CardBody([
-            dcc.Graph(id='grf_pppDosen'),
-            dbc.Button('Lihat Tabel', id='cll_grfpppDosen', n_clicks=0, style=button_style)
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_pppDosen')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpppDosen', n_clicks=0, style=button_style)
         ], style={'padding': '0px'})
     ], style=cardgrf_style),
     dbc.Collapse(
@@ -187,7 +191,7 @@ pppMhs = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
+                    html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrPPPDMStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -197,7 +201,7 @@ pppMhs = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
+                    html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrPPPDMEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -227,8 +231,11 @@ pppMhs = dbc.Container([
                                         )
                                     ],style={'padding-left':'5%'})
                                 ],style={'padding-left':'5%','margin-bottom':'0px'}),
-                                dcc.Graph(id='grf_telitiDsMhs'),
-                                dbc.Button('Lihat Tabel', id='cll_grftelitiDM', n_clicks=0,
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_telitiDsMhs')),
+                                dbc.Button('Lihat Semua Data', id='cll_grftelitiDM', n_clicks=0,
                                            style=button_style)
                             ],style={'textAlign':'center'})
                         ], style=tab_style, selected_style=selected_style
@@ -252,8 +259,11 @@ pppMhs = dbc.Container([
                                         )
                                     ], style={'padding-left': '5%'})
                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-                                dcc.Graph(id='grf_pkmDsMhs'),
-                                dbc.Button('Lihat Tabel', id='cll_grfpkmDM', n_clicks=0,
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_pkmDsMhs')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfpkmDM', n_clicks=0,
                                            style=button_style)
                             ],style={'textAlign':'center'})
                         ], style=tab_style, selected_style=selected_style)
@@ -273,7 +283,7 @@ kerjasamaPPP = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
+                    html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMitraStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -283,7 +293,7 @@ kerjasamaPPP = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
+                    html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMitraEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -314,8 +324,11 @@ kerjasamaPPP = dbc.Container([
                                         )
                                     ], style={'padding-left': '5%'})
                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-                                dcc.Graph(id='grf_MitraTeliti'),
-                                dbc.Button('Lihat Tabel', id='cll_grfMitraTeliti', n_clicks=0, style=button_style)
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_MitraTeliti')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfMitraTeliti', n_clicks=0, style=button_style)
                             ],style={'textAlign':'center'})
                         ],
                         style=tab_style, selected_style=selected_style),
@@ -339,8 +352,11 @@ kerjasamaPPP = dbc.Container([
                                         )
                                     ], style={'padding-left': '5%'})
                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-                                dcc.Graph(id='grf_MitraPKM'),
-                                dbc.Button('Lihat Tabel', id='cll_grfMitraPKM', n_clicks=0, style=button_style)
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_MitraPKM')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfMitraPKM', n_clicks=0, style=button_style)
                             ], style={'textAlign': 'center'})
                         ], style=tab_style, selected_style=selected_style),
             ], style=tabs_styles, id='tab_Mitra', value='kerjaTeliti'),
@@ -362,7 +378,7 @@ sitasi = dbc.Container([
                     html.Div([
                         dbc.Row([
                             dbc.Col([
-                                html.P('Start :', style={'marginBottom': 0}),
+                                html.P('Dari :', style={'marginBottom': 0}),
                                 dcc.Dropdown(
                                     id='fltrSitasiStart',
                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -372,7 +388,7 @@ sitasi = dbc.Container([
                                 )
                             ]),
                             dbc.Col([
-                                html.P('End :', style={'marginBottom': 0}),
+                                html.P('Sampai :', style={'marginBottom': 0}),
                                 dcc.Dropdown(
                                     id='fltrSitasiEnd',
                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -399,8 +415,11 @@ sitasi = dbc.Container([
                     )
                 ])
             ]),
-            dcc.Graph(id='grf_sitasi'),
-            dbc.Button('Lihat Tabel', id='cll_grfsitasi', n_clicks=0, style=button_style),
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_sitasi')),
+            dbc.Button('Lihat Semua Data', id='cll_grfsitasi', n_clicks=0, style=button_style),
         ]),
     ], style=cardgrf_style),
     dbc.Collapse(
@@ -433,7 +452,7 @@ sitasi = dbc.Container([
 #         html.Div([
 #             dbc.Row([
 #                 dbc.Col([
-#                     html.P('Start :', style={'marginBottom': 0}),
+#                     html.P('Dari :', style={'marginBottom': 0}),
 #                     dcc.Dropdown(
 #                         id='fltrLuaranStart',
 #                         options=[{'label': i, 'value': i} for i in listDropdownTA],
@@ -443,7 +462,7 @@ sitasi = dbc.Container([
 #                     )
 #                 ]),
 #                 dbc.Col([
-#                     html.P('End :', style={'marginBottom': 0}),
+#                     html.P('Sampai :', style={'marginBottom': 0}),
 #                     dcc.Dropdown(
 #                         id='fltrLuaranEnd',
 #                         options=[{'label': i, 'value': i} for i in listDropdownTA],
@@ -474,7 +493,9 @@ sitasi = dbc.Container([
 #                                         )
 #                                     ], style={'padding-left': '5%'})
 #                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dcc.Graph(id='grf_luarandsfti'),
+#                                 dbc.Spinner([
+#                                       dcc.Graph(id='grf_luarandsfti')
+#                                 ], size='md', color='info', type='grow'),
 #                                 dbc.Button('Lihat Tabel', id='cll_grfluarandsfti', n_clicks=0,
 #                                            style=button_style)
 #                             ],style={'textAlign':'center'})
@@ -510,7 +531,9 @@ sitasi = dbc.Container([
 #                                         )
 #                                     ],width=8, style={'padding-left': '5%'})
 #                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dcc.Graph(id='grf_luarands'),
+#                                 dbc.Spinner([
+#                                       dcc.Graph(id='grf_luarands')
+#                                 ], size='md', color='info', type='grow'),
 #                                 dbc.Button('Lihat Tabel', id='cll_grfluarands', n_clicks=0,
 #                                            style=button_style)
 #                             ],style={'justify-content':'center'})
@@ -532,7 +555,7 @@ luaranDs = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
+                    html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrLuaranStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
@@ -542,11 +565,11 @@ luaranDs = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
+                    html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrLuaranEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[0],
+                        value=listDropdownTA[2],
                         style={'color': 'black'},
                         clearable=False
                     )
@@ -556,8 +579,23 @@ luaranDs = dbc.Container([
                 dcc.Tab(label='Hak Kekayaan Intelektual (HKI)', value='HKIDosen',
                         children=[
                             html.Div([
-                                dcc.Graph(id='grf_hkiDs'),
-                                dbc.Button('Lihat Tabel', id='cll_grfhkiDs', n_clicks=0,
+                                dbc.Row(
+                                    dbc.Col([
+                                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                                        dcc.Dropdown(
+                                            id='fltrHKIDsNama',
+                                            options=[{'label': i, 'value': i} for i in dosen],
+                                            value=dosen[1],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ])
+                                ),
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_hkiDs')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfhkiDs', n_clicks=0,
                                            style=button_style)
                             ])
                         ],
@@ -565,8 +603,23 @@ luaranDs = dbc.Container([
                 dcc.Tab(label='Teknologi Tepat Guna (TTGU)', value='TTGUDosen',
                         children=[
                             html.Div([
-                                dcc.Graph(id='grf_ttguDs'),
-                                dbc.Button('Lihat Tabel', id='cll_grfttguDs', n_clicks=0,
+                                dbc.Row(
+                                    dbc.Col([
+                                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                                        dcc.Dropdown(
+                                            id='fltrTTGUDsNama',
+                                            options=[{'label': i, 'value': i} for i in dosen],
+                                            value=dosen[1],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ])
+                                ),
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_ttguDs')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfttguDs', n_clicks=0,
                                            style=button_style)
                             ])
                         ],
@@ -574,8 +627,23 @@ luaranDs = dbc.Container([
                 dcc.Tab(label='Buku', value='BukuDosen',
                         children=[
                             html.Div([
-                                dcc.Graph(id='grf_bukuDs'),
-                                dbc.Button('Lihat Tabel', id='cll_grfbukuDs', n_clicks=0,
+                                dbc.Row(
+                                    dbc.Col([
+                                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                                        dcc.Dropdown(
+                                            id='fltrBukuDsNama',
+                                            options=[{'label': i, 'value': i} for i in dosen],
+                                            value=dosen[1],
+                                            style={'color': 'black'},
+                                            clearable=False
+                                        )
+                                    ])
+                                ),
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_bukuDs')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfbukuDs', n_clicks=0,
                                            style=button_style)
                             ])
                         ],
@@ -599,7 +667,7 @@ luaranMhs = dbc.Container([
                         html.Div([
                             dbc.Row([
                                 dbc.Col([
-                                    html.P('Start :', style={'marginBottom': 0}),
+                                    html.P('Dari :', style={'marginBottom': 0}),
                                     dcc.Dropdown(
                                         id='fltrPubMhsStart',
                                         options=[{'label': i, 'value': i} for i in listDropdownTA],
@@ -609,7 +677,7 @@ luaranMhs = dbc.Container([
                                     )
                                 ]),
                                 dbc.Col([
-                                    html.P('End :', style={'marginBottom': 0}),
+                                    html.P('Sampai :', style={'marginBottom': 0}),
                                     dcc.Dropdown(
                                         id='fltrPubMhsEnd',
                                         options=[{'label': i, 'value': i} for i in listDropdownTA],
@@ -621,8 +689,11 @@ luaranMhs = dbc.Container([
                             ])
                         ]),
                         html.Div([
-                            dcc.Graph(id='grf_pubMhs'),
-                            dbc.Button('Lihat Tabel', id='cll_grfpubMhs', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_pubMhs')),
+                            dbc.Button('Lihat Semua Data', id='cll_grfpubMhs', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
@@ -631,7 +702,7 @@ luaranMhs = dbc.Container([
                         html.Div([
                             dbc.Row([
                                 dbc.Col([
-                                    html.P('Start :', style={'marginBottom': 0}),
+                                    html.P('Dari :', style={'marginBottom': 0}),
                                     dcc.Dropdown(
                                         id='fltrTTGUMhsStart',
                                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -641,7 +712,7 @@ luaranMhs = dbc.Container([
                                     )
                                 ]),
                                 dbc.Col([
-                                    html.P('End :', style={'marginBottom': 0}),
+                                    html.P('Sampai :', style={'marginBottom': 0}),
                                     dcc.Dropdown(
                                         id='fltrTTGUMhsEnd',
                                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -654,8 +725,11 @@ luaranMhs = dbc.Container([
                             ])
                         ]),
                         html.Div([
-                            dcc.Graph(id='grf_ttguMhs'),
-                            dbc.Button('Lihat Tabel', id='cll_grfttguMhs', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_ttguMhs')),
+                            dbc.Button('Lihat Semua Data', id='cll_grfttguMhs', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
@@ -664,7 +738,7 @@ luaranMhs = dbc.Container([
                         html.Div([
                             dbc.Row([
                                 dbc.Col([
-                                    html.P('Start :', style={'marginBottom': 0}),
+                                    html.P('Dari :', style={'marginBottom': 0}),
                                     dcc.Dropdown(
                                         id='fltrHKIMhsStart',
                                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -674,7 +748,7 @@ luaranMhs = dbc.Container([
                                     )
                                 ]),
                                 dbc.Col([
-                                    html.P('End :', style={'marginBottom': 0}),
+                                    html.P('Sampai :', style={'marginBottom': 0}),
                                     dcc.Dropdown(
                                         id='fltrHKIMhsEnd',
                                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -686,8 +760,11 @@ luaranMhs = dbc.Container([
                             ])
                         ]),
                         html.Div([
-                            dcc.Graph(id='grf_hkiMhs'),
-                            dbc.Button('Lihat Tabel', id='cll_grfhkiMhs', n_clicks=0,
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_hkiMhs')),
+                            dbc.Button('Lihat Semua Data', id='cll_grfhkiMhs', n_clicks=0,
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
@@ -706,7 +783,7 @@ rerata = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Start :', style={'marginBottom': 0}),
+                    html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrRerataStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -716,7 +793,7 @@ rerata = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('End :', style={'marginBottom': 0}),
+                    html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrRerataEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -730,16 +807,22 @@ rerata = dbc.Container([
                 dcc.Tab(label='Penelitian', value='reTelitiDosen',
                         children=[
                             html.Div([
-                                dcc.Graph(id='grf_reTelitiDosen'),
-                                dbc.Button('Lihat Tabel', id='cll_grfreTelitiDosen', n_clicks=0,
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_reTelitiDosen')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfreTelitiDosen', n_clicks=0,
                                            style=button_style)
                             ])
                         ], style=tab_style, selected_style=selected_style),
                 dcc.Tab(label='Publikasi', value='rePubDosen',
                         children=[
                             html.Div([
-                                dcc.Graph(id='grf_rePubDosen'),
-                                dbc.Button('Lihat Tabel', id='cll_grfrePubDosen', n_clicks=0,
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_rePubDosen')),
+                                dbc.Button('Lihat Semua Data', id='cll_grfrePubDosen', n_clicks=0,
                                            style=button_style)
                             ])
                         ], style=tab_style, selected_style=selected_style),
@@ -902,7 +985,7 @@ def graphPenDM(start, end, radiopendm):
                      inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa
             where (tahun between %(start)s and %(end)s)
             group by tahun
-            order by tahun desc
+            order by tahun
         ''',{'start':start,'end':end})
         figratapendm = px.line(dfratapendm, x=dfratapendm['Tahun'], y=dfratapendm.columns[1:3])
         figratapendm.update_layout(yaxis_title='Rerata Jumlah Partisipan', legend_title='Partisipan')
@@ -1156,7 +1239,7 @@ def graphPubMhs(tglstart, tglend):
              inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
     where fp.is_deleted != 1 and (tahun_ajaran between %(start)s and %(end)s)
     group by tahun_ajaran
-    order by tahun_ajaran desc;
+    order by tahun_ajaran;
     ''', {'start': tglstart, 'end': tglend})
     figPubMhs = px.line(dfPubMhs, x=dfPubMhs['Tahun Ajaran'], y=dfPubMhs['Jumlah Publikasi'])
     figPubMhs.update_traces(mode='lines+markers')
@@ -1180,7 +1263,7 @@ def graphPPMhs(tglstart, tglend):
     where keterangan_jenis_luaran='TEKNOLOGI TEPAT GUNA' 
         and (tahun between %(start)s and %(end)s)
     group by tahun
-    order by tahun desc;
+    order by tahun;
     ''', {'start': tglstart, 'end': tglend})
     figTTGUMhs = px.line(dfTTGUMhs, x=dfTTGUMhs['Tahun'], y=dfTTGUMhs['Jumlah Judul'])
     figTTGUMhs.update_traces(mode='lines+markers')
@@ -1201,7 +1284,7 @@ def graphHKIMhs(tglstart, tglend):
              inner join dim_date dd on dd.id_date = fll.id_tanggal_luaran
     where no_haki is not null and (tahun between %(start)s and %(end)s)
     group by tahun
-    order by tahun desc;
+    order by tahun;
     ''', {'start': tglstart, 'end': tglend})
     fig = px.line(dfHKIMhs, x=dfHKIMhs['Tahun'], y=dfHKIMhs['Jumlah Judul'])
     fig.update_traces(mode='lines+markers')
@@ -1252,6 +1335,11 @@ def graphRerata(tglstart, tglend):
 
 
 # CALLBACK
+@app.callback(Output("loading-output-1", "children"), Input("loading-input-1", "value"))
+def input_triggers_spinner(value):
+    time.sleep(1)
+    return value
+
 @app.callback(
     Output('cll_PPPDosen', 'is_open'),
     Output('cll_PPPDosen', 'children'),
@@ -1310,10 +1398,10 @@ def toggle_collapse(pkmds, dsmhs, ppp, is_open):
     isiTelitiDosen = dbc.Card(
         dt.DataTable(
             id='tbl_telitiDosenMhs',
-            columns=[
-                {'name': i, 'id': i} for i in dfpenelitianmhs.columns
-            ],
-            data=dfpenelitianmhs.to_dict('records'),
+            # columns=[
+            #     {'name': i, 'id': i} for i in dfpenelitianmhs.columns
+            # ],
+            # data=dfpenelitianmhs.to_dict('records'),
             sort_action='native',
             sort_mode='multi',
             style_table={'padding': '10px', 'overflowX': 'auto'},
@@ -1595,7 +1683,7 @@ def graphSitasi(valueFrom, valueTo, radioValue):
                      inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
             where tahun_sitasi between %(start)s and %(end)s
             group by tahun_sitasi
-            order by tahun_sitasi desc;
+            order by tahun_sitasi;
         ''', {'start': valueFrom, 'end': 'valueTo'})
         figperth = px.bar(dfperth, x=dfperth['Tahun Sitasi'], y=dfperth['Jumlah Sitasi'], color=dfperth['Tahun Sitasi'])
         return figperth
@@ -1615,18 +1703,32 @@ def graphSitasi(valueFrom, valueTo, radioValue):
             and tahun_sitasi between %(start)s and %(end)s
         group by dd.nama, tahun_sitasi) sub
         where row <= 1
-        order by `Tahun Sitasi` desc;
+        order by `Tahun Sitasi`;
         ''', {'start': valueFrom, 'end': 'valueTo'})
         figtopds = px.bar(dftopdosen, x=dftopdosen['Tahun Sitasi'], y=dftopdosen['Jumlah Sitasi'], color=dftopdosen['Nama Dosen'])
-        figtopds.update_xaxes(categoryorder='category ascending')
         return figtopds
 
 @app.callback(
     Output('grf_hkiDs', 'figure'),
-    Input('grf_hkiDs', 'id')
+    Input('fltrLuaranStart', 'value'),
+    Input('fltrLuaranEnd', 'value'),
+    Input('fltrHKIDsNama', 'value')
 )
-def grafPubDs(id):
-    df = dfluaranhkidosen
+def grafPubDs(start, end, namads):
+    df = data.getDataFrameFromDBwithParams(f'''
+    select  tahun Tahun, nama 'Nama Dosen',
+            count(dpp.id_penelitian_pkm) 'Jumlah Judul' 
+    from dim_penelitian_pkm dpp
+    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' 
+        and nama like %(nama)s
+        and tahun between %(start)s and %(end)s
+    group by tahun, nama,jenis_luaran
+    order by tahun
+    ''',{'start':start, 'end':end, 'nama':namads})
     fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Judul'], color=df['Nama Dosen'])
     fig.update_layout(barmode='group')
     return fig
@@ -1634,22 +1736,54 @@ def grafPubDs(id):
 
 @app.callback(
     Output('grf_ttguDs', 'figure'),
-    Input('grf_ttguDs', 'id')
+    Input('fltrLuaranStart', 'value'),
+    Input('fltrLuaranEnd', 'value'),
+    Input('fltrTTGUDsNama', 'value')
 )
-def grafTTGUDs(id):
-    df = dfluaranttgudosen
+def grafTTGUDs(start, end, namads):
+    df = data.getDataFrameFromDBwithParams(f'''
+    select  tahun 'Tahun', 
+            nama 'Nama Dosen',
+            count(dpp.id_penelitian_pkm) 'Jumlah Judul' 
+    from dim_penelitian_pkm dpp
+    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where jenis_luaran like 'TEKNOLOGI TEPAT GUNA' 
+        and nama like %(nama)s
+        and tahun between %(start)s and %(end)s
+    group by tahun, nama,jenis_luaran
+    order by tahun
+    ''',{'start':start,'end':end,'nama':namads})
     fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Judul'], color=df['Nama Dosen'])
-    fig.update_layout(barmode='group')
+    # fig.update_layout(barmode='group', xaxis={'categoryorder':'total ascending'})
     return fig
 
 @app.callback(
     Output('grf_bukuDs', 'figure'),
-    Input('grf_bukuDs', 'id')
+    Input('fltrLuaranStart', 'value'),
+    Input('fltrLuaranEnd', 'value'),
+    Input('fltrBukuDsNama', 'value')
 )
-def grafBukuDs(id):
-    df = dfluaranbukudosen
+def grafBukuDs(start,end,namads):
+    df = data.getDataFrameFromDBwithParams(f'''
+    select  tahun Tahun, 
+            nama 'Nama Dosen',
+            count(dpp.id_penelitian_pkm) Jumlah 
+    from dim_penelitian_pkm dpp
+    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where not(jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA') 
+        and nama like %(nama)s
+        and tahun between %(start)s and %(end)s
+    group by tahun, nama, jenis_luaran
+    order by tahun
+    ''',{'start':start,'end':end,'nama':namads})
     fig = px.bar(df, x=df['Tahun'], y=df['Jumlah'], color=df['Nama Dosen'])
-    fig.update_layout(barmode='group')
+    # fig.update_layout(barmode='group', xaxis={'categoryorder':'total ascending'})
     return fig
 
 # @app.callback(

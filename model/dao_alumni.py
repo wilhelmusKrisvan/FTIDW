@@ -43,7 +43,7 @@ left join(
     from dim_lulusan
     group by tahun_lulus
 )terlacak on terlacak.tahun_lulus = data2.`Tahun Lulus`
-order by data2.`Tahun Lulus`;''', con)
+order by data2.`Tahun Lulus` desc ;''', con)
 
 
 def getBidangKerja():
@@ -79,7 +79,7 @@ left join(
     inner join fact_tracer_study on dim_lulusan.id_lulusan = fact_tracer_study.id_lulusan
     group by tahun_lulus
 )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
-order by data2.tahun_lulus''', con)
+order by data2.tahun_lulus desc''', con)
 
 
 def getTracer():
