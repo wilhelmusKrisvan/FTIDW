@@ -10,6 +10,7 @@ from appConfig import app, server
 from dash import html, dcc
 import model.dao_mbkm as data
 from datetime import date
+import plotly.graph_objs as go
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
@@ -104,7 +105,7 @@ buttonLink_style = {
 }
 
 button_style = {
-    'width': '120px',
+    'width': '160px',
     'height': '50px',
     'border-radius': '10px',
     'box-shadow': '5px 10px 20px #ebedeb',
@@ -158,7 +159,7 @@ dftrmitraMBKM = html.Div([
                             dcc.Graph(
                                 id='grf_mitrainternal1'
                             ),
-                            dbc.Button('Lihat Tabel',
+                            dbc.Button('Lihat Semua Data',
                                        id='cll_grfmitrainternal',
                                        n_clicks=0,
                                        style=button_style)
@@ -229,7 +230,7 @@ dftrmitraMBKM = html.Div([
                             dcc.Graph(
                                 id='grf_mitraeksternal'
                             ),
-                            dbc.Button('Lihat Tabel',
+                            dbc.Button('Lihat Semua Data',
                                        id='cll_grfmitraeksternal',
                                        n_clicks=0,
                                        style=button_style)
@@ -271,40 +272,42 @@ dftrmitraMBKMInternal = dbc.Container([
     dbc.Card([
         html.H5('Top 5 Mitra Internal',
                 style=ttlgrf_style),
+        dbc.Row([
+            dbc.Col([
+                html.H6('Dari:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        id='Fromdrpdwn_jumlmitrainternal',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ]),
+            dbc.Col([
+                html.H6('Sampai:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[4],
+                        id='Todrpdwn_jumlmitrainternal',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ])
+        ]),
         dbc.CardLink(
             dbc.CardBody([
-                dbc.Row([
-                    dbc.Col([
-                        html.H6('Dari:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[0],
-                                id='Fromdrpdwn_jumlmitrainternal',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3),
-                    dbc.Col([
-                        html.H6('Sampai:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[4],
-                                id='Todrpdwn_jumlmitrainternal',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3)
-                ]),
-                dcc.Graph(
-                    id='grf_mitrainternal1'
+                dcc.Loading(
+                    id='loading-4',
+                    type="default",
+                    children=dcc.Graph(id='grf_mitrainternal1'),
                 ),
-                dbc.Button('Lihat Tabel',
+                dbc.Button('Lihat Semua Data',
                            id='cll_grfmitrainternal',
                            n_clicks=0,
                            style=button_style)
@@ -343,40 +346,42 @@ dftrmitraMBKMEksternal = dbc.Container([
     dbc.Card([
         html.H5('Top 5 Mitra Eksternal',
                 style=ttlgrf_style),
+        dbc.Row([
+            dbc.Col([
+                html.H6('Dari:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        id='Fromdrpdwn_jumlmitraeksternal',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ]),
+            dbc.Col([
+                html.H6('Sampai:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[4],
+                        id='Todrpdwn_jumlmitraeksternal',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ])
+        ]),
         dbc.CardLink(
             dbc.CardBody([
-                dbc.Row([
-                    dbc.Col([
-                        html.H6('Dari:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[0],
-                                id='Fromdrpdwn_jumlmitraeksternal',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3),
-                    dbc.Col([
-                        html.H6('Sampai:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[4],
-                                id='Todrpdwn_jumlmitraeksternal',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3)
-                ]),
-                dcc.Graph(
-                    id='grf_mitraeksternal'
+                dcc.Loading(
+                    id='loading-5',
+                    type="default",
+                    children=dcc.Graph(id='grf_mitraeksternal'),
                 ),
-                dbc.Button('Lihat Tabel',
+                dbc.Button('Lihat Semua Data',
                            id='cll_grfmitraeksternal',
                            n_clicks=0,
                            style=button_style)
@@ -446,7 +451,7 @@ jumlmitraMBKM = dbc.Container([
                     ], width=3)
                 ]),
                 dcc.Graph(id='grf_jumlmitrambkm'),
-                dbc.Button('Lihat Tabel',
+                dbc.Button('Lihat Semua Data',
                            id='cll_grfjumlmitrambkm',
                            n_clicks=0,
                            style=button_style)
@@ -484,38 +489,43 @@ dosbingMBKM = dbc.Container([
     dbc.Card([
         html.H5('Jumlah Dosen Pembimbing MBKM',
                 style=ttlgrf_style),
+        html.Br(),
+        dbc.Row([
+            dbc.Col([
+                html.H6('Dari:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        id='Fromdrpdwn_dosbingmbkm',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ]),
+            dbc.Col([
+                html.H6('Sampai:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[4],
+                        id='Todrpdwn_dosbingmbkm',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ])
+        ]),
         dbc.CardLink(
             dbc.CardBody([
-                dbc.Row([
-                    dbc.Col([
-                        html.H6('Dari:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[0],
-                                id='Fromdrpdwn_dosbingmbkm',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3),
-                    dbc.Col([
-                        html.H6('Sampai:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[4],
-                                id='Todrpdwn_dosbingmbkm',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3)
-                ]),
-                dcc.Graph(id='grf_jumldosbingmbkm'),
-                dbc.Button('Lihat Tabel',
+                dcc.Loading(
+                    id='loading-3',
+                    type="default",
+                    children=dcc.Graph(id='grf_jumldosbingmbkm'),
+                ),
+                dbc.Button('Lihat Semua Data',
                            id='cll_grfjumldosbingmbkm',
                            n_clicks=0,
                            style=button_style)
@@ -552,38 +562,43 @@ mahasiswaMBKM = dbc.Container([
     dbc.Card([
         html.H5('Jumlah Mahasiswa MBKM',
                 style=ttlgrf_style),
+        html.Br(),
+        dbc.Row([
+            dbc.Col([
+                html.H6('Dari:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        id='Fromdrpdwn_mhsseleksi',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ]),
+            dbc.Col([
+                html.H6('Sampai:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[4],
+                        id='Todrpdwn_mhsseleksi',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ])
+        ]),
         dbc.CardLink(
             dbc.CardBody([
-                dbc.Row([
-                    dbc.Col([
-                        html.H6('Dari:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[0],
-                                id='Fromdrpdwn_mhsseleksi',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3),
-                    dbc.Col([
-                        html.H6('Sampai:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[4],
-                                id='Todrpdwn_mhsseleksi',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3)
-                ]),
-                dcc.Graph(id='grf_mahasiswambkm'),
-                dbc.Button('Lihat Tabel',
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_mahasiswambkm'),
+                ),
+                dbc.Button('Lihat Semua Data',
                            id='cll_grfmahasiswambkm',
                            n_clicks=0,
                            style=button_style)
@@ -621,38 +636,43 @@ reratasksMBKM = dbc.Container([
     dbc.Card([
         html.H5('Rata-rata Konversi SKS MBKM',
                 style=ttlgrf_style),
+        html.Br(),
+        dbc.Row([
+            dbc.Col([
+                html.H6('Dari:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        id='Fromdrpdwn_reratasksmbkm',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ]),
+            dbc.Col([
+                html.H6('Sampai:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[4],
+                        id='Todrpdwn_reratasksmbkm',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ])
+        ]),
         dbc.CardLink(
             dbc.CardBody([
-                dbc.Row([
-                    dbc.Col([
-                        html.H6('Dari:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[0],
-                                id='Fromdrpdwn_reratasksmbkm',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3),
-                    dbc.Col([
-                        html.H6('Sampai:'),
-                        html.Div([
-                            dcc.Dropdown(
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[4],
-                                id='Todrpdwn_reratasksmbkm',
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='-',
-                            ),
-                        ]),
-                    ], width=3)
-                ]),
-                dcc.Graph(id='grf_reratasksmbkm'),
-                dbc.Button('Lihat Tabel',
+                dcc.Loading(
+                    id='loading-2',
+                    type="default",
+                    children=dcc.Graph(id='grf_reratasksmbkm'),
+                ),
+                dbc.Button('Lihat Semua Data',
                            id='cll_grfreratasksmbkm',
                            n_clicks=0,
                            style=button_style)
@@ -816,9 +836,16 @@ def grafMahasiswaMBKM(valueFrom, valueTo):
     group by ds.kode_semester, Bentuk , Semester
     order by ds.kode_semester
     ''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk'])
-    fig.update_layout(barmode='group')
-    return fig
+
+    if (len(df['Semester'])) != 0:
+        fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk'])
+        fig.update_layout(barmode='group')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(

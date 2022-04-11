@@ -8,6 +8,7 @@ from dash.dependencies import Input, Output, State
 from sqlalchemy import create_engine
 from appConfig import app, server
 import model.dao_kegiatankerjasama as data
+import plotly.graph_objs as go
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
@@ -19,8 +20,25 @@ dfprestasiakademik = data.getPrestasiAkademik()
 dfprestasinonakademik = data.getPrestasiNonAkademik()
 # Kulum
 dfKulum = data.getKegKulUmMOU()
+dfTableKulum = data.getTableKegKulUmMOU()
+
 dfrerataKulum = data.getRerataJumlPesertaKulUm()
 dfRekognisiDosenGraf = data.getRekognisiDosen()
+
+dfTahunRekognisiDosen = data.getListTahunKegRekognisiDosen()
+listTahunRekognisiDosen = dfTahunRekognisiDosen['tahun']
+
+dfTahunKegDosen = data.getListTahunKegDosen()
+listTahunKegDosen = dfTahunKegDosen['tahun']
+
+dfTahunPrestasiAkademik = data.getListTahunPrestasiAkademik()
+listTahunPrestasiAkademik = dfTahunPrestasiAkademik['tahun']
+
+dfTahunPrestasiNonAkademik = data.getListTahunPrestasiNonAkademik()
+listTahunPrestasiNonAkademik = dfTahunPrestasiNonAkademik['tahun']
+
+dfTahunKulumMOU = data.getListTahunKulumMOU()
+listTahunKulumMOU = dfTahunKulumMOU['tahun']
 
 # dfkerjasama = data.getKerjasama()
 # dfkerjasamakegiatan = data.getKerjasamaKegiatan()
@@ -104,7 +122,7 @@ buttonLink_style = {
 }
 
 button_style = {
-    'width': '120px',
+    'width': '160px',
     'height': '50px',
     'border-radius': '10px',
     'box-shadow': '5px 10px 20px #ebedeb',
@@ -126,27 +144,53 @@ kegiatan_dosen = dbc.Container([
                     children=[
                         dbc.Container([
                             dbc.Card([
+                                dbc.Row([
+                                            dbc.Col([
+                                                html.Br(),
+                                                html.H6('Wilayah :'),
+                                                dcc.Dropdown(
+                                                    id='drpdwn_kegRekoginisiDosen',
+                                                    options=[{'label': 'Regional', 'value': '1'},
+                                                             {'label': 'Nasional', 'value': '2'},
+                                                             {'label': 'Asean', 'value': '3'},
+                                                             {'label': 'Internasional', 'value': '4'}
+                                                             ],
+                                                    value='2',
+                                                    style={'color': 'black'},
+                                                    clearable=False,
+                                                ),
+                                            ], ),
+                                            dbc.Col([
+                                                html.Br(),
+                                                html.H6('Dari :'),
+                                                dcc.Dropdown(
+                                                    id='drpdwn_FromTahunkegRekoginisiDosen',
+                                                    options=[{'label': i, 'value': i} for i in listTahunRekognisiDosen],
+                                                    value='2015',
+                                                    style={'color': 'black'},
+                                                    clearable=False,
+                                                ),
+                                            ], ),
+                                            dbc.Col([
+                                                html.Br(),
+                                                html.H6('Sampai :'),
+                                                dcc.Dropdown(
+                                                    id='drpdwn_ToTahunkegRekoginisiDosen',
+                                                    options=[{'label': i, 'value': i} for i in listTahunRekognisiDosen],
+                                                    value='2020',
+                                                    style={'color': 'black'},
+                                                    clearable=False,
+                                                ),
+                                            ], ),
+                                        ]),
                                 dbc.CardLink(
                                     dbc.CardBody([
-                                        dbc.Col([
-                                            html.Br(),
-                                            html.H6('Filter Wilayah :'),
-                                            dcc.Dropdown(
-                                                id='drpdwn_kegRekoginisiDosen',
-                                                options=[{'label': 'Regional', 'value': '1'},
-                                                         {'label': 'Nasional', 'value': '2'},
-                                                         {'label': 'Asean', 'value': '3'},
-                                                         {'label': 'Internasional', 'value': '4'}
-                                                         ],
-                                                value='2',
-                                                style={'color': 'black'},
-                                                clearable=False,
-                                            ),
-                                        ], width=3),
-                                        dcc.Graph(
-                                            id='grf_rekognisiDosen',
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_rekognisiDosen', )
                                         ),
-                                        dbc.Button('Lihat Tabel',
+                                        dbc.Button('Lihat Semua Data',
                                                    id='cll_grfrekognisidosen',
                                                    n_clicks=0,
                                                    style=button_style)
@@ -183,31 +227,27 @@ kegiatan_dosen = dbc.Container([
                     ],
                     style=tab_style, selected_style=selected_style),
 
-            #######################################################
             dcc.Tab(label='Jumlah Kegiatan Dosen Tiap Tahun', value='kegDosen',
                     children=[
                         dbc.Container([
                             dbc.Col([
                                 html.Br(),
-                                html.H6('Filter tahun :'),
+                                html.H6('Tahun :'),
                                 dcc.Dropdown(
                                     id='drpdwn_kegDosen',
-                                    options=[
-                                        {'label': '2022', 'value': '2022'},
-                                        {'label': '2021', 'value': '2021'},
-                                        {'label': '2020', 'value': '2020'},
-                                        {'label': '2019', 'value': '2019'},
-                                        {'label': '2018', 'value': '2018'},
-                                        {'label': '2017', 'value': '2017'},
-                                    ],
+                                    options=[{'label': i, 'value': i} for i in listTahunKegDosen],
                                     value='2020',
                                     style={'color': 'black'},
                                     clearable=False,
                                 ),
-                            ], width=3),
+                            ],),
                             dbc.CardLink([
-                                dcc.Graph(id='grf_kegDosen'),
-                                dbc.Button('Lihat Tabel',
+                                dcc.Loading(
+                                    id='loading-1',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_kegDosen'),
+                                ),
+                                dbc.Button('Lihat Semua Data',
                                            id='cll_grfkegDosen',
                                            n_clicks=0,
                                            style=button_style)
@@ -250,24 +290,48 @@ kegiatanMahasiswa = dbc.Container([
         dcc.Tabs([
             dcc.Tab(label='Prestasi Akademik Mahasiswa', value='prestasiMhs',
                     children=[
+                        dbc.Row([
+                                        dbc.Col([
+                                            html.Br(),
+                                            html.H6('Wilayah :'),
+                                            dcc.Dropdown(
+                                                id='drpdwn_prestasiAkademikMahasiswa',
+                                                options=[{'label': 'Lokal', 'value': 'LOKAL'},
+                                                         {'label': 'Regional', 'value': 'REGIONAL'},
+                                                         {'label': 'Nasional', 'value': 'NASIONAL'},
+                                                         {'label': 'Internasional', 'value': 'INTERNASIONAL'}
+                                                         ],
+                                                value='LOKAL',
+                                                style={'color': 'black'},
+                                                clearable=False,
+                                            ),
+                                        ], ),
+                                        dbc.Col([
+                                            html.Br(),
+                                            html.H6('Dari :'),
+                                            dcc.Dropdown(
+                                                id='drpdwn_FromPrestasiAkademikMahasiswa',
+                                                options=[{'label': i, 'value': i} for i in listTahunPrestasiAkademik],
+                                                value='2013',
+                                                style={'color': 'black'},
+                                                clearable=False,
+                                            ),
+                                        ], ),
+                                        dbc.Col([
+                                            html.Br(),
+                                            html.H6('Sampai :'),
+                                            dcc.Dropdown(
+                                                id='drpdwn_ToPrestasiAkademikMahasiswa',
+                                                options=[{'label': i, 'value': i} for i in listTahunPrestasiAkademik],
+                                                value='2017',
+                                                style={'color': 'black'},
+                                                clearable=False,
+                                            ),
+                                        ], ),
+                                    ]),
                         dbc.CardLink([
-                            dbc.Col([
-                                html.Br(),
-                                html.H6('Filter Wilayah :'),
-                                dcc.Dropdown(
-                                    id='drpdwn_prestasiAkademikMahasiswa',
-                                    options=[{'label': 'Lokal', 'value': 'LOKAL'},
-                                             {'label': 'Regional', 'value': 'REGIONAL'},
-                                             {'label': 'Nasional', 'value': 'NASIONAL'},
-                                             {'label': 'Internasional', 'value': 'INTERNASIONAL'}
-                                             ],
-                                    value='LOKAL',
-                                    style={'color': 'black'},
-                                    clearable=False,
-                                ),
-                            ], width=3),
                             dcc.Graph(id='grf_prestasiakademik'),
-                            dbc.Button('Lihat Tabel',
+                            dbc.Button('Lihat Semua Data',
                                        id='cll_grfprestasiakademik',
                                        n_clicks=0,
                                        style=button_style)
@@ -300,24 +364,48 @@ kegiatanMahasiswa = dbc.Container([
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Prestasi Non Akademik Mahasiswa', value='NonprestasiMhs',
                     children=[
+                        dbc.Row([
+                                dbc.Col([
+                                    html.Br(),
+                                    html.H6('Wilayah :'),
+                                    dcc.Dropdown(
+                                        id='drpdwn_prestasiNonAkademikMahasiswa',
+                                        options=[{'label': 'Lokal', 'value': 'LOKAL'},
+                                                 {'label': 'Regional', 'value': 'REGIONAL'},
+                                                 {'label': 'Nasional', 'value': 'NASIONAL'},
+                                                 {'label': 'Internasional', 'value': 'INTERNASIONAL'}
+                                                 ],
+                                        value='LOKAL',
+                                        style={'color': 'black'},
+                                        clearable=False,
+                                    ),
+                                ]),
+                                dbc.Col([
+                                    html.Br(),
+                                    html.H6('Dari :'),
+                                    dcc.Dropdown(
+                                        id='drpdwn_FromPrestasiNonAkademikMahasiswa',
+                                        options=[{'label': i, 'value': i} for i in listTahunPrestasiNonAkademik],
+                                        value='2012',
+                                        style={'color': 'black'},
+                                        clearable=False,
+                                    ),
+                                ]),
+                                dbc.Col([
+                                    html.Br(),
+                                    html.H6('Sampai :'),
+                                    dcc.Dropdown(
+                                        id='drpdwn_ToPrestasiNonAkademikMahasiswa',
+                                        options=[{'label': i, 'value': i} for i in listTahunPrestasiNonAkademik],
+                                        value='2018',
+                                        style={'color': 'black'},
+                                        clearable=False,
+                                    ),
+                                ]),
+                            ]),
                         dbc.CardLink([
-                            dbc.Col([
-                                html.Br(),
-                                html.H6('Filter Wilayah :'),
-                                dcc.Dropdown(
-                                    id='drpdwn_prestasiNonAkademikMahasiswa',
-                                    options=[{'label': 'Lokal', 'value': 'LOKAL'},
-                                             {'label': 'Regional', 'value': 'REGIONAL'},
-                                             {'label': 'Nasional', 'value': 'NASIONAL'},
-                                             {'label': 'Internasional', 'value': 'INTERNASIONAL'}
-                                             ],
-                                    value='LOKAL',
-                                    style={'color': 'black'},
-                                    clearable=False,
-                                ),
-                            ], width=3),
                             dcc.Graph(id='grf_prestasinonakademik'),
-                            dbc.Button('Lihat Tabel',
+                            dbc.Button('Lihat Semua Data',
                                        id='cll_grfprestasinonakademik',
                                        n_clicks=0,
                                        style=button_style)
@@ -359,9 +447,33 @@ kerjasama = dbc.Container([
         dcc.Tabs([
             dcc.Tab(label='Jumlah Kegiatan Kuliah Umum Yang Mempunya Perjanjian Kerjasama', value='Kulum',
                     children=[
+                        dbc.Row([
+                            dbc.Col([
+                                html.Br(),
+                                html.H6('Dari :'),
+                                dcc.Dropdown(
+                                    id='drpdwn_FromKulumMOU',
+                                    options=[{'label': i, 'value': i} for i in listTahunKulumMOU],
+                                    value='2016',
+                                    style={'color': 'black'},
+                                    clearable=False,
+                                ),
+                            ], ),
+                            dbc.Col([
+                                html.Br(),
+                                html.H6('Sampai :'),
+                                dcc.Dropdown(
+                                    id='drpdwn_ToKulumMOU',
+                                    options=[{'label': i, 'value': i} for i in listTahunKulumMOU],
+                                    value='2019',
+                                    style={'color': 'black'},
+                                    clearable=False,
+                                ),
+                            ], ),
+                        ]),
                         dbc.CardLink([
                             dcc.Graph(id='grf_Kulum'),
-                            dbc.Button('Lihat Tabel',
+                            dbc.Button('Lihat Semua Data',
                                        id='cll_grfKulum',
                                        n_clicks=0,
                                        style=button_style)
@@ -372,9 +484,9 @@ kerjasama = dbc.Container([
                                 dt.DataTable(
                                     id='tbl_kulummou',
                                     columns=[
-                                        {'name': i, 'id': i} for i in dfKulum.columns
+                                        {'name': i, 'id': i} for i in dfTableKulum.columns
                                     ],
-                                    data=dfKulum.to_dict('records'),
+                                    data=dfTableKulum.to_dict('records'),
                                     sort_action='native',
                                     sort_mode='multi',
                                     style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
@@ -395,7 +507,7 @@ kerjasama = dbc.Container([
                     children=[
                         dbc.Col([
                             html.Br(),
-                            html.H6('Filter tahun :'),
+                            html.H6('Tahun :'),
                             dcc.Dropdown(
                                 id='drpdwn_pesertaKulum',
                                 options=[
@@ -408,10 +520,10 @@ kerjasama = dbc.Container([
                                 style={'color': 'black'},
                                 clearable=False,
                             ),
-                        ], width=3),
+                        ]),
                         dbc.CardLink([
                             dcc.Graph(id='grf_pesertaKulum'),
-                            dbc.Button('Lihat Tabel',
+                            dbc.Button('Lihat Semua Data',
                                        id='cll_grfpesertaKulum',
                                        n_clicks=0,
                                        style=button_style)
@@ -532,19 +644,32 @@ inner join dim_date dd on dd.id_date=dk.id_tanggal_mulai
 inner join dim_dosen d on fkd.id_dosen = d.id_dosen
 where tahun = %(tahun)s and d.id_prodi = 9
 group by tahun,nama
-order by `Jumlah Kegiatan` desc
+order by `Jumlah Kegiatan` asc
     ''', {'tahun': waktu})
-    fig = px.bar(df, y=df['Jumlah Kegiatan'], x=df['Nama Dosen'])
-    fig.update_layout(xaxis_tickangle=-45)
+    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Kegiatan'],orientation='h')
+    fig.update_layout()
     return fig
 
 
 @app.callback(
     Output('grf_Kulum', 'figure'),
     Input('grf_Kulum', 'id'),
+    Input('drpdwn_FromKulumMOU', 'value'),
+    Input('drpdwn_ToKulumMOU', 'value')
 )
-def graphKulum(id):
-    df = dfKulum
+def graphKulum(id,valueFrom, valueTo):
+    #df = dfKulum
+    df = data.getDataFrameFromDBwithParams('''
+            select ddselesai.tahun as 'Tahun', count(dim_kegiatan.nama_kegiatan) as 'Jumlah Kuliah Umum'
+        from dim_kegiatan
+            inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
+            inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
+            inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
+    where jenis_kegiatan = 'KULIAH UMUM' and dim_kegiatan.id_perjanjian is not null
+    and ddselesai.tahun between %(From)s and %(To)s
+    group by ddselesai.tahun
+    order by ddselesai.tahun asc
+            ''', {'From': valueFrom, 'To': valueTo})
     fig = px.line(df, x=df['Tahun'], y=df['Jumlah Kuliah Umum'])
     fig.update_traces(mode='lines+markers')
     return fig
@@ -565,15 +690,24 @@ and tahun=%(tahun)s
 group by tahun,dk.id_kegiatan,dk.nama_kegiatan
 order by tahun asc
     ''', {'tahun': waktu})
-    fig = px.bar(df, y=df['Nama Kegiatan'], x=df['jumlah'],orientation='h')
-    return fig
+
+    if (len(df['Nama Kegiatan'])) != 0:
+        fig = px.bar(df, y=df['Nama Kegiatan'], x=df['jumlah'],orientation='h')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_rekognisiDosen', 'figure'),
     Input('grf_rekognisiDosen', 'id'),
-    Input('drpdwn_kegRekoginisiDosen', 'value')
+    Input('drpdwn_kegRekoginisiDosen', 'value'),
+    Input('drpdwn_FromTahunkegRekoginisiDosen', 'value'),
+    Input('drpdwn_ToTahunkegRekoginisiDosen', 'value')
 )
-def graphKegRecognisiDosen(id,wilayahValue):
+def graphKegRecognisiDosen(id,wilayahValue,valueFrom, valueTo):
     #df = dfRekognisiDosenGraf
     df = data.getDataFrameFromDBwithParams('''
         select tahun as 'Tahun',count(judul_rekognisi) as 'Jumlah Rekognisi'
@@ -581,20 +715,28 @@ from fact_rekognisi_dosen frd
 inner join dim_date dd on dd.id_date=frd.id_tanggal_mulai
 inner join dim_dosen d on frd.id_dosen = d.id_dosen
 where d.id_prodi = 9
-  
-  and wilayah = %(wilayah)s
+and wilayah = %(wilayah)s
+and tahun between %(From)s and %(To)s
 group by tahun
-order by tahun desc
-        ''', {'wilayah': wilayahValue})
-    fig = px.bar(df, y=df['Jumlah Rekognisi'], x=df['Tahun'], orientation='v')
-    return fig
-
+order by tahun asc
+        ''', {'wilayah': wilayahValue,'From': valueFrom, 'To': valueTo})
+    print(len(df['Tahun']))
+    if (len(df['Tahun'])) != 0:
+        fig = px.bar(df, y=df['Jumlah Rekognisi'], x=df['Tahun'], orientation='v')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 @app.callback(
     Output('grf_prestasinonakademik', 'figure'),
     Input('grf_prestasinonakademik', 'id'),
-    Input('drpdwn_prestasiNonAkademikMahasiswa', 'value')
+    Input('drpdwn_prestasiNonAkademikMahasiswa', 'value'),
+    Input('drpdwn_FromPrestasiNonAkademikMahasiswa', 'value'),
+    Input('drpdwn_ToPrestasiNonAkademikMahasiswa', 'value')
 )
-def graphPrestasiNonAkademik(id,wilayahValue):
+def graphPrestasiNonAkademik(id,wilayahValue,valueFrom, valueTo):
     #df = dfRekognisiDosenGraf
     df = data.getDataFrameFromDBwithParams('''
         select distinct tahun as 'Tahun', count(fact.wilayah_nama) as 'Jumlah Prestasi Mahasiswa'
@@ -602,19 +744,29 @@ def graphPrestasiNonAkademik(id,wilayahValue):
     inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
     inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
     where sifat_partisipasi = 'PM' and is_akademis = 0 and fact.wilayah_nama = %(wilayah)s
+    and tahun between %(From)s and %(To)s
 group by fact.wilayah_nama,tahun
-order by tahun desc 
-        ''', {'wilayah': wilayahValue})
-    fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v')
-    return fig
+order by tahun asc 
+        ''', {'wilayah': wilayahValue,'From': valueFrom, 'To': valueTo})
+
+    if (len(df['Tahun'])) != 0:
+        fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
+                                 font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                 yshift=10)
+        return fig
 
 
 @app.callback(
     Output('grf_prestasiakademik', 'figure'),
     Input('grf_prestasiakademik', 'id'),
-    Input('drpdwn_prestasiAkademikMahasiswa', 'value')
+    Input('drpdwn_prestasiAkademikMahasiswa', 'value'),
+    Input('drpdwn_FromPrestasiAkademikMahasiswa', 'value'),
+    Input('drpdwn_ToPrestasiAkademikMahasiswa', 'value')
 )
-def graphPrestasiAkademik(id,wilayahValue):
+def graphPrestasiAkademik(id,wilayahValue,valueFrom, valueTo):
     #df = dfRekognisiDosenGraf
     df = data.getDataFrameFromDBwithParams('''
         select distinct tahun as 'Tahun', count(fact.wilayah_nama) as 'Jumlah Prestasi Mahasiswa'
@@ -622,8 +774,15 @@ def graphPrestasiAkademik(id,wilayahValue):
     inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
     inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
     where sifat_partisipasi = 'PM' and is_akademis = 1 and fact.wilayah_nama = %(wilayah)s
+    and tahun between %(From)s and %(To)s
 group by fact.wilayah_nama,tahun
-order by tahun desc
-        ''', {'wilayah': wilayahValue})
-    fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v')
-    return fig
+order by tahun asc
+        ''', {'wilayah': wilayahValue,'From': valueFrom, 'To': valueTo})
+    if (len(df['Tahun'])) != 0:
+        fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig

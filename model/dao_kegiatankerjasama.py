@@ -82,7 +82,7 @@ prestasi as 'Prestasi' from(
     inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
     where sifat_partisipasi = 'PM' and is_akademis = 1
 ) data 
-order by tahun, nama_kegiatan''',con)
+order by tahun desc , nama_kegiatan''',con)
 
 def getPrestasiNonAkademik():
     return pd.read_sql('''select nama_kegiatan as 'Nama Kegiatan', tahun as 'Tahun', 
@@ -97,18 +97,29 @@ prestasi as 'Prestasi' from(
     inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
     where sifat_partisipasi = 'PM' and is_akademis = 0
 ) data 
-order by tahun''', con)
+order by tahun desc''', con)
 
 def getKegKulUmMOU():
     return pd.read_sql('''
     select ddselesai.tahun as 'Tahun', count(dim_kegiatan.nama_kegiatan) as 'Jumlah Kuliah Umum'
-     -- , ddmulai.tanggal as tanggal_mulai, ddselesai.tanggal as tanggal_selesai
         from dim_kegiatan
             inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
             inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
             inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
     where jenis_kegiatan = 'KULIAH UMUM' and dim_kegiatan.id_perjanjian is not null
     group by ddselesai.tahun
+    order by ddselesai.tahun asc
+    ''',con)
+
+def getTableKegKulUmMOU():
+    return pd.read_sql('''
+    select ddselesai.tahun as 'Tahun', dim_kegiatan.nama_kegiatan as 'Kuliah Umum'
+        from dim_kegiatan
+            inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
+            inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
+            inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
+    where jenis_kegiatan = 'KULIAH UMUM' and dim_kegiatan.id_perjanjian is not null
+    group by ddselesai.tahun, nama_kegiatan
     order by ddselesai.tahun desc
     ''',con)
 
@@ -220,4 +231,44 @@ where d.id_prodi = 9
   and wilayah = 4
 group by tahun
 order by tahun asc''', con)
+
+def getListTahunKegRekognisiDosen():
+    return pd.read_sql('''select distinct tahun
+from fact_rekognisi_dosen frd
+inner join dim_date dd on dd.id_date=frd.id_tanggal_mulai
+inner join dim_dosen d on frd.id_dosen = d.id_dosen
+where d.id_prodi = 9''', con)
+
+def getListTahunKegDosen():
+    return pd.read_sql('''select distinct tahun
+from fact_kegiatan_dosen fkd
+inner join dim_kegiatan dk on fkd.id_kegiatan = dk.id_kegiatan
+inner join dim_date dd on dd.id_date=dk.id_tanggal_mulai
+inner join dim_dosen d on fkd.id_dosen = d.id_dosen
+where d.id_prodi = 9''', con)
+
+def getListTahunPrestasiAkademik():
+    return pd.read_sql('''select distinct tahun
+from fact_kegiatan_mahasiswa fact
+inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
+inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
+where sifat_partisipasi = 'PM' and is_akademis = 1''', con)
+
+def getListTahunPrestasiNonAkademik():
+    return pd.read_sql('''select distinct tahun
+from fact_kegiatan_mahasiswa fact
+inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
+inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
+where sifat_partisipasi = 'PM' and is_akademis = 0''', con)
+
+def getListTahunKulumMOU():
+    return pd.read_sql('''select distinct ddselesai.tahun
+        from dim_kegiatan
+            inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
+            inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
+            inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
+    where jenis_kegiatan = 'KULIAH UMUM' and dim_kegiatan.id_perjanjian is not null
+    group by ddselesai.tahun
+    order by ddselesai.tahun asc
+    ''', con)
 

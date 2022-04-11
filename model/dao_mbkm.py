@@ -98,4 +98,5 @@ inner join dim_semester ds on mmm.kode_semester = ds.kode_semester
 inner join dim_matakuliah mm on mmm.kode_matakuliah = mm.kode_matakuliah
 where mmm.mitra not in
           (select distinct mitra from mbkm_matkul_monev
-              where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'));''', con)
+              where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'))
+order by semester ASC''', con)
