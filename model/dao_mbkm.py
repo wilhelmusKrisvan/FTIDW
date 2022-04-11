@@ -35,7 +35,7 @@ def getMahasiswaMBKMperSemester():
     inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
     WHERE ds.tahun_ajaran between '2017/2018' and '2021/2022'
     group by ds.kode_semester, Bentuk , Semester
-    order by ds.kode_semester;''', con)
+    order by ds.kode_semester desc;''', con)
 
 
 def getMitraMBKM():
@@ -65,7 +65,7 @@ def getDosbingMBKMperSemester():
          inner join fact_dosen_mengajar fdm on dm.id_matakuliah = fdm.id_matakuliah
          inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
     group by mbm.kode_semester, Semester
-    order by mbm.kode_semester;''', con)
+    order by mbm.kode_semester desc;''', con)
 
 
 def getRerataSKSMBKMperSemester():
@@ -75,7 +75,7 @@ def getRerataSKSMBKMperSemester():
          inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
          inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
     group by mbm.kode_semester, Semester
-    order by mbm.kode_semester;''', con)
+    order by mbm.kode_semester desc;''', con)
 
 
 def getTableMitraInternal():
