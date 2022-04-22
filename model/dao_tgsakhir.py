@@ -92,13 +92,13 @@ order by  dim_semester.tahun_ajaran desc, dim_semester.semester_nama
 
 def getMahasiswaKPpkm():
     return pd.read_sql('''
-select dim_semester.tahun_ajaran 'Tahun Ajaran', count(*) as 'Jumlah KP'
-from fact_kp 
-inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
-inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
-where fact_kp.is_pen_pkm = 1
-group by dim_semester.tahun_ajaran
-order by dim_semester.tahun_ajaran desc''', con)
+    select dim_semester.tahun_ajaran 'Tahun Ajaran',  dim_semester.semester_nama 'Semester', count(*) as 'Jumlah KP'
+        from fact_kp 
+        inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
+        inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+        where fact_kp.is_pen_pkm = 1
+        group by dim_semester.tahun_ajaran, dim_semester.semester_nama
+        order by dim_semester.tahun_ajaran, dim_semester.semester_nama''', con)
 
 def getMhahasiswaSkripsi():
     return pd.read_sql('''

@@ -123,7 +123,7 @@ button_style = {
     'margin': '-50px 25px 10px 10px',
 }
 
-listDropdownSem = ['Gasal','Genap']
+listDropdownSem = ['GASAL','GENAP']
 
 listDropdownTA = []
 for x in range(0, 5):
@@ -689,7 +689,7 @@ ipk_lulusan = dbc.Container([
 
 juml_lulusan = dbc.Container([
     dbc.Card([
-        html.H5('Grafik Jumlah Lulusan per Tahun Ajaran', style=ttlgrf_style),
+        html.H5('Jumlah Lulusan', style=ttlgrf_style),
         dbc.CardBody([
             html.Div([
                 dbc.Row([
@@ -717,7 +717,7 @@ juml_lulusan = dbc.Container([
             ]),
             html.Div([
                 dcc.Tabs([
-                    dcc.Tab(label='All',value='all',
+                    dcc.Tab(label='Berdasarkan Jumlah Mahasiswa Yudisium',value='all',
                             children=[
                                 dcc.Loading(
                                     id='loading-1',
@@ -745,7 +745,7 @@ juml_lulusan = dbc.Container([
 
 masa_studi = dbc.Container([
     dbc.Card([
-        html.H5('Grafik Masa Studi Lulusan per Tahun Ajaran', style=ttlgrf_style),
+        html.H5('Masa Studi Lulusan', style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
@@ -772,7 +772,7 @@ masa_studi = dbc.Container([
         ]),
         html.Div([
             dcc.Tabs([
-                dcc.Tab(label='All', value='all',
+                dcc.Tab(label='Masa Studi Lulusan per Kategori per Semester', value='all',
                         children=[
                             dcc.Loading(
                                 id='loading-1',
@@ -780,7 +780,7 @@ masa_studi = dbc.Container([
                                 children=dcc.Graph(id='grf_msall')),
                             dbc.Button('Lihat Semua Data', id='cll_grfmasaall', n_clicks=0, style=button_style)
                         ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Rata-rata', value='rerata',
+                dcc.Tab(label='Rata-rata Masa Studi Lulusan per Tahun Ajaran Masuk', value='rerata',
                         children=[
                             dcc.Loading(
                                 id='loading-1',
@@ -802,21 +802,21 @@ mitraKP = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Dari : ', style={'marginBottom': 0}),
+                    html.P('Semester:', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrMitraStart',
-                        options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[0],
+                        id='fltrMitraKPSem',
+                        options=[{'label': i, 'value': i} for i in listDropdownSem],
+                        value=listDropdownSem[0],
                         style={'color': 'black'},
                         clearable=False
                     )
                 ]),
                 dbc.Col([
-                    html.P('Sampai: ', style={'marginBottom': 0}),
+                    html.P('Tahun Ajaran : ', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrMitraEnd',
+                        id='fltrMitraKPTA',
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[3],
+                        value=listDropdownTA[0],
                         style={'color': 'black'},
                         clearable=False
                     )
@@ -875,21 +875,21 @@ mitraSkripsi = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Dari : ', style={'marginBottom': 0}),
+                    html.P('Semester:', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrMitraSStart',
-                        options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[0],
+                        id='fltrMitraSSem',
+                        options=[{'label': i, 'value': i} for i in listDropdownSem],
+                        value=listDropdownSem[0],
                         style={'color': 'black'},
                         clearable=False
                     )
                 ]),
                 dbc.Col([
-                    html.P('Sampai: ', style={'marginBottom': 0}),
+                    html.P('Tahun Ajaran : ', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrMitraSEnd',
+                        id='fltrMitraSTA',
                         options=[{'label': i, 'value': i} for i in listDropdownTA],
-                        value=listDropdownTA[3],
+                        value=listDropdownTA[2],
                         style={'color': 'black'},
                         clearable=False
                     )
@@ -1065,23 +1065,23 @@ def toggle_collapse(nall, npkm, kp, is_open):
 )
 def graphKPProdi(thstart, thend):
     dfAll = data.getDataFrameFromDBwithParams('''
-select dim_semester.tahun_ajaran 'Tahun Ajaran',  dim_semester.semester_nama 'Semester', count(*) as 'Jumlah KP' from fact_kp
-inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
-inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
-where dim_semester.tahun_ajaran between %(start)s and %(end)s
-group by dim_semester.tahun_ajaran, dim_semester.semester_nama
-order by  dim_semester.tahun_ajaran, dim_semester.semester_nama
+    select dim_semester.tahun_ajaran 'Tahun Ajaran',  dim_semester.semester_nama 'Semester', count(*) as 'Jumlah KP' from fact_kp
+    inner join dim_semester on dim_semester.id_semester = fact_kp.id_semester
+    inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+    where dim_semester.tahun_ajaran between %(start)s and %(end)s
+    group by dim_semester.tahun_ajaran, dim_semester.semester_nama
+    order by  dim_semester.tahun_ajaran, dim_semester.semester_nama
     ''', {'start': thstart, 'end': thend})
     figAll = px.bar(dfAll, y=dfAll['Jumlah KP'], x=dfAll['Tahun Ajaran'], color=dfAll['Semester'], barmode='group')
     dfPKM = data.getDataFrameFromDBwithParams('''
-select dim_semester.tahun_ajaran 'Tahun Ajaran', count(*) as 'Jumlah KP'
-from fact_kp 
-inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
-inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
-where fact_kp.is_pen_pkm = 1 and (dim_semester.tahun_ajaran between %(start)s and %(end)s)
-group by dim_semester.tahun_ajaran
-order by dim_semester.tahun_ajaran asc''', {'start': thstart, 'end': thend})
-    figPKM = px.bar(dfPKM, y=dfPKM['Jumlah KP'], x=dfPKM['Tahun Ajaran'])
+    select dim_semester.tahun_ajaran 'Tahun Ajaran',  dim_semester.semester_nama 'Semester', count(*) as 'Jumlah KP'
+    from fact_kp 
+    inner join dim_semester on dim_semester.id_semester= fact_kp.id_semester 
+    inner join dim_mahasiswa on dim_mahasiswa.id_mahasiswa = fact_kp.id_mahasiswa AND dim_mahasiswa.id_prodi = 9
+    where fact_kp.is_pen_pkm = 1 and (dim_semester.tahun_ajaran between %(start)s and %(end)s)
+    group by dim_semester.tahun_ajaran, dim_semester.semester_nama
+    order by dim_semester.tahun_ajaran, dim_semester.semester_nama ''', {'start': thstart, 'end': thend})
+    figPKM = px.bar(dfPKM, y=dfPKM['Jumlah KP'], x=dfPKM['Tahun Ajaran'], color=dfPKM['Semester'], barmode='group')
     return figAll, figPKM
 
 @app.callback(
@@ -1389,28 +1389,28 @@ def toggle_collapse(n, is_open):
 )
 def graphIPKLulusan(thstart, thend):
     dfavg = data.getDataFrameFromDBwithParams('''
-    select avg(ipk) as 'Rata-rata IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+    select avg(ipk) as 'Rata-rata IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran Yudisium'
     from fact_yudisium
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by tahun_ajaran_yudisium
     order by tahun_ajaran_yudisium;''', {'start': thstart, 'end': thend})
     dfmax = data.getDataFrameFromDBwithParams('''
-    select max(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+    select max(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran Yudisium'
     from fact_yudisium
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by tahun_ajaran_yudisium
     order by tahun_ajaran_yudisium;''', {'start': thstart, 'end': thend})
     dfmin = data.getDataFrameFromDBwithParams('''
-    select min(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran'
+    select min(ipk) as 'IPK' ,  tahun_ajaran_yudisium as 'Tahun Ajaran Yudisium'
     from fact_yudisium
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by tahun_ajaran_yudisium
     order by tahun_ajaran_yudisium;''', {'start': thstart, 'end': thend})
-    fig = px.bar(dfavg, y=dfavg['Rata-rata IPK'], x=dfavg['Tahun Ajaran'], color=px.Constant('Rata-rata IPK'),
-                 labels=dict(x="Tahun Ajaran", y="IPK", color="IPK"))
-    fig.add_scatter(y=dfmax['IPK'], x=dfmax['Tahun Ajaran'], name='IPK Tertinggi',
+    fig = px.bar(dfavg, y=dfavg['Rata-rata IPK'], x=dfavg['Tahun Ajaran Yudisium'], color=px.Constant('Rata-rata IPK'),
+                 labels=dict(x="Tahun Ajaran Yudisium", y="IPK", color="IPK"))
+    fig.add_scatter(y=dfmax['IPK'], x=dfmax['Tahun Ajaran Yudisium'], name='IPK Tertinggi',
                     hovertemplate="IPK=Tertinggi <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(y=dfmin['IPK'], x=dfmin['Tahun Ajaran'], name='IPK Terendah',
+    fig.add_scatter(y=dfmin['IPK'], x=dfmin['Tahun Ajaran Yudisium'], name='IPK Terendah',
                     hovertemplate="IPK=Terendah <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
     return fig
 
@@ -1440,8 +1440,8 @@ def toggle_collapse(all, ot, llsn, is_open):
     isiOnTime = dbc.Card(
         dt.DataTable(
             id='tbl_lulusanot',
-            columns=[{"name": i, "id": i} for i in dfjumllulusanot.columns],
-            data=dfjumllulusanot.to_dict('records'),
+            # columns=[{"name": i, "id": i} for i in dfjumllulusanot.columns],
+            # data=dfjumllulusanot.to_dict('records'),
             sort_action='native',
             sort_mode='multi',
             style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
@@ -1465,12 +1465,13 @@ def toggle_collapse(all, ot, llsn, is_open):
 )
 def graphJLulusan(thstart, thend):
     df = data.getDataFrameFromDBwithParams('''
-    select count(*) as 'Jumlah Mahasiswa', tahun_ajaran_yudisium 'Tahun Ajaran'
-    from fact_yudisium
+    select concat(tahun_ajaran_yudisium,' ',semester_yudisium) Semester, count(*) as 'Jumlah Mahasiswa Yudisium'
+    from fact_yudisium fy
+    inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
     where tahun_ajaran_yudisium between %(start)s and %(end)s
-    group by tahun_ajaran_yudisium
-    order by tahun_ajaran_yudisium''', {'start': thstart, 'end': thend})
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=px.Constant('Jumlah Mahasiswa'),
+    group by kode_semester, Semester
+    order by kode_semester desc, Semester''', {'start': thstart, 'end': thend})
+    fig = px.bar(df, y=df['Jumlah Mahasiswa Yudisium'], x=df['Semester'], color=px.Constant('Jumlah Mahasiswa Yudisium'),
                  labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
     return fig
 
@@ -1582,7 +1583,7 @@ def graphMSLulusan(start, end):
     order by `Tahun Masuk` desc
     ''', {'start': start, 'end': end})
     fig = px.bar(df, x=df['Tahun Masuk'], y=df.columns[1:6],
-                 labels=dict(x="TA Yudisium", y="Masa Studi (Bulan)", color="Keterangan"))
+                 labels=dict(x="Tahun Ajaran Masuk", y="Masa Studi (Bulan)", color="Keterangan"))
     return fig
 
 @app.callback(
@@ -1621,28 +1622,28 @@ def toggle_collapse(n, is_open):
 
 @app.callback(
     Output('grf_mitra', 'figure'),
-    Input('fltrMitraStart', 'value'),
-    Input('fltrMitraEnd', 'value'),
+    Input('fltrMitraKPSem', 'value'),
+    Input('fltrMitraKPTA', 'value'),
     Input('radio_mitrakp', 'value')
 )
-def PKMDM(start, end, radiomitrakp):
+def PKMDM(sem, ta, radiomitrakp):
     if radiomitrakp == 'top':
         dfsumkp = data.getDataFrameFromDBwithParams(f'''
         select nama_mitra 'Nama Mitra', count(id_kp) Jumlah
         from fact_kp fk
             inner join dim_semester ds on fk.id_semester = ds.id_semester
             inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-        where tahun_ajaran between %(start)s and %(end)s
+        where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
         group by nama_mitra
         order by Jumlah desc 
         limit 10;
-        ''',{'start':start,'end':end})
+        ''',{'sem':sem,'ta':ta})
         figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
         figkpsummitra.update_xaxes(categoryorder='category descending')
         return figkpsummitra
     elif radiomitrakp == 'jenis':
         dfjeniskp = data.getDataFrameFromDBwithParams(f'''
-        select tahun_ajaran 'Tahun Ajaran',
+        select concat(semester_nama,' ',tahun_ajaran) Semester,
                case
                    when jenis_mitra = 'ORGANISASI' then 'ORGANISASI'
                    when jenis_mitra = 'PEMERINTAH' then 'PEMERINTAH'
@@ -1655,17 +1656,17 @@ def PKMDM(start, end, radiomitrakp):
         from fact_kp fk
             inner join dim_semester ds on fk.id_semester = ds.id_semester
             inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-        where tahun_ajaran between %(start)s and %(end)s
-        group by tahun_ajaran, `Jenis Mitra`
-        order by tahun_ajaran desc, `Jenis Mitra`;
-        ''',{'start':start, 'end':end})
-        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Tahun Ajaran'], y=dfjeniskp['Jumlah KP'], color=dfjeniskp['Jenis Mitra'])
+        where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
+        group by semester_nama, `Jenis Mitra`, Semester
+        order by semester_nama desc, `Jenis Mitra`, Semester;
+        ''',{'sem':sem,'ta':ta})
+        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Semester'], y=dfjeniskp['Jumlah KP'], color=dfjeniskp['Jenis Mitra'])
         figjenis.update_layout(barmode='group', yaxis_title='Jumlah KP', xaxis_title='Tahun, Jenis Mitra',
                                legend_title='Mitra')
         return figjenis
     elif radiomitrakp == 'wilayah':
         dfkpwilayah = data.getDataFrameFromDBwithParams(f'''
-        select tahun_ajaran 'Tahun Ajaran',
+        select concat(semester_nama,' ',tahun_ajaran) Semester,
                case
                    when dm.wilayah = '1' then 'LOKAL'
                    when dm.wilayah = '2' then 'REGIONAL'
@@ -1676,39 +1677,41 @@ def PKMDM(start, end, radiomitrakp):
         from fact_kp fk
             inner join dim_semester ds on fk.id_semester = ds.id_semester
             inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-        where tahun_ajaran between %(start)s and %(end)s
-        group by tahun_ajaran, `Wilayah Mitra`
-        order by tahun_ajaran, `Wilayah Mitra`
-        ''', {'start': start, 'end': end})
-        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Tahun Ajaran'], y=dfkpwilayah['Jumlah KP'], color=dfkpwilayah['Wilayah Mitra'])
-        figwilayah.update_layout(yaxis_title='Jumlah KP', xaxis_title='Tahun, Wilayah Mitra',
+        where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
+        group by kode_semester,`Wilayah Mitra`,Semester
+        order by kode_semester desc,`Wilayah Mitra`,Semester
+        ''', {'sem':sem,'ta':ta})
+        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Semester'], y=dfkpwilayah['Jumlah KP'], color=dfkpwilayah['Wilayah Mitra'])
+        figwilayah.update_layout(yaxis_title='Jumlah KP', xaxis_title='Semester, Wilayah Mitra',
                                legend_title='Mitra')
         return figwilayah
 
 @app.callback(
     Output('grf_mitraS', 'figure'),
-    Input('fltrMitraSStart', 'value'),
-    Input('fltrMitraSEnd', 'value'),
+    Input('fltrMitraSSem', 'value'),
+    Input('fltrMitraSTA', 'value'),
     Input('radio_mitraS', 'value')
 )
-def PKMDM(start, end, radiomitrakp):
+def PKMDM(sem, ta, radiomitrakp):
     if radiomitrakp == 'top':
         dfsumkp = data.getDataFrameFromDBwithParams(f'''
-        select nama_mitra 'Nama Mitra', count(id_kp) Jumlah
-        from fact_kp fk
-            inner join dim_semester ds on fk.id_semester = ds.id_semester
-            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-        where tahun_ajaran between %(start)s and %(end)s
+        select nama_mitra 'Nama Mitra', count(id_skripsi) Jumlah
+        from fact_skripsi fs
+            inner join dim_semester ds on fs.id_semester = ds.id_semester
+            inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
+            inner join br_pp_mitra bpm on bps.id_penelitian_pkm = bpm.id_penelitian_pkm
+            inner join dim_mitra dm on bpm.id_mitra = dm.id_mitra
+        where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
         group by nama_mitra
-        order by Jumlah desc 
+        order by Jumlah desc
         limit 10;
-        ''',{'start':start,'end':end})
+        ''',{'ta':ta,'sem':sem})
         figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
         figkpsummitra.update_xaxes(categoryorder='category descending')
         return figkpsummitra
     elif radiomitrakp == 'jenis':
         dfjeniskp = data.getDataFrameFromDBwithParams(f'''
-        select tahun_ajaran 'Tahun Ajaran',
+        select concat(semester_nama,' ',tahun_ajaran) Semester,
                case
                    when jenis_mitra = 'ORGANISASI' then 'ORGANISASI'
                    when jenis_mitra = 'PEMERINTAH' then 'PEMERINTAH'
@@ -1717,37 +1720,40 @@ def PKMDM(start, end, radiomitrakp):
                    when jenis_mitra = 'PENDIDIKAN' then 'PENDIDIKAN'
                    else 'LAINNYA'
                    end as      'Jenis Mitra',
-               count(id_kp)    'Jumlah Skripsi'
-        from fact_kp fk
-            inner join dim_semester ds on fk.id_semester = ds.id_semester
-            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-        where tahun_ajaran between %(start)s and %(end)s
-        group by tahun_ajaran, `Jenis Mitra`
-        order by tahun_ajaran desc, `Jenis Mitra`;
-        ''',{'start':start, 'end':end})
-        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Tahun Ajaran'], y=dfjeniskp['Jumlah Skripsi'], color=dfjeniskp['Jenis Mitra'])
+               count(id_skripsi)    'Jumlah Skripsi'
+        from fact_skripsi fs
+            inner join dim_semester ds on fs.id_semester = ds.id_semester
+            inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
+            inner join br_pp_mitra bpm on bps.id_penelitian_pkm = bpm.id_penelitian_pkm
+            inner join dim_mitra dm on bpm.id_mitra = dm.id_mitra
+#         where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
+        group by semester_nama, `Jenis Mitra`, Semester
+        order by semester_nama desc, `Jenis Mitra`, Semester;
+        ''',{'ta':ta,'sem':sem})
+        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Semester'], y=dfjeniskp['Jumlah Skripsi'], color=dfjeniskp['Jenis Mitra'])
         figjenis.update_layout(barmode='group', yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Jenis Mitra',
                                legend_title='Mitra')
         return figjenis
     elif radiomitrakp == 'wilayah':
         dfkpwilayah = data.getDataFrameFromDBwithParams(f'''
-        select tahun_ajaran 'Tahun Ajaran',
-               semester_nama 'Semester',
+        select concat(semester_nama,' ',tahun_ajaran) Semester,
                case
                    when dm.wilayah = '1' then 'LOKAL'
                    when dm.wilayah = '2' then 'REGIONAL'
                    when dm.wilayah = '3' then 'NASIONAL'
                    when dm.wilayah = '4' then 'INTERNASIONAL'
                    else 'NONE' end as 'Wilayah Mitra',
-               count(id_kp) 'Jumlah Skripsi'
-        from fact_kp fk
-            inner join dim_semester ds on fk.id_semester = ds.id_semester
-            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
-        where (tahun_ajaran between %(start)s and %(end)s)
-        group by tahun_ajaran, semester_nama, `Wilayah Mitra`
-        order by tahun_ajaran, semester_nama, `Wilayah Mitra`
-        ''', {'start': start, 'end': end})
-        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Tahun Ajaran'], y=dfkpwilayah['Jumlah Skripsi'], color=dfkpwilayah['Semester'])
+               count(id_skripsi) 'Jumlah Skripsi'
+        from fact_skripsi fs
+            inner join dim_semester ds on fs.id_semester = ds.id_semester
+            inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
+            inner join br_pp_mitra bpm on bps.id_penelitian_pkm = bpm.id_penelitian_pkm
+            inner join dim_mitra dm on bpm.id_mitra = dm.id_mitra
+        where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
+        group by semester_nama, `Wilayah Mitra`, Semester
+        order by semester_nama desc, `Wilayah Mitra`, Semester;
+        ''', {'ta':ta,'sem':sem})
+        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Semester'], y=dfkpwilayah['Jumlah Skripsi'], color=dfkpwilayah['Wilayah Mitra'])
         figwilayah.update_layout(yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Wilayah Mitra',
                                legend_title='Mitra')
         return figwilayah
