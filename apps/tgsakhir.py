@@ -27,7 +27,9 @@ dfjumllulusan = data.getJmlLulusan()
 dfjumllulusanot = data.getJumlLulusSkripsiOntime()
 
 dfskripmhs = data.getMhahasiswaSkripsipkm()
+dfskripsi = data.getMhahasiswaSkripsi()
 dfmitra = data.getMitraKP()
+dfmitraSkripsi = data.getMitraSkripsi()
 dfttgumhs = data.getTTGU()
 dfpersen_mhsLulus = data.getMahasiswaLulus()
 dfpersen_mhsLulusAngkt = data.getMahasiswaLulusBandingTotal()
@@ -121,6 +123,8 @@ button_style = {
     'margin': '-50px 25px 10px 10px',
 }
 
+listDropdownSem = ['Gasal','Genap']
+
 listDropdownTA = []
 for x in range(0, 5):
     counter = x + 1
@@ -135,7 +139,7 @@ for x in range(0, 5):
 #------------KP------------
 kp_prodi = dbc.Container([
     dbc.Card([
-        html.H5('KP Prodi Informatika',
+        html.H5('Jumlah Mahasiswa KP/Magang per Semester',
                 style=ttlgrf_style),
         dbc.Row([
             dbc.Col([
@@ -160,7 +164,7 @@ kp_prodi = dbc.Container([
             ])
         ], style={'padding': '15px'}),
         dcc.Tabs([
-            dcc.Tab(label='All', value='all',
+            dcc.Tab(label='Jumlah Seluruh KP Prodi Informatika', value='all',
                     children=[
                         html.Div([
                             dcc.Loading(
@@ -171,7 +175,7 @@ kp_prodi = dbc.Container([
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='PKM Dosen', value='PKMDosen',
+            dcc.Tab(label='Jumlah KP Terlibat PKM Dosen', value='PKMDosen',
                     children=[
                         html.Div([
                             dcc.Loading(
@@ -248,9 +252,66 @@ ttguKP = dbc.Container([
 ], style=cont_style)
 
 #------------SKRIPSI------------
+skripsiall = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah Mahasiswa Skripsi', style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari : ', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrSkripsiStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai : ', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrSkripsiEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        html.Div([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_skripsi')),
+            dbc.Button('Lihat Semua Data', id='cll_grfskripsi', n_clicks=0,
+                        style=button_style)
+        ])
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_skripsi',
+                columns=[{"name": i, "id": i} for i in dfskripsi.columns],
+                data=dfskripsi.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                             'overflowY': 'auto', 'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                export_format='xlsx',
+                page_size=5
+            ), style=cardtbl_style
+        ),
+        id='cll_tblskripsi',
+        is_open=False
+    )
+], style=cont_style)
+
 skripsi = dbc.Container([
     dbc.Card([
-        html.H5('Mahasiswa Skripsi Terlibat PKM', style=ttlgrf_style),
+        html.H5('Jumlah Mahasiswa Skripsi Terlibat PKM Dosen', style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
@@ -304,29 +365,6 @@ skripsi = dbc.Container([
         is_open=False
     )
 ], style=cont_style)
-# skripsii = dbc.Container([
-#     dbc.Row([
-#         dbc.Col(
-#             dbc.Card([
-#                 html.H5('Mahasiswa Skripsi Terlibat PKM',
-#                         style=ttlgrf_style),
-#                 dt.DataTable(
-#                     id='tbl_skripmhs',
-#                     columns=[{"name": i, "id": i} for i in dfskripmhs.columns],
-#                     data=dfskripmhs.to_dict('records'),
-#                     sort_action='native',
-#                     sort_mode='multi',
-#                     style_table={'width': '100%', 'height': '100%', 'padding': '10px',
-#                                  'overflowY': 'auto', 'margin-top': '25px'},
-#                     style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                     style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                     page_size=5
-#                 )
-#             ], style=cardgrf_style
-#             ),
-#         )
-#     ], style={'margin-top': '10px'})
-# ], style=cont_style)
 
 dosbing = dbc.Container([
     dbc.Card([
@@ -336,14 +374,29 @@ dosbing = dbc.Container([
                 dbc.Row(
                     dbc.Col([
                         html.Div([
-                            html.P('Tahun Ajaran :', style={'marginBottom': 0}),
-                            dcc.Dropdown(
-                                id='fltrDosbing',
-                                options=[{'label': i, 'value': i} for i in listDropdownTA],
-                                value=listDropdownTA[0],
-                                style={'color': 'black'},
-                                clearable=False
-                            )
+                            dbc.Row([
+                                dbc.Col([
+                                    html.P('Semester:', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrDosbingS',
+                                        options=[{'label': i, 'value': i} for i in listDropdownSem],
+                                        value=listDropdownSem[0],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ]),
+                                dbc.Col([
+                                    html.P('Tahun Ajaran :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrDosbing',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                                        value=listDropdownTA[0],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ])
+                            ])
+
                         ])
                     ])
                 ),
@@ -579,7 +632,7 @@ persen_mhsLulus = dbc.Container([
 
 ipk_lulusan = dbc.Container([
     dbc.Card([
-        html.H5('8.a. IPK Lulusan',
+        html.H5('IPK Lulusan',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
@@ -743,9 +796,9 @@ masa_studi = dbc.Container([
         is_open=False)
 ], style=cont_style)
 
-mitra = dbc.Container([
+mitraKP = dbc.Container([
     dbc.Card([
-        html.H5('Mitra yang Terlibat KP-Skripsi-Yudisium',style=ttlgrf_style),
+        html.H5('Mitra yang Terlibat KP',style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
@@ -816,6 +869,79 @@ mitra = dbc.Container([
     )
 ], style=cont_style)
 
+mitraSkripsi = dbc.Container([
+    dbc.Card([
+        html.H5('Mitra yang Terlibat Skripsi',style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari : ', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrMitraSStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                        value=listDropdownTA[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai: ', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrMitraSEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                        value=listDropdownTA[3],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                    dcc.RadioItems(
+                        id='radio_mitraS',
+                        options=[{'label': 'Top 10 Mitra (Skripsi Terbanyak)', 'value': 'top'},
+                                 {'label': 'Jenis Mitra', 'value': 'jenis'},
+                                 {'label': 'Wilayah Mitra', 'value': 'wilayah'}
+                                 ],
+                        value='top',
+                        style={'width': '100%', 'padding': '0px', },
+                        className='card-body',
+                        labelStyle={'display': 'block', 'display': 'inline-block',
+                                    'margin-right': '10%', 'margin-top': '5px'}
+                    )
+                ], style={'padding-left': '5%'}),
+            ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_mitraS')),
+            dbc.Button('Lihat Semua Data', id='cll_grfmitraS', n_clicks=0,
+                       style=button_style)
+        ], style={'textAlign': 'center'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                    id='tbl_mitra',
+                    columns=[{"name": i, "id": i} for i in dfmitraSkripsi.columns],
+                    data=dfmitraSkripsi.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+                                 'overflowY': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=5
+                ), style=cardgrf_style
+        ),
+        id='cll_tblmitraS',
+        is_open=False
+    )
+], style=cont_style)
+
 # mitraa = dbc.Container([
 #     dbc.Row([
 #         dbc.Col(
@@ -847,22 +973,24 @@ tgsakhir = dbc.Container([
             dcc.Tab(label='Kerja Praktik', value='kp',
                     children=[
                         kp_prodi,
-                        ttguKP
+                        ttguKP,
+                        mitraKP
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Skripsi', value='skripsi',
                     children=[
+                        skripsiall,
                         skripsi,
-                        dosbing
+                        dosbing,
+                        mitraSkripsi
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Yudisium', value='yudisium',
                     children=[
                         persen_mhsLulus,
-                        ipk_lulusan,
                         juml_lulusan,
-                        masa_studi,
-                        mitra
+                        ipk_lulusan,
+                        masa_studi
                     ],
                     style=tab_style, selected_style=selected_style)
         ], style=tabs_styles, value='kp')
@@ -871,7 +999,7 @@ tgsakhir = dbc.Container([
 
 layout = html.Div([
     html.Div(
-        html.H1('Analisis KP, Skripsi, Yudisium',
+        html.H1('KP, Skripsi, Yudisium',
                 style={'margin-top': '30px', 'textAlign': 'center'}
                 )
     ),
@@ -993,6 +1121,15 @@ def toggle_collapse(n, is_open):
     return is_open
 
 @app.callback(
+    Output("cll_tblskripsi", "is_open"),
+    [Input("cll_grfskripsi", "n_clicks")],
+    [State("cll_tblskripsi", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+@app.callback(
     Output("cll_tblskripsipkm", "is_open"),
     [Input("cll_grfskripsipkm", "n_clicks")],
     [State("cll_tblskripsipkm", "is_open")])
@@ -1000,6 +1137,36 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+@app.callback(
+    Output('grf_skripsi','figure'),
+    Input('fltrSkripsiStart','value'),
+    Input('fltrSkripsiEnd','value')
+)
+def graphSkripsiPKM(start,end):
+    df = data.getDataFrameFromDBwithParams('''
+        select c.Semester, `Mahasiswa Skripsi`, Penelitian
+        from
+        (select concat(semester_nama, ' ', tahun_ajaran) 'Semester', count(distinct fs.id_mahasiswa) as 'Penelitian'
+            from fact_skripsi fs
+            inner join dim_semester ds on fs.id_semester = ds.id_semester
+            inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
+            inner join dim_penelitian_pkm dpp on bps.id_penelitian_pkm = dpp.id_penelitian_pkm
+        where dpp.jenis='PENELITIAN' and tahun_ajaran between %(start)s and %(end)s
+        group by Semester, kode_semester
+        order by kode_semester desc, Semester) b,
+        (select concat(semester_nama, ' ', tahun_ajaran) 'Semester', count(distinct fs.id_mahasiswa) as 'Mahasiswa Skripsi'
+        from fact_skripsi fs
+            inner join dim_semester ds on fs.id_semester = ds.id_semester
+        where tahun_ajaran between %(start)s and %(end)s
+        group by Semester, kode_semester
+        order by kode_semester asc, Semester) c
+        where b.Semester=c.Semester
+        ''', {'start': start, 'end': end})
+    fig = px.bar(df, y=df['Mahasiswa Skripsi'], x=df['Semester'])
+    fig.add_scatter(y=df['Penelitian'], x=df['Semester'], name='Penelitian',
+                    hovertemplate="Penelitian <br>Jumlah Mahasiswa=%{y} </br> Semester= %{x}")
+    return fig
 
 @app.callback(
     Output('grf_skripsipkm','figure'),
@@ -1022,16 +1189,18 @@ def graphSkripsiPKM(start,end):
 @app.callback(
     Output('grf_dosbing', 'figure'),
     Input('fltrDosbing', 'value'),
+    Input('fltrDosbingS', 'value'),
 )
-def graphDosbing(value):
-    df = data.getDataFrameFromDBwithParams('''select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',count(id_mahasiswa) 'Jumlah Mahasiswa', nama 'Nama Dosen' 
+def graphDosbing(value, valueS):
+    df = data.getDataFrameFromDBwithParams('''
+    select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',count(id_mahasiswa) 'Jumlah Mahasiswa', nama 'Nama Dosen' 
     from fact_skripsi fs
-inner join dim_dosen dd on fs.id_dosen_pembimbing1=dd.id_dosen
-inner join dim_semester ds on fs.id_semester = ds.id_semester
-where tahun_ajaran=%(tahun_ajaran)s
-group by tahun_ajaran,semester_nama,nama
-order by tahun_ajaran desc, semester_nama asc''', {'tahun_ajaran': value})
-    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Mahasiswa'], color=df['Semester'], barmode='group')
+    inner join dim_dosen dd on fs.id_dosen_pembimbing1=dd.id_dosen
+    inner join dim_semester ds on fs.id_semester = ds.id_semester
+    where tahun_ajaran=%(tahun_ajaran)s and semester_nama=%(semester_nama)s
+    group by tahun_ajaran,semester_nama,nama
+    order by `Jumlah Mahasiswa` asc''', {'tahun_ajaran': value, 'semester_nama':valueS})
+    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Mahasiswa'])
     return fig
 
 #------------YUDISIUM------------
@@ -1442,6 +1611,15 @@ def toggle_collapse(n, is_open):
     return is_open
 
 @app.callback(
+    Output("cll_tblmitraS", "is_open"),
+    [Input("cll_grfmitraS", "n_clicks")],
+    [State("cll_tblmitraS", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+@app.callback(
     Output('grf_mitra', 'figure'),
     Input('fltrMitraStart', 'value'),
     Input('fltrMitraEnd', 'value'),
@@ -1456,10 +1634,11 @@ def PKMDM(start, end, radiomitrakp):
             inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
         where tahun_ajaran between %(start)s and %(end)s
         group by nama_mitra
-        order by Jumlah desc
+        order by Jumlah desc 
         limit 10;
         ''',{'start':start,'end':end})
         figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
+        figkpsummitra.update_xaxes(categoryorder='category descending')
         return figkpsummitra
     elif radiomitrakp == 'jenis':
         dfjeniskp = data.getDataFrameFromDBwithParams(f'''
@@ -1502,6 +1681,73 @@ def PKMDM(start, end, radiomitrakp):
         order by tahun_ajaran, `Wilayah Mitra`
         ''', {'start': start, 'end': end})
         figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Tahun Ajaran'], y=dfkpwilayah['Jumlah KP'], color=dfkpwilayah['Wilayah Mitra'])
-        figwilayah.update_layout(barmode='group', yaxis_title='Jumlah KP', xaxis_title='Tahun, Wilayah Mitra',
+        figwilayah.update_layout(yaxis_title='Jumlah KP', xaxis_title='Tahun, Wilayah Mitra',
+                               legend_title='Mitra')
+        return figwilayah
+
+@app.callback(
+    Output('grf_mitraS', 'figure'),
+    Input('fltrMitraSStart', 'value'),
+    Input('fltrMitraSEnd', 'value'),
+    Input('radio_mitraS', 'value')
+)
+def PKMDM(start, end, radiomitrakp):
+    if radiomitrakp == 'top':
+        dfsumkp = data.getDataFrameFromDBwithParams(f'''
+        select nama_mitra 'Nama Mitra', count(id_kp) Jumlah
+        from fact_kp fk
+            inner join dim_semester ds on fk.id_semester = ds.id_semester
+            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+        where tahun_ajaran between %(start)s and %(end)s
+        group by nama_mitra
+        order by Jumlah desc 
+        limit 10;
+        ''',{'start':start,'end':end})
+        figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
+        figkpsummitra.update_xaxes(categoryorder='category descending')
+        return figkpsummitra
+    elif radiomitrakp == 'jenis':
+        dfjeniskp = data.getDataFrameFromDBwithParams(f'''
+        select tahun_ajaran 'Tahun Ajaran',
+               case
+                   when jenis_mitra = 'ORGANISASI' then 'ORGANISASI'
+                   when jenis_mitra = 'PEMERINTAH' then 'PEMERINTAH'
+                   when jenis_mitra = 'BISNIS' then 'BISNIS'
+                   when jenis_mitra = 'GEREJA' then 'GEREJA'
+                   when jenis_mitra = 'PENDIDIKAN' then 'PENDIDIKAN'
+                   else 'LAINNYA'
+                   end as      'Jenis Mitra',
+               count(id_kp)    'Jumlah Skripsi'
+        from fact_kp fk
+            inner join dim_semester ds on fk.id_semester = ds.id_semester
+            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+        where tahun_ajaran between %(start)s and %(end)s
+        group by tahun_ajaran, `Jenis Mitra`
+        order by tahun_ajaran desc, `Jenis Mitra`;
+        ''',{'start':start, 'end':end})
+        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Tahun Ajaran'], y=dfjeniskp['Jumlah Skripsi'], color=dfjeniskp['Jenis Mitra'])
+        figjenis.update_layout(barmode='group', yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Jenis Mitra',
+                               legend_title='Mitra')
+        return figjenis
+    elif radiomitrakp == 'wilayah':
+        dfkpwilayah = data.getDataFrameFromDBwithParams(f'''
+        select tahun_ajaran 'Tahun Ajaran',
+               semester_nama 'Semester',
+               case
+                   when dm.wilayah = '1' then 'LOKAL'
+                   when dm.wilayah = '2' then 'REGIONAL'
+                   when dm.wilayah = '3' then 'NASIONAL'
+                   when dm.wilayah = '4' then 'INTERNASIONAL'
+                   else 'NONE' end as 'Wilayah Mitra',
+               count(id_kp) 'Jumlah Skripsi'
+        from fact_kp fk
+            inner join dim_semester ds on fk.id_semester = ds.id_semester
+            inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+        where (tahun_ajaran between %(start)s and %(end)s)
+        group by tahun_ajaran, semester_nama, `Wilayah Mitra`
+        order by tahun_ajaran, semester_nama, `Wilayah Mitra`
+        ''', {'start': start, 'end': end})
+        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Tahun Ajaran'], y=dfkpwilayah['Jumlah Skripsi'], color=dfkpwilayah['Semester'])
+        figwilayah.update_layout(yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Wilayah Mitra',
                                legend_title='Mitra')
         return figwilayah

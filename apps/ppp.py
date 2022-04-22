@@ -835,11 +835,28 @@ rerata = dbc.Container([
     )
 ], style=cont_style)
 
+ppkm = dbc.Container([
+    html.Div([
+        dcc.Tabs([
+            dcc.Tab(label='Penelitian', value='kp',
+                    children=[
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='PKM', value='skripsi',
+                    children=[
+                    ],
+                    style=tab_style, selected_style=selected_style)
+        ], style=tabs_styles, value='kp')
+    ])
+])
+
 layout = html.Div([
-    html.Div(html.H1('Analisis Penelitian, Pengabdian, Publikasi, dan Luaran',
+    html.Div(html.H1('Penelitian, Pengabdian, Publikasi, dan Luaran',
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
+    html.Div([]),
+    html.Div([ppkm]),
     html.Div([pppDs]),
     html.Div([pppMhs]),
     html.Div([kerjasamaPPP]),

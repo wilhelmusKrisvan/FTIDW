@@ -330,7 +330,7 @@ def getGajiLulusan():
 inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
 where waktu_tunggu like 'KURANG 6 BULAN'
 group by tahun_lulus
-order by tahun_lulus''',con)
+order by tahun_lulus desc''',con)
 
 def getWirausaha():
     return pd.read_sql('''

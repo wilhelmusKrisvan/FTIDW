@@ -100,13 +100,33 @@ where fact_kp.is_pen_pkm = 1
 group by dim_semester.tahun_ajaran
 order by dim_semester.tahun_ajaran desc''', con)
 
+def getMhahasiswaSkripsi():
+    return pd.read_sql('''
+    select c.Semester, `Mahasiswa Skripsi`, Penelitian
+    from
+    (select concat(semester_nama, ' ', tahun_ajaran) 'Semester', count(distinct fs.id_mahasiswa) as 'Penelitian'
+        from fact_skripsi fs
+        inner join dim_semester ds on fs.id_semester = ds.id_semester
+        inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
+        inner join dim_penelitian_pkm dpp on bps.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where dpp.jenis='PENELITIAN'
+    group by Semester, kode_semester
+    order by kode_semester desc, Semester) b,
+    (select concat(semester_nama, ' ', tahun_ajaran) 'Semester', count(distinct fs.id_mahasiswa) as 'Mahasiswa Skripsi'
+    from fact_skripsi fs
+        inner join dim_semester ds on fs.id_semester = ds.id_semester
+    group by Semester, kode_semester
+    order by kode_semester desc, Semester) c
+    where b.Semester=c.Semester''',con)
+
 def getMhahasiswaSkripsipkm():
-    return pd.read_sql('''select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', count(distinct fs.id_mahasiswa) as 'Jumlah Mahasiswa'
-from fact_skripsi fs
-inner join dim_semester ds on fs.id_semester = ds.id_semester
-inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
-group by semester_nama, tahun_ajaran
-order by tahun_ajaran desc,semester_nama asc''',con)
+    return pd.read_sql('''
+    select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', count(distinct fs.id_mahasiswa) as 'Jumlah Mahasiswa'
+    from fact_skripsi fs
+    inner join dim_semester ds on fs.id_semester = ds.id_semester
+    inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
+    group by semester_nama, tahun_ajaran
+    order by tahun_ajaran desc,semester_nama asc''',con)
 
 def getMitraKP():
     return pd.read_sql('''
@@ -116,6 +136,16 @@ def getMitraKP():
     inner join dim_semester ds on fk.id_semester = ds.id_semester
     group by  semester_nama, tahun_ajaran, wilayah
     order by tahun_ajaran desc, semester_nama asc''',con)
+
+def getMitraSkripsi():
+    return pd.read_sql('''
+    select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', wilayah 'Tingkat Wilayah', count(distinct fk.id_mitra) as 'Jumlah Mitra'
+    from fact_kp fk
+    inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
+    inner join dim_semester ds on fk.id_semester = ds.id_semester
+    group by  semester_nama, tahun_ajaran, wilayah
+    order by tahun_ajaran desc, semester_nama asc''',con)
+
 
 def getTTGU():
     return pd.read_sql('''select semester_nama Semester, tahun_ajaran 'Tahun Ajaran', count(distinct id_mahasiswa) as 'Jumlah Mahasiswa'
