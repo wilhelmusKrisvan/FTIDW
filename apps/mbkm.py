@@ -270,7 +270,7 @@ dftrmitraMBKM = html.Div([
 # +grafcollapse
 dftrmitraMBKMInternal = dbc.Container([
     dbc.Card([
-        html.H5('Top 5 Mitra Internal',
+        html.H5('5 Mitra Internal Terbanyak',
                 style=ttlgrf_style),
         dbc.Row([
             dbc.Col([
@@ -344,7 +344,7 @@ dftrmitraMBKMInternal = dbc.Container([
 # +grafcollapse
 dftrmitraMBKMEksternal = dbc.Container([
     dbc.Card([
-        html.H5('Top 5 Mitra Eksternal',
+        html.H5('5 Mitra Eksternal Terbanyak',
                 style=ttlgrf_style),
         dbc.Row([
             dbc.Col([
@@ -560,7 +560,7 @@ dosbingMBKM = dbc.Container([
 # +grafcollapse
 mahasiswaMBKM = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Mahasiswa MBKM',
+        html.H5('Jumlah Mahasiswa MBKM per Kegiatan',
                 style=ttlgrf_style),
         html.Br(),
         dbc.Row([
@@ -708,7 +708,7 @@ reratasksMBKM = dbc.Container([
 # layout
 mbkm = dbc.Container([
     html.Div([
-        html.H1('Analisis MBKM',
+        html.H1('MBKM',
                 style=ttlgrf_style),
         dcc.Tabs([
             dcc.Tab(label='Mahasiswa', value='mahasiswa',
@@ -827,18 +827,18 @@ def grafMahasiswaMBKM(valueFrom, valueTo):
             when kode_bkp = 'AM' then 'Asisten Mengajar'
             when kode_bkp = 'AK' then 'Ambil Kredit Unit'
             else kode_bkp
-    end) as Bentuk,
+    end) as 'Bentuk Kegiatan',
        count(distinct id_mahasiswa) Jumlah
     from mbkm_matkul_monev
     inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
     where ds.tahun_ajaran between 
     %(From)s and %(To)s
-    group by ds.kode_semester, Bentuk , Semester
+    group by ds.kode_semester, `Bentuk Kegiatan` , Semester
     order by ds.kode_semester
     ''', {'From': valueFrom, 'To': valueTo})
 
     if (len(df['Semester'])) != 0:
-        fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk'])
+        fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk Kegiatan'])
         fig.update_layout(barmode='group')
         return fig
     else:
@@ -857,7 +857,7 @@ def grafMahasiswaMBKM(valueFrom, valueTo):
 def grafRerataKonversiSKS(valueFrom, valueTo):
     # df=dfreratasksmbkm
     df = data.getDataFrameFromDBwithParams('''
-    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, count(sks) 'Jumlah SKS'
+    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, AVG((sks)) 'Rata-rata SKS'
     from mbkm_matkul_monev mbm
          inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
          inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
@@ -865,7 +865,7 @@ def grafRerataKonversiSKS(valueFrom, valueTo):
     %(From)s and %(To)s
     group by mbm.kode_semester, Semester
     order by mbm.kode_semester;''', {'From': valueFrom, 'To': valueTo})
-    fig = px.line(df, x=df['Semester'], y=df['Jumlah SKS'])
+    fig = px.line(df, x=df['Semester'], y=df['Rata-rata SKS'])
     return fig
 
 
