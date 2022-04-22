@@ -96,6 +96,16 @@ menu = dbc.CardGroup([
     dbc.Row([
         dbc.Card(
             dbc.CardLink([
+                html.H5('Dosen',
+                        style=title_style),
+                html.P('Profil Dosen Fakultas Teknologi Informasi',
+                       style=desc_style)
+            ], href='/dashboard/profil-dosen')
+            , outline=True
+            , id='card_menu'
+        ),
+        dbc.Card(
+            dbc.CardLink([
                 html.H5('PMB', className='card-title',
                         style=title_style),
                 html.P('Penerimaan Mahasiswa Baru, Daya Tampung, Mahasiswa Aktif',
@@ -106,7 +116,7 @@ menu = dbc.CardGroup([
         ),
         dbc.Card(
             dbc.CardLink([
-                html.H5('Registrasi KBM',
+                html.H5('KBM',
                         style=title_style),
                 html.P('Registrasi Mahasiswa, Dosen Mengajar',
                        style=desc_style)
@@ -123,22 +133,22 @@ menu = dbc.CardGroup([
             ], href='/dashboard/mbkm')
             , outline=True
             , id='card_menu'
-        ),
+        )
+    ]),
+    dbc.Row([
         dbc.Card(
             dbc.CardLink([
-                html.H5('KP, Skripsi, Yudisium',
+                html.H5('KP',
                         style=title_style),
                 html.P('KP Penelitian Pengabdian, Masa Studi, Jumlah Kelulusan',
                        style=desc_style)
             ], href='/dashboard/kp-skripsi-yudisium')
             , outline=True
             , id='card_menu'
-        )
-    ]),
-    dbc.Row([
+        ),
         dbc.Card(
             dbc.CardLink([
-                html.H5('Kegiatan Kerjasama',
+                html.H5('Kegiatan',
                         style=title_style),
                 html.P('Kegiatan (Mahasiswa & Dosen), Kerjasama, IPK Dosen',
                        style=desc_style)
@@ -148,21 +158,11 @@ menu = dbc.CardGroup([
         ),
         dbc.Card(
             dbc.CardLink([
-                html.H5('PPP & Luaran',
+                html.H5('PPP',
                         style=title_style),
                 html.P('Penelitian, Pengabdian kepada Masyarakat, Publikasi dan Luaran',
                        style=desc_style)
             ], href='/dashboard/ppp')
-            , outline=True
-            , id='card_menu'
-        ),
-        dbc.Card(
-            dbc.CardLink([
-                html.H5('Dosen',
-                        style=title_style),
-                html.P('Profil Dosen Fakultas Teknologi Informasi',
-                       style=desc_style)
-            ], href='/dashboard/profil-dosen')
             , outline=True
             , id='card_menu'
         ),

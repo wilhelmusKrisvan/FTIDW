@@ -2,6 +2,7 @@ import dash
 import pandas as pd
 import dash_table as dt
 import plotly.express as px
+import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from apps import pmb, kbm, kegiatan_kerjasama, tgsakhir, alumni, ppp
 from dash.dependencies import Input, Output, State
@@ -10,10 +11,8 @@ from appConfig import app, server
 from dash import html, dcc
 import model.dao_dosen as data
 
-con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
-
 dfpersendosens3 = data.getDosenS3()
-dfjabfung = data.getJabfungperTahun()
+
 dfpersenjabfungAkumulasi = data.getPersenJabfungAkumulasiperTahun()
 dfpersenjabfung = data.getPersenJabfungperTahun()
 dfdosentetapinf = data.getDosenTetapINF()
@@ -141,7 +140,7 @@ dosens3 = dbc.Container([
 
 jumljabfungDosen = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Jabfung Dosen per Tahun',
+        html.H5('Perbandingan Dosen Jabatan Fungsi dengan Dosen Non Jabatan Fungsi per Tahun',
                 style=ttlgrf_style),
         dbc.CardBody([
             dcc.Loading([
@@ -157,8 +156,8 @@ jumljabfungDosen = dbc.Container([
         dbc.Card(
             dt.DataTable(
                 id='tbl_jabfungth',
-                columns=[{"name": i, "id": i} for i in dfjabfung.columns],
-                data=dfjabfung.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in dfpersenjabfungAkumulasi.columns],
+                data=dfpersenjabfungAkumulasi.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
                 style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
@@ -175,7 +174,7 @@ jumljabfungDosen = dbc.Container([
 
 persenjabfungthDosen = dbc.Container([
     dbc.Card([
-        html.H5('Persentase Jabfung Dosen per Tahun',
+        html.H5('Jumlah Jabatan Fungsi Dosen per Tahun',
                 style=ttlgrf_style),
         dbc.CardBody([
             dcc.Loading([
@@ -218,17 +217,19 @@ dosenINF = dbc.Container([
                             dcc.Loading([
                                 dcc.Graph(id='grf_DosenTetapInfInduk'),
                             ], type='default'),
-                            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfInduk', n_clicks=0, style=button_style),
+                            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfInduk', n_clicks=0,
+                                       style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Dosen Informatika Bersertif', value='DosenTetapInfSertif',
+            dcc.Tab(label='Dosen Informatika Bersertifikat', value='DosenTetapInfSertif',
                     children=[
                         dbc.CardBody([
                             dcc.Loading([
                                 dcc.Graph(id='grf_DosenTetapInfSertif'),
                             ], type='default'),
-                            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfSertif', n_clicks=0, style=button_style),
+                            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfSertif', n_clicks=0,
+                                       style=button_style),
                         ])
                     ],
                     style=tab_style, selected_style=selected_style)
@@ -240,79 +241,50 @@ dosenINF = dbc.Container([
     )
 ], style=cont_style)
 
-# dosentetapinf = html.Div([
-#     dbc.Row([
-#         dbc.Col([
-#             html.H5('Daftar Dosen Tetap Informatika', style=ttlgrf_style),
-#             dbc.Card([
-#                 dt.DataTable(
-#                     id='tbl_dosentetapinf',
-#                     columns=[
-#                         {'name': i, 'id': i} for i in dfdosentetapinf.columns
-#                     ],
-#                     data=dfdosentetapinf.to_dict('records'),
-#                     sort_action='native',
-#                     sort_mode='multi',
-#                     style_table={'padding': '10px', 'overflowX': 'auto'},
-#                     style_header={'textAlign': 'center'},
-#                     style_data={'font-size': '80%', 'textAlign': 'center'},
-#                     style_cell={'width': 95},
-#                     page_size=10,
-#                     export_format='xlsx'
-#                 )
-#             ], style=cardtbl_style)
-#         ], width=12),
-#     ])
-# ], style={'margin-top': '50px', 'width': '100%'})
-
-dosentetapindustri = html.Div([
-    dbc.Row([
-        dbc.Col([
-            html.H5('Daftar Dosen Industri Praktisi', style=ttlgrf_style),
+dosentetapindustri = dbc.Container([
+    dbc.Card([
+        html.H5('Daftar Dosen Industri Praktisi',
+                style=ttlgrf_style),
             dbc.Card([
                 dt.DataTable(
                     id='tbl_dosenindustriinf',
-                    columns=[
-                        {'name': i, 'id': i} for i in dfdosenindustri.columns
-                    ],
+                    columns=[{"name": i, "id": i} for i in dfdosenindustri.columns],
                     data=dfdosenindustri.to_dict('records'),
                     sort_action='native',
                     sort_mode='multi',
-                    style_table={'padding': '10px', 'overflowX': 'auto'},
-                    style_header={'textAlign': 'center'},
-                    style_data={'font-size': '80%', 'textAlign': 'center'},
-                    style_cell={'width': 95},
+                    style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
                     page_size=10,
                     export_format='xlsx'
-                )
-            ], style=cardtbl_style)
-        ], width=12),
-    ])
-], style={'margin-top': '50px', 'width': '100%'})
-
-dosen = dbc.Container([
-    html.Div([
-        dcc.Tabs([
-            dcc.Tab(label='Pendidikan', value='pendidikan',
-                    children=[
-                        dosens3
-                    ],
-                    style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Jabatan Fungsi', value='jabfung',
-                    children=[
-                        jumljabfungDosen,
-                        persenjabfungthDosen
-                    ],
-                    style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Status', value='status',
-                    children=[
-                        dosenINF,
-                        dosentetapindustri
-                    ],
-                    style=tab_style, selected_style=selected_style)
-        ], style=tabs_styles, value='pendidikan')
-    ])
+                ),
+            ], style=cardtbl_style),
+    ], style=cardgrf_style),
 ], style=cont_style)
+
+# dosen = dbc.Container([
+#     html.Div([
+#         dcc.Tabs([
+#             dcc.Tab(label='Pendidikan', value='pendidikan',
+#                     children=[
+#                         dosens3
+#                     ],
+#                     style=tab_style, selected_style=selected_style),
+#             dcc.Tab(label='Jabatan Fungsi', value='jabfung',
+#                     children=[
+#                         jumljabfungDosen,
+#                         persenjabfungthDosen
+#                     ],
+#                     style=tab_style, selected_style=selected_style),
+#             dcc.Tab(label='Status', value='status',
+#                     children=[
+#                         dosenINF,
+#                         dosentetapindustri
+#                     ],
+#                     style=tab_style, selected_style=selected_style)
+#         ], style=tabs_styles, value='pendidikan')
+#     ])
+# ], style=cont_style)
 
 layout = html.Div([
     html.Div(html.H1('Analisis Profil Dosen Prodi Informatika',
@@ -320,9 +292,11 @@ layout = html.Div([
                      )
              ),
     html.A(className='name'),
-    html.Div([
-        dosen
-    ], style={'margin-bottom': '50px'}),
+    html.Div([dosenINF]),
+    html.Div([dosentetapindustri]),
+    html.Div([jumljabfungDosen]),
+    html.Div([persenjabfungthDosen]),
+    html.Div([dosens3], style={'margin-bottom': '50px'}),
     dbc.Container([
         dcc.Link([
             dbc.Button('^', style=buttonLink_style),
@@ -429,10 +403,11 @@ def grafDosenS3(id):
 def grafJumlJabfungth(id):
     df = dfpersenjabfungAkumulasi
     if (len(df['Tahun']) != 0):
-        fig = px.line(df, x=df['Tahun'], y=df['persentase'], labels=dict(x='Tahun', y='Jumlah Dosen'))
-        fig.update_traces(mode='lines+markers')
-        # fig.add_bar(x=df['Tahun'], y=df['Total Dosen'],
-        #             hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
+        fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Jabatan'],color=px.Constant('Jabatan'),
+                     labels=dict(x='Tahun', y='Jumlah Dosen',color='Jenis Jabatan'))
+        # fig.update_traces(mode='lines+markers')
+        fig.add_bar(x=df['Tahun'], y=df['Jumlah Non Jabatan'],name='Non Jabatan',
+                    hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -449,9 +424,9 @@ def grafJumlJabfungth(id):
 def grafPersenJabfungth(id):
     df = dfpersenjabfung
     if (len(df['Tahun']) != 0):
-        fig = px.line(df, x=df['Tahun'], y=df['persentase'], color='Jabatan')
-        fig.update_traces(mode='lines+markers')
+        fig = px.bar(df, x=df['Tahun'], y=df['persentase'], color='Jabatan Fungsi', barmode='stack')
         fig.update_xaxes(categoryorder='category ascending')
+        fig.update_layout(yaxis_title="Persentase (%)")
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -487,18 +462,18 @@ def graphDosenInfInduk(id):
 )
 def graphDosenInfSertif(id):
     df = data.getDataFrameFromDB('''
-    select count(no_sertifikat) Jumlah, 'Sertif' as 'Tipe Sertif'
+    select count(no_sertifikat) Jumlah, 'Sertifikat' as 'Tipe Sertifikat'
     from dim_dosen
     where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
     and no_sertifikat is not null
     union all 
-    select sum(if(no_sertifikat is null,1,0)) Jumlah, 'Non Sertif' as 'Tipe Sertif'
+    select sum(if(no_sertifikat is null,1,0)) Jumlah, 'Non Sertifikat' as 'Tipe Sertifikat'
     from dim_dosen
     where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
     and no_sertifikat is null
     ''')
     if (len(df['Jumlah']) != 0):
-        fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Sertif'], color=df['Tipe Sertif'])
+        fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Sertifikat'], color=df['Tipe Sertifikat'])
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",

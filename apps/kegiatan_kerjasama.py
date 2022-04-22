@@ -15,6 +15,7 @@ con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawareh
 # Kegiatan Dosen
 dfrekognisiDosen = data.getPrestasiRekognisiDosen()
 dfkegiatandosen = data.getKegiatanDosen()
+dfKegiatanKerjasama = data.getKegiatanKerjasama()
 # Prestasi Mahasiswa
 dfprestasiakademik = data.getPrestasiAkademik()
 dfprestasinonakademik = data.getPrestasiNonAkademik()
@@ -39,6 +40,9 @@ listTahunPrestasiNonAkademik = dfTahunPrestasiNonAkademik['tahun']
 
 dfTahunKulumMOU = data.getListTahunKulumMOU()
 listTahunKulumMOU = dfTahunKulumMOU['tahun']
+
+dfTahunTipeKegiatan = data.getListTahunTipeKegiatan()
+listTahunTipeKegiatan = dfTahunTipeKegiatan['Tahun']
 
 # dfkerjasama = data.getKerjasama()
 # dfkerjasamakegiatan = data.getKerjasamaKegiatan()
@@ -137,8 +141,6 @@ button_style = {
 
 kegiatan_dosen = dbc.Container([
     dbc.Card([
-        html.H5('DOSEN',
-                style=ttlgrf_style),
         dcc.Tabs([
             dcc.Tab(label='Kegiatan Rekognisi Dosen', value='rekognisiDosen',
                     children=[
@@ -285,8 +287,6 @@ kegiatan_dosen = dbc.Container([
 
 kegiatanMahasiswa = dbc.Container([
     dbc.Card([
-        html.H5('PRESTASI MAHASISWA',
-                style=ttlgrf_style),
         dcc.Tabs([
             dcc.Tab(label='Prestasi Akademik Mahasiswa', value='prestasiMhs',
                     children=[
@@ -442,10 +442,67 @@ kegiatanMahasiswa = dbc.Container([
 
 kerjasama = dbc.Container([
     dbc.Card([
-        html.H5('KEGIATAN KULIAH UMUM',
+        html.H5('Jumlah Kegiatan Berdasarkan Tipe Kerjasama',
                 style=ttlgrf_style),
+        html.Br(),
+        dbc.Row([
+            dbc.Col([
+                html.Br(),
+                html.H6('Dari :'),
+                dcc.Dropdown(
+                    id='drpdwn_FromTipeKegiatan',
+                    options=[{'label': i, 'value': i} for i in listTahunTipeKegiatan],
+                    value='2015',
+                    style={'color': 'black'},
+                    clearable=False,
+                ),
+            ], ),
+            dbc.Col([
+                html.Br(),
+                html.H6('Sampai :'),
+                dcc.Dropdown(
+                    id='drpdwn_ToTipeKegiatan',
+                    options=[{'label': i, 'value': i} for i in listTahunTipeKegiatan],
+                    value='2023',
+                    style={'color': 'black'},
+                    clearable=False,
+                ),
+            ], ),
+        ]),
+        dbc.CardLink([
+            dcc.Graph(id='grf_tipeKerjasama'),
+            dbc.Button('Lihat Semua Data',
+                       id='cll_grfKegiatanKerjasama',
+                       n_clicks=0,
+                       style=button_style)
+        ], id='cll_grfKegiatanKerjasama', n_clicks=0),
+        dbc.Collapse(
+            dbc.Card(
+                dt.DataTable(
+                    id='tbl_kegiatanKerjasama',
+                    columns=[
+                        {'name': i, 'id': i} for i in dfKegiatanKerjasama.columns
+                    ],
+                    data=dfKegiatanKerjasama.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                                 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_cell={'width': 95},
+                    page_size=10,
+                    export_format='xlsx'
+                ), style=cardtbl_style
+            ),
+            id='cll_tblKegiatanKerjasama',
+            is_open=False
+        )
+    ], style=cardgrf_style),
+    html.Br(),
+    dbc.Card([
         dcc.Tabs([
-            dcc.Tab(label='Jumlah Kegiatan Kuliah Umum Yang Mempunya Perjanjian Kerjasama', value='Kulum',
+            dcc.Tab(label='Jumlah Kegiatan Yang Mempunyai MoU', value='Kulum',
                     children=[
                         dbc.Row([
                             dbc.Col([
@@ -503,7 +560,7 @@ kerjasama = dbc.Container([
                         )
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Jumlah Peserta Kegiatan Kuliah Umum', value='pesertaKulum',
+            dcc.Tab(label='Jumlah Peserta Kegiatan Yang Mempunyai MoU', value='pesertaKulum',
                     children=[
                         dbc.Col([
                             html.Br(),
@@ -533,26 +590,53 @@ kerjasama = dbc.Container([
                     style=tab_style, selected_style=selected_style),
         ], style=tabs_styles, id='tab_Kegkulum', value='Kulum'),
     ], style=cardgrf_style),
+
+
     dbc.Collapse(
         id='cll_Kegkulum',
         is_open=False
     )
 ], style=cont_style)
 
-layout = html.Div([
-    html.Div(html.H1('Analisis Kegiatan dan Kerjasama',
-                     style={'margin-top': '30px', 'textAlign': 'center'}
-                     )
-             ),
-    html.Div([kegiatan_dosen]),
-    html.Div([kegiatanMahasiswa]),
-    html.Div([kerjasama], style={'margin-bottom': '50px'}),
-    dbc.Container([
-        dcc.Link([
-            dbc.Button('^', style=buttonLink_style),
-        ], href='#name'),
-    ], style={'margin-left': '90%'}),
-], style={'justify-content': 'center'})
+layout = dbc.Container([
+    html.Div([
+        html.Div(html.H1('Kegiatan',
+                         style={'margin-top': '30px', 'textAlign': 'center'}
+                         )
+                 ),
+        html.Br(),
+        html.Div([
+            dcc.Tabs([
+                dcc.Tab(label='Mahasiswa', value='mahasiswa',
+                        children=[
+                            html.Div([kegiatanMahasiswa]),
+                        ],
+                        style=tab_style, selected_style=selected_style
+                        ),
+                dcc.Tab(label='Dosen', value='dosen',
+                        children=[
+                            html.Div([kegiatan_dosen]),
+                        ],
+                        style=tab_style, selected_style=selected_style
+                        ),
+                dcc.Tab(label='Mitra', value='mitra',
+                        children=[
+                            html.Div([kerjasama], style={'margin-bottom': '50px'}),
+                        ],
+                        style=tab_style, selected_style=selected_style
+                        ),
+            ], style=tabs_styles, value='mahasiswa'),
+        ]),
+        #html.Div([kegiatan_dosen]),
+        #html.Div([kegiatanMahasiswa]),
+        #html.Div([kerjasama], style={'margin-bottom': '50px'}),
+        dbc.Container([
+            dcc.Link([
+                dbc.Button('^', style=buttonLink_style),
+            ], href='#name'),
+        ], style={'margin-left': '90%'}),
+    ], style={'justify-content': 'center'})
+], style=cont_style)
 
 
 # CONTROL COLLAPSE
@@ -579,6 +663,15 @@ def toggle_collapse(n, is_open):
     Output("cll_tblprestasiakademikmhs", "is_open"),
     [Input("cll_grfprestasiakademik", "n_clicks")],
     [State("cll_tblprestasiakademikmhs", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output("cll_tblKegiatanKerjasama", "is_open"),
+    [Input("cll_grfKegiatanKerjasama", "n_clicks")],
+    [State("cll_tblKegiatanKerjasama", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
@@ -647,6 +740,9 @@ group by tahun,nama
 order by `Jumlah Kegiatan` asc
     ''', {'tahun': waktu})
     fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Kegiatan'],orientation='h')
+    fig.update_layout(
+        yaxis=dict(tickvals=df['Nama Dosen'].unique())
+    )
     fig.update_layout()
     return fig
 
@@ -660,7 +756,7 @@ order by `Jumlah Kegiatan` asc
 def graphKulum(id,valueFrom, valueTo):
     #df = dfKulum
     df = data.getDataFrameFromDBwithParams('''
-            select ddselesai.tahun as 'Tahun', count(dim_kegiatan.nama_kegiatan) as 'Jumlah Kuliah Umum'
+            select ddselesai.tahun as 'Tahun', count(dim_kegiatan.nama_kegiatan) as 'Jumlah Kegiatan'
         from dim_kegiatan
             inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
             inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
@@ -670,7 +766,7 @@ def graphKulum(id,valueFrom, valueTo):
     group by ddselesai.tahun
     order by ddselesai.tahun asc
             ''', {'From': valueFrom, 'To': valueTo})
-    fig = px.line(df, x=df['Tahun'], y=df['Jumlah Kuliah Umum'])
+    fig = px.line(df, x=df['Tahun'], y=df['Jumlah Kegiatan'])
     fig.update_traces(mode='lines+markers')
     return fig
 
@@ -786,3 +882,31 @@ order by tahun asc
                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                          yshift=10)
         return fig
+
+
+@app.callback(
+    Output('grf_tipeKerjasama', 'figure'),
+    Input('grf_tipeKerjasama', 'id'),
+    Input('drpdwn_FromTipeKegiatan', 'value'),
+    Input('drpdwn_ToTipeKegiatan', 'value')
+    #Input('drpdwn_kegDosen', 'value')
+)
+def graphTipeKegiatan(id,valueFrom, valueTo):
+    df = data.getDataFrameFromDBwithParams('''
+    select ddselesai.tahun as Tahun,CASE WHEN dp.tipe_perjanjian = 'MO' THEN 'MOU'
+		WHEN dp.tipe_perjanjian = 'PK' THEN 'PERJANJIAN KERJASAMA'
+		ELSE 'NONE' END AS 'Tipe Kerjasama', count(dp.tipe_perjanjian) as Jumlah
+        from dim_kegiatan
+            inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
+            inner join br_mitra_perjanjian bmp on bmp.id_perjanjian = dim_kegiatan.id_perjanjian
+            inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
+            inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
+            inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
+    where dim_kegiatan.id_perjanjian is not null
+    and ddselesai.tahun between %(From)s and %(To)s
+    group by `Tipe Kerjasama`,Tahun
+    order by ddselesai.tahun asc;
+    ''',{'From': valueFrom, 'To': valueTo})
+    fig = px.bar(df, y=df['Jumlah'], x=df['Tahun'],color=df['Tipe Kerjasama'], orientation='v')
+    fig.update_layout()
+    return fig

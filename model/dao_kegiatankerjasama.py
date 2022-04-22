@@ -227,10 +227,25 @@ from fact_rekognisi_dosen frd
 inner join dim_date dd on dd.id_date=frd.id_tanggal_mulai
 inner join dim_dosen d on frd.id_dosen = d.id_dosen
 where d.id_prodi = 9
-  and tahun in (2015,2016,2017,2018,2019,2020)
+  and tahun in (2015,2016,2017,2018,2019,2020) #SALAH KIEEEE
   and wilayah = 4
 group by tahun
 order by tahun asc''', con)
+
+def getKegiatanKerjasama():
+    return pd.read_sql('''select ddselesai.tahun as 'Tahun', dim_kegiatan.nama_kegiatan as 'Kegiatan',
+       CASE WHEN dp.tipe_perjanjian = 'MO' THEN 'MOU'
+		WHEN dp.tipe_perjanjian = 'PK' THEN 'PERJANJIAN KERJASAMA'
+		ELSE 'NONE' END AS 'Tipe Kerjasama'
+        from dim_kegiatan
+            inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
+            inner join br_mitra_perjanjian bmp on bmp.id_perjanjian = dim_kegiatan.id_perjanjian
+            inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
+            inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
+            inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
+    where dim_kegiatan.id_perjanjian is not null
+    group by ddselesai.tahun, Kegiatan, `Tipe Kerjasama`
+    order by ddselesai.tahun asc''', con)
 
 def getListTahunKegRekognisiDosen():
     return pd.read_sql('''select distinct tahun
@@ -269,6 +284,20 @@ def getListTahunKulumMOU():
             inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
     where jenis_kegiatan = 'KULIAH UMUM' and dim_kegiatan.id_perjanjian is not null
     group by ddselesai.tahun
+    order by ddselesai.tahun asc
+    ''', con)
+
+
+
+def getListTahunTipeKegiatan():
+    return pd.read_sql('''select distinct ddselesai.tahun as 'Tahun'
+        from dim_kegiatan
+            inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
+            inner join br_mitra_perjanjian bmp on bmp.id_perjanjian = dim_kegiatan.id_perjanjian
+            inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
+            inner join dim_date ddmulai on ddmulai.id_date = dim_kegiatan.id_tanggal_mulai
+            inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
+    where dim_kegiatan.id_perjanjian is not null
     order by ddselesai.tahun asc
     ''', con)
 
