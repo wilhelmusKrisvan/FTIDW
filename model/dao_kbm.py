@@ -57,13 +57,13 @@ where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat
 order by ds.tahun_ajaran, ds.semester, kelompok_matakuliah, nama_matakuliah''', con)
 
 
-def getMahasiswaAktif():
-    return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
-inner join dim_semester ds on ds.id_semester = fms.id_semester
-where fms.status = 'AK' and 
-ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-group by ds.tahun_ajaran, ds.semester_nama
-order by ds.tahun_ajaran, ds.semester_nama''', con)
+# def getMahasiswaAktif():
+#     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
+# inner join dim_semester ds on ds.id_semester = fms.id_semester
+# where fms.status = 'AK' and
+# ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+# group by ds.tahun_ajaran, ds.semester_nama
+# order by ds.tahun_ajaran, ds.semester_nama''', con)
 
 
 def getMahasiswaAsing():

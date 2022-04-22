@@ -40,6 +40,14 @@ where status = 'AK'
 group by tahun_ajaran
 )aktif on aktif.tahun_ajaran = tahun_aka''',con)
 
+def getMahasiswaAktif():
+    return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where fms.status = 'AK' and 
+ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+group by ds.tahun_ajaran, ds.semester_nama
+order by ds.tahun_ajaran, ds.semester_nama''', con)
+
 def getMahasiswaAsing():
     return pd.read_sql('''select data.nama_prodi as 'Program Studi', tahun_semster as 'Tahun Ajaran', jumlah as 'Jumlah', parttime as 'Parttime', (jumlah - parttime) as 'Fulltime'
 from (
@@ -51,8 +59,8 @@ where warga_negara = 'WNA'
 group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
 ) data
 inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 
-and dim_semester.id_semester <= (select id_semester from dim_semester where tahun_ajaran=concat(year(now())-1,'/',year(now())) limit 1)
-order by nama_prodi, tahun_semster desc''',con)
+where tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+order by tahun_semster desc''',con)
 
 def getJenisSekolahPendaftar():
     return pd.read_sql('''select
