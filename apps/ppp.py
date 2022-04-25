@@ -15,6 +15,7 @@ dfdosen = data.getDosen()
 dosen = dfdosen['nama'].dropna().unique()
 
 dfjmlppp = data.getJumlahPPP()
+# dfjmlpkm = data.getJumlahPKM()
 # dfppdosenkpskripsimhs = data.getPPDosenKPSkripsiMhs()
 # dfpenelitianmhs = data.getPenelitianMhs()
 dfpkmmhs = data.getPKMMhs()
@@ -136,64 +137,16 @@ for x in range(0, 5):
     counter = x + 1
     listDropdownTh.append(str(int(date.today().strftime('%Y')) - 5 + x))
 
-pppDs = dbc.Container([
+penSum = dbc.Container([
     dbc.Card([
-        html.H5('Penelitian PKM Publikasi Dosen',
-                style=ttlgrf_style),
-        html.Div([
-            dbc.Row([
-                dbc.Col([
-                    html.P('Nama Dosen :', style={'margin-bottom': '0'}),
-                    dcc.Dropdown(
-                        id='fltrPPPDsNama',
-                        options=[{'label': i, 'value': i} for i in dosen],
-                        value=dosen[1],
-                        style={'color': 'black'},
-                        clearable=False
-                    )
-                ]),
-                dbc.Col([
-                    html.P('Visualisasi :', style={'margin-bottom': '0'}),
-                    dcc.RadioItems(
-                        id='radio_ppp',
-                        options=[{'label': 'Penelitian', 'value': 'pen'},
-                                 {'label': 'PKM', 'value': 'pkm'},
-                                 {'label': 'Publikasi', 'value': 'pub'},
-                                 {'label': 'Luaran Lainnya', 'value': 'luaran'}
-                                 ],
-                        value='pen',
-                        style={'width': '100%', 'padding': '0px', },
-                        className='card-body',
-                        labelStyle={'display': 'block', 'display': 'inline-block',
-                                    'margin-right': '10%', 'margin-top': '5px'}
-                    )
-                ])
-            ])
-        ]),
-        dbc.CardBody([
-            dcc.Loading(
-                id='loading-1',
-                type="default",
-                children=dcc.Graph(id='grf_pppDosen')),
-            dbc.Button('Lihat Semua Data', id='cll_grfpppDosen', n_clicks=0, style=button_style)
-        ], style={'padding': '0px'})
-    ], style=cardgrf_style),
-    dbc.Collapse(
-        id='cll_PPPDosen',
-        is_open=False
-    )
-], style=cont_style)
-
-pppMhs = dbc.Container([
-    dbc.Card([
-        html.H5('Penelitian PKM Publikasi Dosen & Mahasiswa',
+        html.H5('Jumlah Seluruh Penelitian per Tahun',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
                     html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrPPPDMStart',
+                        id='fltrPenSumStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
                         value=listDropdownTh[1],
                         style={'color': 'black'},
@@ -203,7 +156,200 @@ pppMhs = dbc.Container([
                 dbc.Col([
                     html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrPPPDMEnd',
+                        id='fltrPenSumEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[4],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),dbc.CardBody([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_penSum')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpenSum', n_clicks=0, style=button_style)
+        ], style={'padding': '0px'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PenSum',
+        is_open=False
+    )
+], style=cont_style)
+
+pkmSum = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah Seluruh PKM per Tahun',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMSumStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMSumEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[4],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),dbc.CardBody([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_pkmSum')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpkmSum', n_clicks=0, style=button_style)
+        ], style={'padding': '0px'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PKMSum',
+        is_open=False
+    )
+], style=cont_style)
+
+penDs = dbc.Container([
+    dbc.Card([
+        html.H5('Penelitian Dosen',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                    dcc.Dropdown(
+                        id='fltrPenDsNama',
+                        options=[{'label': i, 'value': i} for i in dosen],
+                        value=dosen[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        dbc.CardBody([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_penDs')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpenDs', n_clicks=0, style=button_style)
+        ], style={'padding': '0px'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PenDs',
+        is_open=False
+    )
+], style=cont_style)
+
+pkmDs = dbc.Container([
+    dbc.Card([
+        html.H5('PKM Dosen',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                    dcc.Dropdown(
+                        id='fltrPKMDsNama',
+                        options=[{'label': i, 'value': i} for i in dosen],
+                        value=dosen[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        dbc.CardBody([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_pkmDs')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpkmDs', n_clicks=0, style=button_style)
+        ], style={'padding': '0px'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PKMDs',
+        is_open=False
+    )
+], style=cont_style)
+
+# pppDs = dbc.Container([
+#     dbc.Card([
+#         html.H5('Penelitian PKM Publikasi Dosen',
+#                 style=ttlgrf_style),
+#         html.Div([
+#             dbc.Row([
+#                 dbc.Col([
+#                     html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+#                     dcc.Dropdown(
+#                         id='fltrPPPDsNama',
+#                         options=[{'label': i, 'value': i} for i in dosen],
+#                         value=dosen[1],
+#                         style={'color': 'black'},
+#                         clearable=False
+#                     )
+#                 ]),
+#                 dbc.Col([
+#                     html.P('Visualisasi :', style={'margin-bottom': '0'}),
+#                     dcc.RadioItems(
+#                         id='radio_ppp',
+#                         options=[{'label': 'Penelitian', 'value': 'pen'},
+#                                  {'label': 'PKM', 'value': 'pkm'},
+#                                  {'label': 'Publikasi', 'value': 'pub'},
+#                                  {'label': 'Luaran Lainnya', 'value': 'luaran'}
+#                                  ],
+#                         value='pen',
+#                         style={'width': '100%', 'padding': '0px', },
+#                         className='card-body',
+#                         labelStyle={'display': 'block', 'display': 'inline-block',
+#                                     'margin-right': '10%', 'margin-top': '5px'}
+#                     )
+#                 ])
+#             ])
+#         ]),
+#         dbc.CardBody([
+#             dcc.Loading(
+#                 id='loading-1',
+#                 type="default",
+#                 children=dcc.Graph(id='grf_pppDosen')),
+#             dbc.Button('Lihat Semua Data', id='cll_grfpppDosen', n_clicks=0, style=button_style)
+#         ], style={'padding': '0px'})
+#     ], style=cardgrf_style),
+#     dbc.Collapse(
+#         id='cll_PPPDosen',
+#         is_open=False
+#     )
+# ], style=cont_style)
+penMhs = dbc.Container([
+    dbc.Card([
+        html.H5('Penelitian Dosen yang Melibatkan Mahasiswa',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPenDMStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPenDMEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
                         value=listDropdownTh[4],
                         style={'color': 'black'},
@@ -211,81 +357,198 @@ pppMhs = dbc.Container([
                     )
                 ])
             ]),
-            dcc.Tabs([
-                dcc.Tab(label='Penelitian Dosen & Mahasiswa', value='telitidosenmhs',
-                        children=[
-                            html.Div([
-                                dbc.Row([
-                                    dbc.Col([
-                                        html.P('Visualisasi :', style={'margin-bottom': '0','margin-top':'10px'}),
-                                        dcc.RadioItems(
-                                            id='radio_pendm',
-                                            options=[{'label': 'Rerata', 'value': 'rata'},
-                                                     {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
-                                                     ],
-                                            value='rata',
-                                            style={'width': '100%', 'padding': '0px', },
-                                            className='card-body',
-                                            labelStyle={'display': 'block', 'display': 'inline-block',
-                                                        'margin-right': '10%', 'margin-top': '5px'}
-                                        )
-                                    ],style={'padding-left':'5%'})
-                                ],style={'padding-left':'5%','margin-bottom':'0px'}),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_telitiDsMhs')),
-                                dbc.Button('Lihat Semua Data', id='cll_grftelitiDM', n_clicks=0,
-                                           style=button_style)
-                            ],style={'textAlign':'center'})
-                        ], style=tab_style, selected_style=selected_style
-                        ),
-                dcc.Tab(label='PKM Dosen & Mahasiswa', value='pkmdosenmhs',
-                        children=[
-                            html.Div([
-                                dbc.Row([
-                                    dbc.Col([
-                                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-                                        dcc.RadioItems(
-                                            id='radio_pkmdm',
-                                            options=[{'label': 'Rerata', 'value': 'rata'},
-                                                     {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
-                                                     ],
-                                            value='rata',
-                                            style={'width': '100%', 'padding': '0px', },
-                                            className='card-body',
-                                            labelStyle={'display': 'block', 'display': 'inline-block',
-                                                        'margin-right': '10%', 'margin-top': '5px'}
-                                        )
-                                    ], style={'padding-left': '5%'})
-                                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_pkmDsMhs')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfpkmDM', n_clicks=0,
-                                           style=button_style)
-                            ],style={'textAlign':'center'})
-                        ], style=tab_style, selected_style=selected_style)
-            ], style=tabs_styles, id='tab_pppDM', value='telitidosenmhs')
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                        dcc.RadioItems(
+                            id='radio_pendm',
+                            options=[{'label': 'Rerata', 'value': 'rata'},
+                                     {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
+                                     ],
+                            value='rata',
+                            style={'width': '100%', 'padding': '0px', },
+                            className='card-body',
+                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                        'margin-right': '10%', 'margin-top': '5px'}
+                        )
+                    ], style={'padding-left': '5%'})
+                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_PenDM')),
+                dbc.Button('Lihat Semua Data', id='cll_grfPenDM', n_clicks=0,
+                           style=button_style)
+            ], style={'textAlign': 'center'})
         ])
     ], style=cardgrf_style),
     dbc.Collapse(
-        id='cll_PPPDM',
+        id='cll_PenDM',
         is_open=False
     )
 ], style=cont_style)
 
-kerjasamaPPP = dbc.Container([
+pkmMhs = dbc.Container([
     dbc.Card([
-        html.H5('Kegiatan dengan Mitra',
+        html.H5('PKM Dosen yang Melibatkan Mahasiswa',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
                     html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrMitraStart',
+                        id='fltrPKMDMStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMDMEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[4],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ]),
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                        dcc.RadioItems(
+                            id='radio_pkmdm',
+                            options=[{'label': 'Rerata', 'value': 'rata'},
+                                     {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
+                                     ],
+                            value='rata',
+                            style={'width': '100%', 'padding': '0px', },
+                            className='card-body',
+                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                        'margin-right': '10%', 'margin-top': '5px'}
+                        )
+                    ], style={'padding-left': '5%'})
+                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_pkmDM')),
+                dbc.Button('Lihat Semua Data', id='cll_grfpkmDM', n_clicks=0,
+                           style=button_style)
+            ], style={'textAlign': 'center'})
+        ])
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PKMDM',
+        is_open=False
+    )
+], style=cont_style)
+
+# pppMhs = dbc.Container([
+#     dbc.Card([
+#         html.H5('Penelitian PKM Publikasi Dosen & Mahasiswa',
+#                 style=ttlgrf_style),
+#         html.Div([
+#             dbc.Row([
+#                 dbc.Col([
+#                     html.P('Dari :', style={'marginBottom': 0}),
+#                     dcc.Dropdown(
+#                         id='fltrPPPDMStart',
+#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
+#                         value=listDropdownTh[1],
+#                         style={'color': 'black'},
+#                         clearable=False
+#                     )
+#                 ]),
+#                 dbc.Col([
+#                     html.P('Sampai :', style={'marginBottom': 0}),
+#                     dcc.Dropdown(
+#                         id='fltrPPPDMEnd',
+#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
+#                         value=listDropdownTh[4],
+#                         style={'color': 'black'},
+#                         clearable=False
+#                     )
+#                 ])
+#             ]),
+#             dcc.Tabs([
+#                 dcc.Tab(label='Penelitian Dosen & Mahasiswa', value='telitidosenmhs',
+#                         children=[
+#                             html.Div([
+#                                 dbc.Row([
+#                                     dbc.Col([
+#                                         html.P('Visualisasi :', style={'margin-bottom': '0','margin-top':'10px'}),
+#                                         dcc.RadioItems(
+#                                             id='radio_pendm',
+#                                             options=[{'label': 'Rerata', 'value': 'rata'},
+#                                                      {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
+#                                                      ],
+#                                             value='rata',
+#                                             style={'width': '100%', 'padding': '0px', },
+#                                             className='card-body',
+#                                             labelStyle={'display': 'block', 'display': 'inline-block',
+#                                                         'margin-right': '10%', 'margin-top': '5px'}
+#                                         )
+#                                     ],style={'padding-left':'5%'})
+#                                 ],style={'padding-left':'5%','margin-bottom':'0px'}),
+#                                 dcc.Loading(
+#                                     id='loading-1',
+#                                     type="default",
+#                                     children=dcc.Graph(id='grf_telitiDsMhs')),
+#                                 dbc.Button('Lihat Semua Data', id='cll_grftelitiDM', n_clicks=0,
+#                                            style=button_style)
+#                             ],style={'textAlign':'center'})
+#                         ], style=tab_style, selected_style=selected_style
+#                         ),
+#                 dcc.Tab(label='PKM Dosen & Mahasiswa', value='pkmdosenmhs',
+#                         children=[
+#                             html.Div([
+#                                 dbc.Row([
+#                                     dbc.Col([
+#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+#                                         dcc.RadioItems(
+#                                             id='radio_pkmdm',
+#                                             options=[{'label': 'Rerata', 'value': 'rata'},
+#                                                      {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
+#                                                      ],
+#                                             value='rata',
+#                                             style={'width': '100%', 'padding': '0px', },
+#                                             className='card-body',
+#                                             labelStyle={'display': 'block', 'display': 'inline-block',
+#                                                         'margin-right': '10%', 'margin-top': '5px'}
+#                                         )
+#                                     ], style={'padding-left': '5%'})
+#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+#                                 dcc.Loading(
+#                                     id='loading-1',
+#                                     type="default",
+#                                     children=dcc.Graph(id='grf_pkmDsMhs')),
+#                                 dbc.Button('Lihat Semua Data', id='cll_grfpkmDM', n_clicks=0,
+#                                            style=button_style)
+#                             ],style={'textAlign':'center'})
+#                         ], style=tab_style, selected_style=selected_style)
+#             ], style=tabs_styles, id='tab_pppDM', value='telitidosenmhs')
+#         ])
+#     ], style=cardgrf_style),
+#     dbc.Collapse(
+#         id='cll_PPPDM',
+#         is_open=False
+#     )
+# ], style=cont_style)
+penMitra = dbc.Container([
+    dbc.Card([
+        html.H5('Penelitian dengan Mitra',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPenMitraStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
                         value=listDropdownTh[0],
                         style={'color': 'black'},
@@ -295,7 +558,7 @@ kerjasamaPPP = dbc.Container([
                 dbc.Col([
                     html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrMitraEnd',
+                        id='fltrPenMitraEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
                         value=listDropdownTh[4],
                         style={'color': 'black'},
@@ -303,74 +566,269 @@ kerjasamaPPP = dbc.Container([
                     )
                 ])
             ]),
-            dcc.Tabs([
-                dcc.Tab(label='Penelitian', value='kerjaTeliti',
-                        children=[
-                            html.Div([
-                                dbc.Row([
-                                    dbc.Col([
-                                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-                                        dcc.RadioItems(
-                                            id='radio_penmitra',
-                                            options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
-                                                     {'label': 'Jenis Mitra', 'value': 'jenis'},
-                                                     {'label': 'Wilayah Mitra', 'value':'wilayah'}
-                                                     ],
-                                            value='top',
-                                            style={'width': '100%', 'padding': '0px', },
-                                            className='card-body',
-                                            labelStyle={'display': 'block', 'display': 'inline-block',
-                                                        'margin-right': '10%', 'margin-top': '5px'}
-                                        )
-                                    ], style={'padding-left': '5%'})
-                                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_MitraTeliti')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfMitraTeliti', n_clicks=0, style=button_style)
-                            ],style={'textAlign':'center'})
-                        ],
-                        style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='PKM', value='kerjaPKM',
-                        children=[
-                            html.Div([
-                                dbc.Row([
-                                    dbc.Col([
-                                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-                                        dcc.RadioItems(
-                                            id='radio_pkmmitra',
-                                            options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
-                                                     {'label': 'Jenis Mitra', 'value': 'jenis'},
-                                                     {'label': 'Wilayah Mitra', 'value':'wilayah'}
-                                                     ],
-                                            value='top',
-                                            style={'width': '100%', 'padding': '0px', },
-                                            className='card-body',
-                                            labelStyle={'display': 'block', 'display': 'inline-block',
-                                                        'margin-right': '10%', 'margin-top': '5px'}
-                                        )
-                                    ], style={'padding-left': '5%'})
-                                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_MitraPKM')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfMitraPKM', n_clicks=0, style=button_style)
-                            ], style={'textAlign': 'center'})
-                        ], style=tab_style, selected_style=selected_style),
-            ], style=tabs_styles, id='tab_Mitra', value='kerjaTeliti'),
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                        dcc.RadioItems(
+                            id='radio_penMitra',
+                            options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
+                                     {'label': 'Jenis Mitra', 'value': 'jenis'},
+                                     {'label': 'Wilayah Mitra', 'value': 'wilayah'}
+                                     ],
+                            value='top',
+                            style={'width': '100%', 'padding': '0px', },
+                            className='card-body',
+                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                        'margin-right': '10%', 'margin-top': '5px'}
+                        )
+                    ], style={'padding-left': '5%'})
+                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_penMitra')),
+                dbc.Button('Lihat Semua Data', id='cll_grfpenMitra', n_clicks=0, style=button_style)
+            ], style={'textAlign': 'center'})
         ])
     ], style=cardgrf_style),
     dbc.Collapse(
-        id='cll_Mitra',
+        id='cll_penMitra',
         is_open=False
     )
 ], style=cont_style)
 
-sitasi = dbc.Container([
+pkmMitra = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Karya Ilmiah yang Disitasi',
+        html.H5('PKM dengan Mitra',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMMitraStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMMitraEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[4],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ]),
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                        dcc.RadioItems(
+                            id='radio_pkmMitra',
+                            options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
+                                     {'label': 'Jenis Mitra', 'value': 'jenis'},
+                                     {'label': 'Wilayah Mitra', 'value': 'wilayah'}
+                                     ],
+                            value='top',
+                            style={'width': '100%', 'padding': '0px', },
+                            className='card-body',
+                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                        'margin-right': '10%', 'margin-top': '5px'}
+                        )
+                    ], style={'padding-left': '5%'})
+                ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_pkmMitra')),
+                dbc.Button('Lihat Semua Data', id='cll_grfpkmMitra', n_clicks=0, style=button_style)
+            ], style={'textAlign': 'center'})
+        ])
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_pkmMitra',
+        is_open=False
+    )
+], style=cont_style)
+
+# kerjasamaPPP = dbc.Container([
+#     dbc.Card([
+#         html.H5('Kegiatan dengan Mitra',
+#                 style=ttlgrf_style),
+#         html.Div([
+#             dbc.Row([
+#                 dbc.Col([
+#                     html.P('Dari :', style={'marginBottom': 0}),
+#                     dcc.Dropdown(
+#                         id='fltrMitraStart',
+#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
+#                         value=listDropdownTh[0],
+#                         style={'color': 'black'},
+#                         clearable=False
+#                     )
+#                 ]),
+#                 dbc.Col([
+#                     html.P('Sampai :', style={'marginBottom': 0}),
+#                     dcc.Dropdown(
+#                         id='fltrMitraEnd',
+#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
+#                         value=listDropdownTh[4],
+#                         style={'color': 'black'},
+#                         clearable=False
+#                     )
+#                 ])
+#             ]),
+#             dcc.Tabs([
+#                 dcc.Tab(label='Penelitian', value='kerjaTeliti',
+#                         children=[
+#                             html.Div([
+#                                 dbc.Row([
+#                                     dbc.Col([
+#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+#                                         dcc.RadioItems(
+#                                             id='radio_penmitra',
+#                                             options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
+#                                                      {'label': 'Jenis Mitra', 'value': 'jenis'},
+#                                                      {'label': 'Wilayah Mitra', 'value':'wilayah'}
+#                                                      ],
+#                                             value='top',
+#                                             style={'width': '100%', 'padding': '0px', },
+#                                             className='card-body',
+#                                             labelStyle={'display': 'block', 'display': 'inline-block',
+#                                                         'margin-right': '10%', 'margin-top': '5px'}
+#                                         )
+#                                     ], style={'padding-left': '5%'})
+#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+#                                 dcc.Loading(
+#                                     id='loading-1',
+#                                     type="default",
+#                                     children=dcc.Graph(id='grf_MitraTeliti')),
+#                                 dbc.Button('Lihat Semua Data', id='cll_grfMitraTeliti', n_clicks=0, style=button_style)
+#                             ],style={'textAlign':'center'})
+#                         ],
+#                         style=tab_style, selected_style=selected_style),
+#                 dcc.Tab(label='PKM', value='kerjaPKM',
+#                         children=[
+#                             html.Div([
+#                                 dbc.Row([
+#                                     dbc.Col([
+#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
+#                                         dcc.RadioItems(
+#                                             id='radio_pkmmitra',
+#                                             options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
+#                                                      {'label': 'Jenis Mitra', 'value': 'jenis'},
+#                                                      {'label': 'Wilayah Mitra', 'value':'wilayah'}
+#                                                      ],
+#                                             value='top',
+#                                             style={'width': '100%', 'padding': '0px', },
+#                                             className='card-body',
+#                                             labelStyle={'display': 'block', 'display': 'inline-block',
+#                                                         'margin-right': '10%', 'margin-top': '5px'}
+#                                         )
+#                                     ], style={'padding-left': '5%'})
+#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
+#                                 dcc.Loading(
+#                                     id='loading-1',
+#                                     type="default",
+#                                     children=dcc.Graph(id='grf_MitraPKM')),
+#                                 dbc.Button('Lihat Semua Data', id='cll_grfMitraPKM', n_clicks=0, style=button_style)
+#                             ], style={'textAlign': 'center'})
+#                         ], style=tab_style, selected_style=selected_style),
+#             ], style=tabs_styles, id='tab_Mitra', value='kerjaTeliti'),
+#         ])
+#     ], style=cardgrf_style),
+#     dbc.Collapse(
+#         id='cll_Mitra',
+#         is_open=False
+#     )
+# ], style=cont_style)
+
+# sitasi = dbc.Container([
+#     dbc.Card([
+#         html.H5('Jumlah Karya Ilmiah yang Disitasi',
+#                 style=ttlgrf_style),
+#         dbc.CardBody([
+#             dbc.Row([
+#                 dbc.Col(
+#                     html.Div([
+#                         dbc.Row([
+#                             dbc.Col([
+#                                 html.P('Dari :', style={'marginBottom': 0}),
+#                                 dcc.Dropdown(
+#                                     id='fltrSitasiStart',
+#                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
+#                                     value=listDropdownTh[0],
+#                                     style={'color': 'black'},
+#                                     clearable=False
+#                                 )
+#                             ]),
+#                             dbc.Col([
+#                                 html.P('Sampai :', style={'marginBottom': 0}),
+#                                 dcc.Dropdown(
+#                                     id='fltrSitasiEnd',
+#                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
+#                                     value=listDropdownTh[3],
+#                                     style={'color': 'black'},
+#                                     clearable=False
+#                                 )
+#                             ])
+#                         ])
+#                     ])
+#                 ),
+#                 dbc.Col([
+#                     html.P('Visualisasi :', style={'margin-bottom': '0'}),
+#                     dcc.RadioItems(
+#                         id='radioSitasi',
+#                         options=[{'label': 'Per Tahun', 'value': 'tahun'},
+#                                  {'label': 'Dosen Top', 'value': 'topdosen'}
+#                                  ],
+#                         value='tahun',
+#                         style={'width': '100%', 'padding': '0px', },
+#                         className='card-body',
+#                         labelStyle={'display': 'block', 'display': 'inline-block',
+#                                     'margin-right': '10%', 'margin-top': '5px'},
+#                     )
+#                 ])
+#             ]),
+#             dcc.Loading(
+#                 id='loading-1',
+#                 type="default",
+#                 children=dcc.Graph(id='grf_sitasi')),
+#             dbc.Button('Lihat Semua Data', id='cll_grfsitasi', n_clicks=0, style=button_style),
+#         ]),
+#     ], style=cardgrf_style),
+#     dbc.Collapse(
+#         dbc.Card(
+#             dt.DataTable(
+#                 id='tbl_Sitasi',
+#                 columns=[
+#                     {'name': i, 'id': i} for i in dfkisitasi3th.columns
+#                 ],
+#                 data=dfkisitasi3th.to_dict('records'),
+#                 sort_action='native',
+#                 sort_mode='multi',
+#                 style_table={'padding': '10px', 'overflowX': 'auto'},
+#                 style_header={'textAlign': 'center'},
+#                 style_data={'font-size': '80%', 'textAlign': 'center'},
+#                 style_cell={'width': 95},
+#                 page_size=10,
+#                 export_format='xlsx'
+#             ), style=cardtbl_style
+#         ),
+#         id='cll_tblsitasi',
+#         is_open=False
+#     )
+# ], style=cont_style)
+
+penSitasi = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah Penelitian yang Disitasi',
                 style=ttlgrf_style),
         dbc.CardBody([
             dbc.Row([
@@ -380,7 +838,7 @@ sitasi = dbc.Container([
                             dbc.Col([
                                 html.P('Dari :', style={'marginBottom': 0}),
                                 dcc.Dropdown(
-                                    id='fltrSitasiStart',
+                                    id='fltrPenSitasiStart',
                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
                                     value=listDropdownTh[0],
                                     style={'color': 'black'},
@@ -390,7 +848,7 @@ sitasi = dbc.Container([
                             dbc.Col([
                                 html.P('Sampai :', style={'marginBottom': 0}),
                                 dcc.Dropdown(
-                                    id='fltrSitasiEnd',
+                                    id='fltrPenSitasiEnd',
                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
                                     value=listDropdownTh[3],
                                     style={'color': 'black'},
@@ -403,9 +861,9 @@ sitasi = dbc.Container([
                 dbc.Col([
                     html.P('Visualisasi :', style={'margin-bottom': '0'}),
                     dcc.RadioItems(
-                        id='radioSitasi',
-                        options=[{'label': 'Per Tahun', 'value': 'tahun'},
-                                 {'label': 'Dosen Top', 'value': 'topdosen'}
+                        id='radioPenSitasi',
+                        options=[{'label': 'Sitasi Per Tahun', 'value': 'tahun'},
+                                 {'label': 'Dosen Sitasi Terbanyak', 'value': 'topdosen'}
                                  ],
                         value='tahun',
                         style={'width': '100%', 'padding': '0px', },
@@ -418,14 +876,14 @@ sitasi = dbc.Container([
             dcc.Loading(
                 id='loading-1',
                 type="default",
-                children=dcc.Graph(id='grf_sitasi')),
-            dbc.Button('Lihat Semua Data', id='cll_grfsitasi', n_clicks=0, style=button_style),
+                children=dcc.Graph(id='grf_penSitasi')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpenSitasi', n_clicks=0, style=button_style),
         ]),
     ], style=cardgrf_style),
     dbc.Collapse(
         dbc.Card(
             dt.DataTable(
-                id='tbl_Sitasi',
+                id='tbl_penSitasi',
                 columns=[
                     {'name': i, 'id': i} for i in dfkisitasi3th.columns
                 ],
@@ -440,7 +898,84 @@ sitasi = dbc.Container([
                 export_format='xlsx'
             ), style=cardtbl_style
         ),
-        id='cll_tblsitasi',
+        id='cll_tblpenSitasi',
+        is_open=False
+    )
+], style=cont_style)
+
+pkmSitasi = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah PKM yang Disitasi',
+                style=ttlgrf_style),
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col(
+                    html.Div([
+                        dbc.Row([
+                            dbc.Col([
+                                html.P('Dari :', style={'marginBottom': 0}),
+                                dcc.Dropdown(
+                                    id='fltrPKMSitasiStart',
+                                    options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                    value=listDropdownTh[0],
+                                    style={'color': 'black'},
+                                    clearable=False
+                                )
+                            ]),
+                            dbc.Col([
+                                html.P('Sampai :', style={'marginBottom': 0}),
+                                dcc.Dropdown(
+                                    id='fltrPKMSitasiEnd',
+                                    options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                    value=listDropdownTh[3],
+                                    style={'color': 'black'},
+                                    clearable=False
+                                )
+                            ])
+                        ])
+                    ])
+                ),
+                dbc.Col([
+                    html.P('Visualisasi :', style={'margin-bottom': '0'}),
+                    dcc.RadioItems(
+                        id='radioPKMSitasi',
+                        options=[{'label': 'Sitasi Per Tahun', 'value': 'tahun'},
+                                 {'label': 'Dosen Sitasi Terbanyak', 'value': 'topdosen'}
+                                 ],
+                        value='tahun',
+                        style={'width': '100%', 'padding': '0px', },
+                        className='card-body',
+                        labelStyle={'display': 'block', 'display': 'inline-block',
+                                    'margin-right': '10%', 'margin-top': '5px'},
+                    )
+                ])
+            ]),
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_pkmSitasi')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpenSitasi', n_clicks=0, style=button_style),
+        ]),
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_pkmSitasi',
+                columns=[
+                    {'name': i, 'id': i} for i in dfkisitasi3th.columns
+                ],
+                data=dfkisitasi3th.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'padding': '10px', 'overflowX': 'auto'},
+                style_header={'textAlign': 'center'},
+                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 95},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardtbl_style
+        ),
+        id='cll_tblpkmSitasi',
         is_open=False
     )
 ], style=cont_style)
@@ -548,9 +1083,9 @@ sitasi = dbc.Container([
 #     )
 # ], style=cont_style)
 
-luaranDs = dbc.Container([
+luaranPenDs = dbc.Container([
     dbc.Card([
-        html.H5('Luaran PPP Dosen',
+        html.H5('Luaran Penelitian Dosen',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
@@ -575,91 +1110,92 @@ luaranDs = dbc.Container([
                     )
                 ])
             ]),
-            dcc.Tabs([
-                dcc.Tab(label='Hak Kekayaan Intelektual (HKI)', value='HKIDosen',
-                        children=[
-                            html.Div([
-                                dbc.Row(
-                                    dbc.Col([
-                                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
-                                        dcc.Dropdown(
-                                            id='fltrHKIDsNama',
-                                            options=[{'label': i, 'value': i} for i in dosen],
-                                            value=dosen[1],
-                                            style={'color': 'black'},
-                                            clearable=False
-                                        )
-                                    ])
-                                ),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_hkiDs')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfhkiDs', n_clicks=0,
-                                           style=button_style)
-                            ])
-                        ],
-                        style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Teknologi Tepat Guna (TTGU)', value='TTGUDosen',
-                        children=[
-                            html.Div([
-                                dbc.Row(
-                                    dbc.Col([
-                                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
-                                        dcc.Dropdown(
-                                            id='fltrTTGUDsNama',
-                                            options=[{'label': i, 'value': i} for i in dosen],
-                                            value=dosen[1],
-                                            style={'color': 'black'},
-                                            clearable=False
-                                        )
-                                    ])
-                                ),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_ttguDs')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfttguDs', n_clicks=0,
-                                           style=button_style)
-                            ])
-                        ],
-                        style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Buku', value='BukuDosen',
-                        children=[
-                            html.Div([
-                                dbc.Row(
-                                    dbc.Col([
-                                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
-                                        dcc.Dropdown(
-                                            id='fltrBukuDsNama',
-                                            options=[{'label': i, 'value': i} for i in dosen],
-                                            value=dosen[1],
-                                            style={'color': 'black'},
-                                            clearable=False
-                                        )
-                                    ])
-                                ),
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_bukuDs')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfbukuDs', n_clicks=0,
-                                           style=button_style)
-                            ])
-                        ],
-                        style=tab_style, selected_style=selected_style),
-            ], style=tabs_styles, id='tab_luaranDosen', value='HKIDosen'),
+            html.Div([
+                dbc.Row(
+                    dbc.Col([
+                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                        dcc.Dropdown(
+                            id='fltrHKIDsNama',
+                            options=[{'label': i, 'value': i} for i in dosen],
+                            value=dosen[1],
+                            style={'color': 'black'},
+                            clearable=False
+                        )
+                    ])
+                ),
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_hkiDs')),
+                dbc.Button('Lihat Semua Data', id='cll_grfhkiDs', n_clicks=0,
+                           style=button_style)
+            ]),
         ])
     ], style=cardgrf_style),
     dbc.Collapse(
-        id='cll_luaranPPPDosen',
+        id='cll_luaranPenDosen',
         is_open=False
     )
 ], style=cont_style)
 
-luaranMhs = dbc.Container([
+luaranPKMDs = dbc.Container([
     dbc.Card([
-        html.H5('Luaran PPP Mahasiswa',
+        html.H5('Luaran PKM Dosen',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrLuaranPKMStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                        value=listDropdownTA[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrLuaranPKMEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                        value=listDropdownTA[2],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ]),
+            html.Div([
+                dbc.Row(
+                    dbc.Col([
+                        html.P('Nama Dosen :', style={'margin-bottom': '0'}),
+                        dcc.Dropdown(
+                            id='fltrHKIPKMDsNama',
+                            options=[{'label': i, 'value': i} for i in dosen],
+                            value=dosen[1],
+                            style={'color': 'black'},
+                            clearable=False
+                        )
+                    ])
+                ),
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_hkiPKMDs')),
+                dbc.Button('Lihat Semua Data', id='cll_grfhkiPKMDs', n_clicks=0,
+                           style=button_style)
+            ]),
+        ])
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_luaranPKMDosen',
+        is_open=False
+    )
+], style=cont_style)
+
+luaranPenMhs = dbc.Container([
+    dbc.Card([
+        html.H5('Luaran Penelitian Mahasiswa',
                 style=ttlgrf_style),
         dcc.Tabs([
             dcc.Tab(label='Publikasi', value='pubMhs',
@@ -776,16 +1312,135 @@ luaranMhs = dbc.Container([
     )
 ], style=cont_style)
 
-rerata = dbc.Container([
+luaranPKMMhs = dbc.Container([
     dbc.Card([
-        html.H5('Rata-rata Jumlah PPP Dosen',
+        html.H5('Luaran PKM Mahasiswa',
+                style=ttlgrf_style),
+        dcc.Tabs([
+            dcc.Tab(label='Publikasi', value='pubPKMMhs',
+                    children=[
+                        html.Div([
+                            dbc.Row([
+                                dbc.Col([
+                                    html.P('Dari :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrPubPKMMhsStart',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                                        value=listDropdownTA[0],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ]),
+                                dbc.Col([
+                                    html.P('Sampai :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrPubPKMMhsEnd',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTA],
+                                        value=listDropdownTA[3],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ])
+                            ])
+                        ]),
+                        html.Div([
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_pubPKMMhs')),
+                            dbc.Button('Lihat Semua Data', id='cll_grfpubPKMMhs', n_clicks=0,
+                                       style=button_style)
+                        ])
+                    ], style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Teknologi Tepat Guna (TTGU)', value='ttguPKMMhs',
+                    children=[
+                        html.Div([
+                            dbc.Row([
+                                dbc.Col([
+                                    html.P('Dari :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrTTGUPKMMhsStart',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                        value=listDropdownTh[0],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ]),
+                                dbc.Col([
+                                    html.P('Sampai :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrTTGUPKMMhsEnd',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                        value=listDropdownTh[3],
+                                        style={'color': 'black'},
+                                        placeholder='Pilih Tahun Akhir',
+                                        clearable=False
+                                    )
+                                ])
+                            ])
+                        ]),
+                        html.Div([
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_ttguPKMMhs')),
+                            dbc.Button('Lihat Semua Data', id='cll_grfttguPKMMhs', n_clicks=0,
+                                       style=button_style)
+                        ])
+                    ], style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Hak Kekayaan Intelektual (HKI)', value='hkiPKMMhs',
+                    children=[
+                        html.Div([
+                            dbc.Row([
+                                dbc.Col([
+                                    html.P('Dari :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrHKIPKMMhsStart',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                        value=listDropdownTh[0],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ]),
+                                dbc.Col([
+                                    html.P('Sampai :', style={'marginBottom': 0}),
+                                    dcc.Dropdown(
+                                        id='fltrHKIPKMMhsEnd',
+                                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                        value=listDropdownTh[3],
+                                        style={'color': 'black'},
+                                        clearable=False
+                                    )
+                                ])
+                            ])
+                        ]),
+                        html.Div([
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_hkiPKMMhs')),
+                            dbc.Button('Lihat Semua Data', id='cll_grfhkiPKMMhs', n_clicks=0,
+                                       style=button_style)
+                        ])
+                    ], style=tab_style, selected_style=selected_style),
+        ], style=tabs_styles, id='tab_luaranPKMMhs', value='pubPKMMhs')
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_luaranPKMMhs',
+        is_open=False
+    )
+], style=cont_style)
+
+penRerata = dbc.Container([
+    dbc.Card([
+        html.H5('Rata-rata Jumlah Penelitian Dosen',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
                     html.P('Dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrRerataStart',
+                        id='fltrPenRerataStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
                         value=listDropdownTh[0],
                         style={'color': 'black'},
@@ -795,7 +1450,7 @@ rerata = dbc.Container([
                 dbc.Col([
                     html.P('Sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
-                        id='fltrRerataEnd',
+                        id='fltrPenRerataEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
                         value=listDropdownTh[3],
                         style={'color': 'black'},
@@ -803,34 +1458,185 @@ rerata = dbc.Container([
                     )
                 ])
             ]),
-            dcc.Tabs([
-                dcc.Tab(label='Penelitian', value='reTelitiDosen',
-                        children=[
-                            html.Div([
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_reTelitiDosen')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfreTelitiDosen', n_clicks=0,
-                                           style=button_style)
-                            ])
-                        ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Publikasi', value='rePubDosen',
-                        children=[
-                            html.Div([
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_rePubDosen')),
-                                dbc.Button('Lihat Semua Data', id='cll_grfrePubDosen', n_clicks=0,
-                                           style=button_style)
-                            ])
-                        ], style=tab_style, selected_style=selected_style),
-            ], style=tabs_styles, id='tab_rerataPPP', value='reTelitiDosen')
+            html.Div([
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_reTelitiDosen')),
+                dbc.Button('Lihat Semua Data', id='cll_grfreTelitiDosen', n_clicks=0,
+                           style=button_style)
+            ])
+        ])
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_rerataPen',
+        is_open=False
+    )
+], style=cont_style)
+
+pkmRerata = dbc.Container([
+    dbc.Card([
+        html.H5('Rata-rata Jumlah PKM Dosen',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMRerataStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMRerataEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ]),
+            html.Div([
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_rePubDosen')),
+                dbc.Button('Lihat Semua Data', id='cll_grfrePubDosen', n_clicks=0,
+                           style=button_style)
+            ])
         ]),
     ], style=cardgrf_style),
     dbc.Collapse(
-        id='cll_rerataPPP',
+        id='cll_rerataPKM',
+        is_open=False
+    )
+], style=cont_style)
+
+penDana = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah Penelitian Berdasarkan Sumber Dana per Tahun Ajaran',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPenDanaStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPenDanaEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ]),
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Visualisasi :', style={'margin-bottom': '0'}),
+                        dcc.RadioItems(
+                            id='radio_penDana',
+                            options=[{'label': 'Wilayah', 'value': 'wilayah'},
+                                     {'label': 'Sumber Dana', 'value': 'sumber'},
+                                     {'label': 'Asal Sumber Dana', 'value': 'asal'}
+                                     ],
+                            value='wilayah',
+                            style={'width': '100%', 'padding': '0px', },
+                            className='card-body',
+                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                        'margin-right': '10%', 'margin-top': '5px'}
+                        )
+                    ])
+                ])
+            ], style={'textAlign': 'center'}),
+            html.Div([
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_penDana')),
+                dbc.Button('Lihat Semua Data', id='cll_grfpenDana', n_clicks=0,
+                           style=button_style)
+            ])
+        ]),
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_penDana',
+        is_open=False
+    )
+], style=cont_style)
+
+pkmDana = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah PKM Berdasarkan Sumber Dana per Tahun Ajaran',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMDanaStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPKMDanaEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ]),
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.P('Visualisasi :', style={'margin-bottom': '0'}),
+                        dcc.RadioItems(
+                            id='radio_pkmDana',
+                            options=[{'label': 'Wilayah', 'value': 'wilayah'},
+                                     {'label': 'Sumber Dana', 'value': 'sumber'},
+                                     {'label': 'Asal Sumber Dana', 'value': 'asal'}
+                                     ],
+                            value='wilayah',
+                            style={'width': '100%', 'padding': '0px', },
+                            className='card-body',
+                            labelStyle={'display': 'block', 'display': 'inline-block',
+                                        'margin-right': '10%', 'margin-top': '5px'}
+                        )
+                    ])
+                ])
+            ], style={'textAlign': 'center'}),
+            html.Div([
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_pkmDana')),
+                dbc.Button('Lihat Semua Data', id='cll_grfpkmDana', n_clicks=0,
+                           style=button_style)
+            ])
+        ]),
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_pkmDana',
         is_open=False
     )
 ], style=cont_style)
@@ -838,15 +1644,34 @@ rerata = dbc.Container([
 ppkm = dbc.Container([
     html.Div([
         dcc.Tabs([
-            dcc.Tab(label='Penelitian', value='kp',
+            dcc.Tab(label='Penelitian', value='pen',
                     children=[
+                        penSum,
+                        penDs,
+                        penMhs,
+                        penMitra,
+                        # skripsi/kp
+                        penSitasi,
+                        penRerata,
+                        penDana,
+                        luaranPenDs,
+                        luaranPenMhs
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='PKM', value='skripsi',
+            dcc.Tab(label='PKM', value='pkm',
                     children=[
+                        pkmSum,
+                        pkmDs,
+                        pkmMhs,
+                        pkmMitra,
+                        pkmSitasi,
+                        pkmRerata,
+                        pkmDana,
+                        luaranPKMDs,
+                        luaranPKMMhs
                     ],
                     style=tab_style, selected_style=selected_style)
-        ], style=tabs_styles, value='kp')
+        ], style=tabs_styles, value='pen')
     ])
 ])
 
@@ -855,15 +1680,7 @@ layout = html.Div([
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
-    html.Div([]),
-    html.Div([ppkm]),
-    html.Div([pppDs]),
-    html.Div([pppMhs]),
-    html.Div([kerjasamaPPP]),
-    html.Div([sitasi]),
-    html.Div([luaranDs]),
-    html.Div([luaranMhs]),
-    html.Div([rerata], style={'margin-bottom': '50px'}),
+    html.Div([ppkm], style={'margin-bottom': '50px'}),
     dbc.Container([
         dcc.Link([
             dbc.Button('^', style=buttonLink_style),
@@ -874,13 +1691,113 @@ layout = html.Div([
 
 # FILTER CALLBACK
 @app.callback(
-    Output('grf_pppDosen', 'figure'),
-    Input('fltrPPPDsNama', 'value'),
-    Input('radio_ppp', 'value')
+    Output('grf_penSum', 'figure'),
+    Input('fltrPenSumStart', 'value'),
+    Input('fltrPenSumEnd', 'value')
 )
-def graphPPPDosen(namads, radioppp):
-    if radioppp == 'pen':
-        dfpenelitian = data.getDataFrameFromDBwithParams(f'''
+def graphPenSum(start, end):
+    dfpen = data.getDataFrameFromDBwithParams(f'''
+                        select tahun Tahun, count(*) 'Jumlah Penelitian'
+                        from fact_penelitian fact
+                                 inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
+                                 inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
+                                 inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                                 inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+                        where dim.jenis = 'PENELITIAN'
+                          and tahun between %(start)s and %(end)s
+                        group by tahun
+                        order by tahun
+                        ''', {'start':start, 'end':end})
+    dfpub = data.getDataFrameFromDBwithParams(f'''
+                        select tahun_publikasi as Tahun, count(*) 'Jumlah Publikasi'
+                        from fact_publikasi fact
+                        inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
+                        inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
+                        inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
+                        inner join dim_penelitian_pkm dpp on dimpub.id_penelitian_pkm = dpp.id_penelitian_pkm
+                        inner join br_pp_publikasi bpp on brpub.id_publikasi = bpp.id_publikasi
+                        where dpp.jenis='PENELITIAN'
+                            and tahun_publikasi between %(start)s and %(end)s
+                        group by tahun_publikasi
+                        order by tahun_publikasi
+                    ''', {'start':start, 'end':end})
+    dfluaran = data.getDataFrameFromDBwithParams(f'''
+                        select tahun Tahun, count(*) 'Jumlah Luaran Lainnya'
+                        from fact_luaran_lainnya fatl
+                        inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
+                        inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
+                        inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
+                        inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                        inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
+                        where brl.jenis='PENELITIAN'
+                            and tahun between %(start)s and %(end)s
+                        group by tahun
+                        order by tahun
+                    ''', {'start':start, 'end':end})
+    figpenSum = px.bar(dfpen, x=dfpen['Tahun'], y=dfpen['Jumlah Penelitian'],color=px.Constant('Penelitian'),
+                      labels=dict(x='Tahun', y='Jumlah Penelitian', color='Keterangan'))
+    figpenSum.add_bar(x=dfpub['Tahun'], y=dfpub['Jumlah Publikasi'],name='Publikasi Penelitian')
+    figpenSum.add_bar(x=dfluaran['Tahun'], y=dfluaran['Jumlah Luaran Lainnya'],name='Luaran Penelitian')
+    figpenSum.update_traces(hovertemplate='Tahun : %{x}<br>Jumlah : %{value}')
+    return figpenSum
+
+@app.callback(
+    Output('grf_pkmSum', 'figure'),
+    Input('fltrPKMSumStart', 'value'),
+    Input('fltrPKMSumEnd', 'value')
+)
+def graphPKMSum(start, end):
+    dfpkm = data.getDataFrameFromDBwithParams(f'''
+                        select tahun Tahun, count(*) 'Jumlah PKM'
+                        from fact_pkm fact
+                                 inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
+                                 inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
+                                 inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                                 inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+                        where dim.jenis = 'PKM'
+                          and tahun between %(start)s and %(end)s
+                        group by tahun
+                        order by tahun
+                        ''', {'start':start, 'end':end})
+    dfpub = data.getDataFrameFromDBwithParams(f'''
+                        select tahun_publikasi as Tahun, count(*) 'Jumlah Publikasi'
+                        from fact_publikasi fact
+                                 inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
+                                 inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
+                                 inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
+                                 inner join dim_penelitian_pkm dpp on dimpub.id_penelitian_pkm = dpp.id_penelitian_pkm
+                                 inner join br_pp_publikasi bpp on brpub.id_publikasi = bpp.id_publikasi
+                        where dpp.jenis = 'PKM'
+                          and tahun_publikasi between %(start)s and %(end)s
+                        group by tahun_publikasi
+                        order by tahun_publikasi
+                    ''', {'start':start, 'end':end})
+    dfluaran = data.getDataFrameFromDBwithParams(f'''
+                        select tahun Tahun, count(*) 'Jumlah Luaran Lainnya'
+                        from fact_luaran_lainnya fatl
+                                 inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
+                                 inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
+                                 inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
+                                 inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                                 inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
+                        where brl.jenis='PKM'
+                          and tahun between %(start)s and %(end)s
+                        group by tahun
+                        order by tahun
+                    ''', {'start':start, 'end':end})
+    figpkmSum = px.bar(dfpkm, x=dfpkm['Tahun'], y=dfpkm['Jumlah PKM'],color=px.Constant('PKM'),
+                      labels=dict(x='Tahun', y='Jumlah PKM', color='Keterangan'))
+    figpkmSum.add_bar(x=dfpub['Tahun'], y=dfpub['Jumlah Publikasi'],name='Publikasi PKM')
+    figpkmSum.add_bar(x=dfluaran['Tahun'], y=dfluaran['Jumlah Luaran Lainnya'],name='Luaran PKM')
+    figpkmSum.update_traces(hovertemplate='Tahun : %{x}<br>Jumlah : %{value}')
+    return figpkmSum
+
+@app.callback(
+    Output('grf_penDs', 'figure'),
+    Input('fltrPenDsNama', 'value')
+)
+def graphPenDosen(namads):
+    dfpen = data.getDataFrameFromDBwithParams(f'''
                         select upper(nama) Nama, tahun Tahun, count(*) 'Jumlah Penelitian'
                         from fact_penelitian fact
                         inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
@@ -891,10 +1808,46 @@ def graphPPPDosen(namads, radioppp):
                         group by nama, tahun
                         order by nama, tahun
                         ''', {'nama': namads})
-        figpenelitian = px.bar(dfpenelitian, x=dfpenelitian['Tahun'], y=dfpenelitian['Jumlah Penelitian'])
-        return figpenelitian
-    elif radioppp == 'pkm':
-        dfpkm = data.getDataFrameFromDBwithParams(f'''
+    dfpub = data.getDataFrameFromDBwithParams(f'''
+                        select upper(nama) Nama, tahun_publikasi as Tahun, count(*) 'Jumlah Publikasi'
+                        from fact_publikasi fact
+                        inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
+                        inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
+                        inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
+                        inner join dim_penelitian_pkm dpp on dimpub.id_penelitian_pkm = dpp.id_penelitian_pkm
+                        inner join br_pp_publikasi bpp on brpub.id_publikasi = bpp.id_publikasi
+                        where dpp.jenis='PENELITIAN'
+                               and (tahun_publikasi>=year(now())-5 and nama like %(nama)s)
+                        group by nama, tahun_publikasi
+                        order by nama, tahun_publikasi
+                    ''', {'nama': namads})
+    dfluaran = data.getDataFrameFromDBwithParams(f'''
+                        select upper(nama) Nama, tahun Tahun, count(*) 'Jumlah Luaran Lainnya'
+                        from fact_luaran_lainnya fatl
+                        inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
+                        inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
+                        inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
+                        inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                        inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
+                        where brl.jenis='PENELITIAN'
+                               and tahun>=year(now())-5 and nama like %(nama)s
+                        group by  nama, tahun
+                        order by nama, tahun
+                    ''', {'nama': namads})
+    figpenDs = px.bar(dfpen, x=dfpen['Tahun'], y=dfpen['Jumlah Penelitian'],color=px.Constant('Penelitian'),
+                      labels=dict(x='Tahun', y='Jumlah Penelitian', color='Keterangan'))
+    figpenDs.add_bar(x=dfpub['Tahun'], y=dfpub['Jumlah Publikasi'],name='Publikasi Penelitian')
+    figpenDs.add_bar(x=dfluaran['Tahun'], y=dfluaran['Jumlah Luaran Lainnya'],name='Luaran Penelitian')
+    figpenDs.update_traces(hovertemplate='Tahun : %{x}<br>Jumlah : %{value}')
+    return figpenDs
+
+
+@app.callback(
+    Output('grf_pkmDs', 'figure'),
+    Input('fltrPKMDsNama', 'value')
+)
+def graphPKMDosen(namads):
+    dfpkm = data.getDataFrameFromDBwithParams(f'''
                         select upper(nama) Nama, tahun Tahun, count(*) as 'Jumlah PKM'
                         from fact_pkm fact
                         inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
@@ -905,23 +1858,20 @@ def graphPPPDosen(namads, radioppp):
                         group by dim_dosen.id_dosen, nama, tahun
                         order by nama, tahun
                     ''', {'nama': namads})
-        figpkm = px.bar(dfpkm, x=dfpkm['Tahun'], y=dfpkm['Jumlah PKM'])
-        return figpkm
-    elif radioppp == 'pub':
-        dfpub = data.getDataFrameFromDBwithParams(f'''
+    dfpub = data.getDataFrameFromDBwithParams(f'''
                         select upper(nama) Nama, tahun_publikasi as Tahun, count(*) 'Jumlah Publikasi'
                         from fact_publikasi fact
                         inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
                         inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
                         inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
-                        where tahun_publikasi>=year(now())-5 and nama like %(nama)s
+                        inner join dim_penelitian_pkm dpp on dimpub.id_penelitian_pkm = dpp.id_penelitian_pkm
+                        inner join br_pp_publikasi bpp on brpub.id_publikasi = bpp.id_publikasi
+                        where dpp.jenis='PKM'
+                                and (tahun_publikasi>=year(now())-5 and nama like %(nama)s)
                         group by nama, tahun_publikasi
                         order by nama, tahun_publikasi
                     ''', {'nama': namads})
-        figpub = px.bar(dfpub, x=dfpub['Tahun'], y=dfpub['Jumlah Publikasi'])
-        return figpub
-    elif radioppp == 'luaran':
-        dfluaran = data.getDataFrameFromDBwithParams(f'''
+    dfluaran = data.getDataFrameFromDBwithParams(f'''
                         select upper(nama) Nama, tahun Tahun, count(*) 'Jumlah Luaran Lainnya'
                         from fact_luaran_lainnya fatl
                         inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
@@ -929,61 +1879,22 @@ def graphPPPDosen(namads, radioppp):
                         inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
                         inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
                         inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
-                        where tahun>=year(now())-5 and nama like %(nama)s
+                        where brl.jenis='PKM'
+                               and tahun>=year(now())-5 and nama like %(nama)s
                         group by  nama, tahun
                         order by nama, tahun
                     ''', {'nama': namads})
-        figluaran = px.bar(dfluaran, x=dfluaran['Tahun'], y=dfluaran['Jumlah Luaran Lainnya'])
-        return figluaran
-    elif radioppp == 'persen':
-        dfpersen = data.getDataFrameFromDBwithParams(f'''
-            select Tahun, Nama, MAX(PENELITIAN) PENELITIAN, MAX(PKM) PKM, MAX(PUBLIKASI) 'PUBLIKASI PENELITIAN & PKM', MAX(LUARANLAINNYA) 'LUARAN LAINNYA' from
-            (
-               ( select nama, dim_dosen.id_dosen, tahun, count(*) as PENELITIAN, null as PKM, null as PUBLIKASI, null as LUARANLAINNYA from fact_penelitian fact
-                    inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
-                    inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
-                    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
-                    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-                    group by nama,dim_dosen.id_dosen, tahun
-                    order by nama, tahun)
-                    union
-                (select nama, dim_dosen.id_dosen, tahun, null as PENELITIAN, count(*) as PKM , null as PUBLIKASI, null as LUARANLAINNYA  from fact_pkm fact
-                    inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
-                    inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
-                    inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
-                    inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
-                    group by dim_dosen.id_dosen, nama, tahun
-                    order by nama, tahun)
-                union
-                (select nama, dimdos.id_dosen, tahun_publikasi as tahun, null as PENELITIAN, null as PKM, count(*) as PUBLIKASI, null as LUARANLAINNYA from fact_publikasi fact
-                    inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
-                    inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
-                    inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
-                    group by nama, dimdos.id_dosen, tahun_publikasi
-                    order by nama)
-                union
-                (select nama, dim_dosen.id_dosen, tahun,
-                    null as PENELITIAN, null as PKM, null as PUBLIKASI ,
-                    count(*) LUARANLAINNYA
-                    from fact_luaran_lainnya fatl
-                    inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
-                    inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
-                    inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
-                    inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
-                    inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
-                    group by  nama, dim_dosen.id_dosen, tahun)
-            ) data
-            where Tahun>year(now())-5 and nama like %(nama)s
-            group by Nama, Tahun
-            order by Nama, Tahun
-        ''',{'nama':namads})
-        figpersen= px.bar(dfpersen, x=dfpersen['Tahun'], y=dfpersen['Jumlah Luaran Lainnya'])
-        return figpersen
+    figpkm = px.bar(dfpkm, x=dfpkm['Tahun'], y=dfpkm['Jumlah PKM'],color=px.Constant('PKM'),
+                      labels=dict(x='Tahun', y='Jumlah PKM', color='Keterangan'))
+    figpkm.add_bar(x=dfpub['Tahun'], y=dfpub['Jumlah Publikasi'], name='Publikasi PKM')
+    figpkm.add_bar(x=dfluaran['Tahun'], y=dfluaran['Jumlah Luaran Lainnya'], name='Luaran PKM')
+    figpkm.update_traces(hovertemplate='Tahun: %{x}<br>Jumlah :%{value}')
+    return figpkm
 
 @app.callback(
-    Output('grf_telitiDsMhs','figure'),
-    Input('fltrPPPDMStart','value'),
-    Input('fltrPPPDMEnd','value'),
+    Output('grf_PenDM','figure'),
+    Input('fltrPenDMStart','value'),
+    Input('fltrPenDMEnd','value'),
     Input('radio_pendm','value')
 )
 def graphPenDM(start, end, radiopendm):
@@ -1032,9 +1943,9 @@ def graphPenDM(start, end, radiopendm):
         return figtop
 
 @app.callback(
-    Output('grf_pkmDsMhs', 'figure'),
-    Input('fltrPPPDMStart', 'value'),
-    Input('fltrPPPDMEnd', 'value'),
+    Output('grf_pkmDM', 'figure'),
+    Input('fltrPKMDMStart', 'value'),
+    Input('fltrPKMDMEnd', 'value'),
     Input('radio_pkmdm', 'value')
 )
 def PKMDM(start, end, radiopkmdm):
@@ -1081,10 +1992,10 @@ def PKMDM(start, end, radiopkmdm):
         return figtoppkm
 
 @app.callback(
-    Output('grf_MitraTeliti', 'figure'),
-    Input('fltrMitraStart', 'value'),
-    Input('fltrMitraEnd', 'value'),
-    Input('radio_penmitra', 'value')
+    Output('grf_penMitra', 'figure'),
+    Input('fltrPenMitraStart', 'value'),
+    Input('fltrPenMitraEnd', 'value'),
+    Input('radio_penMitra', 'value')
 )
 def MitraPen(start, end, radiopenmitra):
     if radiopenmitra == 'top':
@@ -1160,10 +2071,10 @@ def MitraPen(start, end, radiopenmitra):
         return figwilayah
 
 @app.callback(
-    Output('grf_MitraPKM', 'figure'),
-    Input('fltrMitraStart', 'value'),
-    Input('fltrMitraEnd', 'value'),
-    Input('radio_pkmmitra', 'value')
+    Output('grf_pkmMitra', 'figure'),
+    Input('fltrPKMMitraStart', 'value'),
+    Input('fltrPKMMitraEnd', 'value'),
+    Input('radio_pkmMitra', 'value')
 )
 def PKMDM(start, end, radiopkmmitra):
     if radiopkmmitra == 'top':
@@ -1239,7 +2150,7 @@ def PKMDM(start, end, radiopkmmitra):
                                legend_title='Mitra')
         return figwilayah
 
-
+#luaran Penelitian mahasiswa
 @app.callback(
     Output('grf_pubMhs', 'figure'),
     Input('fltrPubMhsStart', 'value'),
@@ -1247,14 +2158,17 @@ def PKMDM(start, end, radiopkmmitra):
 )
 def graphPubMhs(tglstart, tglend):
     dfPubMhs = data.getDataFrameFromDBwithParams('''
-    select  tahun_ajaran 'Tahun Ajaran', 
-            count(distinct fp.id_publikasi) 'Jumlah Publikasi'
+    select tahun_ajaran                    'Tahun Ajaran',
+           count(distinct fp.id_publikasi) 'Jumlah Publikasi'
     from br_pub_mahasiswa bpm
              inner join dim_publikasi dp on bpm.id_publikasi = dp.id_penelitian_pkm
              inner join fact_publikasi fp on bpm.id_publikasi = fp.id_penelitian_pkm
              inner join dim_date dd on fp.id_tanggal_publikasi = dd.id_date
              inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
-    where fp.is_deleted != 1 and (tahun_ajaran between %(start)s and %(end)s)
+             inner join dim_penelitian_pkm dpp on dp.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where fp.is_deleted != 1
+        and jenis='PENELITIAN'
+        and (tahun_ajaran between %(start)s and %(end)s)
     group by tahun_ajaran
     order by tahun_ajaran;
     ''', {'start': tglstart, 'end': tglend})
@@ -1262,23 +2176,24 @@ def graphPubMhs(tglstart, tglend):
     figPubMhs.update_traces(mode='lines+markers')
     return figPubMhs
 
-
 @app.callback(
     Output('grf_ttguMhs', 'figure'),
     Input('fltrTTGUMhsStart', 'value'),
     Input('fltrTTGUMhsEnd', 'value')
 )
 def graphPPMhs(tglstart, tglend):
-    dfTTGUMhs = data.getDataFrameFromDBwithParams('''
-    select tahun 'Tahun',
-            count(distinct dll.id_penelitian_pkm) 'Jumlah Judul'
+    dfTTGUMhs = data.getDataFrameFromDBwithParams(f'''
+    select tahun                                 'Tahun',
+           count(distinct dll.id_penelitian_pkm) 'Jumlah Judul'
     from dim_luaran_lainnya dll
              inner join fact_luaran_lainnya fll on dll.id_penelitian_pkm = fll.id_penelitian_pkm
              inner join dim_jenis_luaran djl on dll.id_jenis_luaran = djl.id_jenis_luaran
              inner join br_ll_mahasiswa blm on dll.id_luaran_lainnya = blm.id_luaran_lainnya
-             inner join dim_date dd on dd.id_date=dll.id_tanggal_luaran
-    where keterangan_jenis_luaran='TEKNOLOGI TEPAT GUNA' 
-        and (tahun between %(start)s and %(end)s)
+             inner join dim_date dd on dd.id_date = dll.id_tanggal_luaran
+             inner join dim_penelitian_pkm dpp on dll.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where keterangan_jenis_luaran = 'TEKNOLOGI TEPAT GUNA'
+        and jenis='PENELITIAN'
+      and (tahun between %(start)s and %(end)s)
     group by tahun
     order by tahun;
     ''', {'start': tglstart, 'end': tglend})
@@ -1299,7 +2214,10 @@ def graphHKIMhs(tglstart, tglend):
              inner join fact_luaran_lainnya fll on blm.id_luaran_lainnya = fll.id_luaran_lainnya
              inner join dim_luaran_lainnya dll on blm.id_luaran_lainnya = dll.id_luaran_lainnya
              inner join dim_date dd on dd.id_date = fll.id_tanggal_luaran
-    where no_haki is not null and (tahun between %(start)s and %(end)s)
+             inner join dim_penelitian_pkm dpp on dll.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where no_haki is not null
+      and jenis='PENELITIAN'
+      and (tahun between %(start)s and %(end)s)
     group by tahun
     order by tahun;
     ''', {'start': tglstart, 'end': tglend})
@@ -1307,12 +2225,86 @@ def graphHKIMhs(tglstart, tglend):
     fig.update_traces(mode='lines+markers')
     return fig
 
+#luaran pkm mahasiswa
+@app.callback(
+    Output('grf_pubPKMMhs', 'figure'),
+    Input('fltrPubPKMMhsStart', 'value'),
+    Input('fltrPubPKMMhsEnd', 'value')
+)
+def graphPubMhs(tglstart, tglend):
+    dfPubMhs = data.getDataFrameFromDBwithParams('''
+    select tahun_ajaran                    'Tahun Ajaran',
+           count(distinct fp.id_publikasi) 'Jumlah Publikasi'
+    from br_pub_mahasiswa bpm
+             inner join dim_publikasi dp on bpm.id_publikasi = dp.id_penelitian_pkm
+             inner join fact_publikasi fp on bpm.id_publikasi = fp.id_penelitian_pkm
+             inner join dim_date dd on fp.id_tanggal_publikasi = dd.id_date
+             inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
+             inner join dim_penelitian_pkm dpp on dp.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where fp.is_deleted != 1
+        and jenis='PKM'
+       and (tahun_ajaran between %(start)s and %(end)s)
+    group by tahun_ajaran
+    order by tahun_ajaran;
+    ''', {'start': tglstart, 'end': tglend})
+    figPubMhs = px.line(dfPubMhs, x=dfPubMhs['Tahun Ajaran'], y=dfPubMhs['Jumlah Publikasi'])
+    figPubMhs.update_traces(mode='lines+markers')
+    return figPubMhs
+
+
+@app.callback(
+    Output('grf_ttguPKMMhs', 'figure'),
+    Input('fltrTTGUPKMMhsStart', 'value'),
+    Input('fltrTTGUPKMMhsEnd', 'value')
+)
+def graphPPMhs(tglstart, tglend):
+    dfTTGUMhs = data.getDataFrameFromDBwithParams('''
+    select tahun                                 'Tahun',
+           count(distinct dll.id_penelitian_pkm) 'Jumlah Judul'
+    from dim_luaran_lainnya dll
+             inner join fact_luaran_lainnya fll on dll.id_penelitian_pkm = fll.id_penelitian_pkm
+             inner join dim_jenis_luaran djl on dll.id_jenis_luaran = djl.id_jenis_luaran
+             inner join br_ll_mahasiswa blm on dll.id_luaran_lainnya = blm.id_luaran_lainnya
+             inner join dim_date dd on dd.id_date = dll.id_tanggal_luaran
+             inner join dim_penelitian_pkm dpp on dll.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where keterangan_jenis_luaran = 'TEKNOLOGI TEPAT GUNA'
+        and jenis='PKM'
+      and (tahun between %(start)s and %(end)s)
+    group by tahun
+    order by tahun;
+    ''', {'start': tglstart, 'end': tglend})
+    figTTGUMhs = px.line(dfTTGUMhs, x=dfTTGUMhs['Tahun'], y=dfTTGUMhs['Jumlah Judul'])
+    figTTGUMhs.update_traces(mode='lines+markers')
+    return figTTGUMhs
+
+
+@app.callback(
+    Output('grf_hkiPKMMhs', 'figure'),
+    Input('fltrHKIPKMMhsStart', 'value'),
+    Input('fltrHKIPKMMhsEnd', 'value')
+)
+def graphHKIMhs(tglstart, tglend):
+    dfHKIMhs = data.getDataFrameFromDBwithParams(f'''
+    select tahun 'Tahun', count(distinct fll.id_luaran_lainnya) 'Jumlah Judul'
+    from br_ll_mahasiswa blm
+             inner join fact_luaran_lainnya fll on blm.id_luaran_lainnya = fll.id_luaran_lainnya
+             inner join dim_luaran_lainnya dll on blm.id_luaran_lainnya = dll.id_luaran_lainnya
+             inner join dim_date dd on dd.id_date = fll.id_tanggal_luaran
+             inner join dim_penelitian_pkm dpp on dll.id_penelitian_pkm = dpp.id_penelitian_pkm
+    where no_haki is not null
+      and jenis='PKM'
+      and (tahun between %(start)s and %(end)s)
+    group by tahun
+    order by tahun;
+    ''', {'start': tglstart, 'end': tglend})
+    fig = px.line(dfHKIMhs, x=dfHKIMhs['Tahun'], y=dfHKIMhs['Jumlah Judul'])
+    fig.update_traces(mode='lines+markers')
+    return fig
 
 @app.callback(
     Output('grf_reTelitiDosen', 'figure'),
-    Output('grf_rePubDosen', 'figure'),
-    Input('fltrRerataStart', 'value'),
-    Input('fltrRerataEnd', 'value')
+    Input('fltrPenRerataStart', 'value'),
+    Input('fltrPenRerataEnd', 'value')
 )
 def graphRerata(tglstart, tglend):
     dfPenDs = data.getDataFrameFromDBwithParams('''
@@ -1333,10 +2325,18 @@ def graphRerata(tglstart, tglend):
     where pp.tahun=dosen.tahun and (pp.tahun between %(Start)s and %(End)s)
     group by pp.tahun, pp.jumlah, dosen.jumlah, `Rerata`
     order by pp.tahun;''', {'Start': tglstart, 'End': tglend})
-    figPenDs = px.line(dfPenDs, x=dfPenDs['Tahun'], y=dfPenDs['Rerata'], color=px.Constant('Penelitian /Dosen'))
+    figPenDs = px.line(dfPenDs, x=dfPenDs['Tahun'], y=dfPenDs['Rerata'], color=px.Constant('Penelitian /Dosen'),
+                       labels=dict(x='Tahun', y='Rerata', color='Keterangan'))
     figPenDs.update_traces(mode='lines+markers')
     figPenDs.add_bar(x=dfPenDs['Tahun'], y=dfPenDs['Jumlah Judul'], name='Penelitian')
+    return figPenDs
 
+@app.callback(
+    Output('grf_rePubDosen', 'figure'),
+    Input('fltrPKMRerataStart', 'value'),
+    Input('fltrPKMRerataEnd', 'value')
+)
+def graphRerata(tglstart, tglend):
     dfPubDs = data.getDataFrameFromDBwithParams('''
     select dd.tahun Tahun, count(distinct dp.id_publikasi) 'Jumlah Judul'
     from br_pp_publikasi bpp
@@ -1344,11 +2344,11 @@ def graphRerata(tglstart, tglend):
              inner join dim_date dd on dp.tahun_publikasi = dd.tahun
     where dd.tahun and (dd.tahun between %(Start)s and %(End)s)
     group by dd.tahun''', {'Start': tglstart, 'End': tglend})
-    figPubDs = px.bar(dfPubDs, x=dfPubDs['Tahun'], y=dfPubDs['Jumlah Judul'])
+    figPubDs = px.bar(dfPubDs, x=dfPubDs['Tahun'], y=dfPubDs['Jumlah Judul'],
+                       labels=dict(x='Tahun', y='Jumlah Judul', color='Keterangan'))
     figPubDs.update_yaxes(categoryorder='category descending')
     figPubDs.update_layout(barmode='group')
-
-    return figPenDs, figPubDs
+    return figPubDs
 
 
 # CALLBACK
@@ -1358,13 +2358,144 @@ def input_triggers_spinner(value):
     return value
 
 @app.callback(
-    Output('cll_PPPDosen', 'is_open'),
-    Output('cll_PPPDosen', 'children'),
-    Input('cll_grfpppDosen', 'n_clicks'),
-    [State('cll_PPPDosen', 'is_open')]
+    Output('cll_PenSum', 'is_open'),
+    Output('cll_PenSum', 'children'),
+    Input('cll_grfpenSum', 'n_clicks'),
+    [State('cll_PenSum', 'is_open')]
 )
-def toggle_collapse(pppds, is_open):
-    isiPPPDosen = dbc.Card(
+def toggle_collapse(pensum, is_open):
+    dfpen = data.getDataFrameFromDB('''
+                        select tahun Tahun, count(*) 'Jumlah Penelitian'
+                        from fact_penelitian fact
+                                 inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
+                                 inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
+                                 inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                                 inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+                        where dim.jenis = 'PENELITIAN'
+                          and tahun>year(now())-5
+                        group by tahun
+                        order by tahun desc''')
+    dfpub = data.getDataFrameFromDB('''
+                        select tahun_publikasi as Tahun, count(*) 'Jumlah Publikasi'
+                        from fact_publikasi fact
+                        inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
+                        inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
+                        inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
+                        inner join dim_penelitian_pkm dpp on dimpub.id_penelitian_pkm = dpp.id_penelitian_pkm
+                        inner join br_pp_publikasi bpp on brpub.id_publikasi = bpp.id_publikasi
+                        where dpp.jenis='PENELITIAN'
+                            and tahun_publikasi>year(now())-5
+                        group by tahun_publikasi
+                        order by tahun_publikasi desc''')
+    dfluaran = data.getDataFrameFromDB('''
+                        select tahun Tahun, count(*) 'Jumlah Luaran Lainnya'
+                        from fact_luaran_lainnya fatl
+                        inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
+                        inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
+                        inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
+                        inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                        inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
+                        where brl.jenis='PENELITIAN'
+                            and tahun>year(now())-5
+                        group by tahun
+                        order by tahun desc''')
+    df = dfpen.merge(dfpub,how='inner').merge(dfluaran,how='inner')
+    isiPenDosen = dbc.Card(
+        dt.DataTable(
+            id='tbl_penSum',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if pensum:
+        return not is_open, isiPenDosen
+    return is_open, None
+
+@app.callback(
+    Output('cll_PKMSum', 'is_open'),
+    Output('cll_PKMSum', 'children'),
+    Input('cll_grfpkmSum', 'n_clicks'),
+    [State('cll_PKMSum', 'is_open')]
+)
+def toggle_collapse(pkmsum, is_open):
+    dfpkm = data.getDataFrameFromDB('''
+                        select tahun Tahun, count(*) 'Jumlah PKM'
+                        from fact_pkm fact
+                                 inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
+                                 inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
+                                 inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                                 inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+                        where dim.jenis = 'PKM'
+                          and tahun>year(now())-5
+                        group by tahun
+                        order by tahun
+                        ''')
+    dfpub = data.getDataFrameFromDB('''
+                        select tahun_publikasi as Tahun, count(*) 'Jumlah Publikasi'
+                        from fact_publikasi fact
+                                 inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
+                                 inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
+                                 inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9
+                                 inner join dim_penelitian_pkm dpp on dimpub.id_penelitian_pkm = dpp.id_penelitian_pkm
+                                 inner join br_pp_publikasi bpp on brpub.id_publikasi = bpp.id_publikasi
+                        where dpp.jenis = 'PKM'
+                          and tahun_publikasi>year(now())-5
+                        group by tahun_publikasi
+                        order by tahun_publikasi
+                    ''')
+    dfluaran = data.getDataFrameFromDB('''
+                        select tahun Tahun, count(*) 'Jumlah Luaran Lainnya'
+                        from fact_luaran_lainnya fatl
+                                 inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
+                                 inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
+                                 inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
+                                 inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9
+                                 inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
+                        where brl.jenis='PKM'
+                          and tahun>year(now())-5
+                        group by tahun
+                        order by tahun
+                    ''')
+    df = dfpkm.merge(dfpub, how='left').merge(dfluaran,how='left')
+    isiPKMDosen = dbc.Card(
+        dt.DataTable(
+            id='tbl_pkmSum',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if pkmsum:
+        return not is_open, isiPKMDosen
+    return is_open, None
+
+@app.callback(
+    Output('cll_PenDs', 'is_open'),
+    Output('cll_PenDs', 'children'),
+    Input('cll_grfpenDs', 'n_clicks'),
+    [State('cll_PenDs', 'is_open')]
+)
+def toggle_collapse(pends, is_open):
+    isiPenDosen = dbc.Card(
         dt.DataTable(
             id='tbl_pppDs',
             columns=[
@@ -1381,8 +2512,36 @@ def toggle_collapse(pppds, is_open):
             export_format='xlsx'
         ), style=cardtbl_style
     )
-    if pppds:
-        return not is_open, isiPPPDosen
+    if pends:
+        return not is_open, isiPenDosen
+    return is_open, None
+
+@app.callback(
+    Output('cll_PKMDs', 'is_open'),
+    Output('cll_PKMDs', 'children'),
+    Input('cll_grfpkmDs', 'n_clicks'),
+    [State('cll_PKMDs', 'is_open')]
+)
+def toggle_collapse(pkmds, is_open):
+    isiPKMDosen = dbc.Card(
+        dt.DataTable(
+            id='tbl_pppDs',
+            columns=[
+                {'name': i, 'id': i} for i in dfjmlppp.columns
+            ],
+            data=dfjmlppp.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if pkmds:
+        return not is_open, isiPKMDosen
     return is_open, None
 
 
@@ -1485,24 +2644,43 @@ def toggle_collapse(mitrapen, mitrapkm, mitra, is_open):
         return not is_open, isiMitraPKM
     return is_open, None
 
+# @app.callback(
+#     Output("cll_tblsitasi", "is_open"),
+#     [Input("cll_grfsitasi", "n_clicks")],
+#     [State("cll_tblsitasi", "is_open")])
+# def toggle_collapse(n, is_open):
+#     if n:
+#         return not is_open
+#     return is_open
+
 @app.callback(
-    Output("cll_tblsitasi", "is_open"),
-    [Input("cll_grfsitasi", "n_clicks")],
-    [State("cll_tblsitasi", "is_open")])
+    Output("cll_tblpenSitasi", "is_open"),
+    [Input("grf_penSitasi", "n_clicks")],
+    [State("cll_tblpenSitasi", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output("cll_tblpkmSitasi", "is_open"),
+    [Input("grf_penSitasi", "n_clicks")],
+    [State("cll_tblpkmSitasi", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
 
 #LuaranDosen
+##TABEL INI
 @app.callback(
-    Output('cll_luaranPPPDosen', 'is_open'),
-    Output('cll_luaranPPPDosen', 'children'),
+    Output('cll_luaranPenDosen', 'is_open'),
+    Output('cll_luaranPenDosen', 'children'),
     [Input('cll_grfhkiDs', 'n_clicks'),
      Input('cll_grfttguDs', 'n_clicks'),
      Input('cll_grfbukuDs', 'n_clicks'),
      Input('tab_luaranDosen', 'value')],
-    [State('cll_luaranPPPDosen', 'is_open')]
+    [State('cll_luaranPenDosen', 'is_open')]
 )
 def toggle_collapse(nhkids, nttguds, nbukuds, luarands, is_open):
     isiHKIDosen = dbc.Card(
@@ -1683,58 +2861,104 @@ def toggle_collapse(nneliti, npub, ppp, is_open):
         return not is_open, isiPublikasi
     return is_open, None
 
-
 # GRAPH CALLBACK
 @app.callback(
-    Output('grf_sitasi', 'figure'),
-    Input('fltrSitasiStart', 'value'),
-    Input('fltrSitasiEnd', 'value'),
-    Input('radioSitasi', 'value')
+    Output('grf_penSitasi', 'figure'),
+    Input('fltrPenSitasiStart', 'value'),
+    Input('fltrPenSitasiEnd', 'value'),
+    Input('radioPenSitasi', 'value')
 )
-def graphSitasi(valueFrom, valueTo, radioValue):
+def graphPenSitasi(valueFrom, valueTo, radioValue):
     if radioValue == 'tahun':
         dfperth = data.getDataFrameFromDBwithParams(f'''
-            select  tahun_sitasi 'Tahun Sitasi',
-                    sum(distinct jumlah_sitasi) 'Jumlah Sitasi'
+            select tahun_sitasi                'Tahun Sitasi',
+                   sum(distinct jumlah_sitasi) 'Jumlah Sitasi'
             from fact_publikasi_sitasi fps
-                     inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
-            where tahun_sitasi between %(start)s and %(end)s
+                inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
+                inner join dim_penelitian_pkm dpp on dp.id_penelitian_pkm = dpp.id_penelitian_pkm
+            where jenis='PENELITIAN'
+                  and tahun_sitasi between %(start)s and %(end)s
             group by tahun_sitasi
             order by tahun_sitasi;
-        ''', {'start': valueFrom, 'end': 'valueTo'})
+        ''', {'start': valueFrom, 'end': valueTo})
         figperth = px.bar(dfperth, x=dfperth['Tahun Sitasi'], y=dfperth['Jumlah Sitasi'], color=dfperth['Tahun Sitasi'])
         return figperth
     elif radioValue == 'topdosen':
         dftopdosen = data.getDataFrameFromDBwithParams(f'''
-        select sub.`Tahun Sitasi`,`Nama Dosen`,`Jumlah Sitasi`
-        from
-        (select tahun_sitasi 'Tahun Sitasi',
-                dd.nama 'Nama Dosen',
-                sum(jumlah_sitasi) 'Jumlah Sitasi',
-                row_number() over (partition by tahun_sitasi order by jumlah_sitasi desc) as row
-        from fact_publikasi_sitasi fps
-            inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
-            inner join br_pub_dosen bpd on dp.id_publikasi = bpd.id_publikasi
-            inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-        where dd.id_prodi=9
-            and tahun_sitasi between %(start)s and %(end)s
-        group by dd.nama, tahun_sitasi) sub
+        select sub.`Tahun Sitasi`, `Nama Dosen`, `Jumlah Sitasi`
+        from (select tahun_sitasi                                                                 'Tahun Sitasi',
+                     dd.nama                                                                      'Nama Dosen',
+                     sum(jumlah_sitasi)                                                           'Jumlah Sitasi',
+                     row_number() over (partition by tahun_sitasi order by jumlah_sitasi desc) as row
+              from fact_publikasi_sitasi fps
+                       inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
+                       inner join dim_penelitian_pkm dpp on dp.id_penelitian_pkm = dpp.id_penelitian_pkm
+                       inner join br_pub_dosen bpd on dp.id_publikasi = bpd.id_publikasi
+                       inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+              where dd.id_prodi = 9
+                    and jenis='PENELITIAN'
+                    and tahun_sitasi between %(start)s and %(end)s
+              group by dd.nama, tahun_sitasi) sub
         where row <= 1
         order by `Tahun Sitasi`;
-        ''', {'start': valueFrom, 'end': 'valueTo'})
+        ''', {'start': valueFrom, 'end': valueTo})
         figtopds = px.bar(dftopdosen, x=dftopdosen['Tahun Sitasi'], y=dftopdosen['Jumlah Sitasi'], color=dftopdosen['Nama Dosen'])
         return figtopds
 
+@app.callback(
+    Output('grf_pkmSitasi', 'figure'),
+    Input('fltrPKMSitasiStart', 'value'),
+    Input('fltrPKMSitasiEnd', 'value'),
+    Input('radioPKMSitasi', 'value')
+)
+def graphPKMSitasi(valueFrom, valueTo, radioValue):
+    if radioValue == 'tahun':
+        dfperth = data.getDataFrameFromDBwithParams(f'''
+            select tahun_sitasi                'Tahun Sitasi',
+                   sum(distinct jumlah_sitasi) 'Jumlah Sitasi'
+            from fact_publikasi_sitasi fps
+                inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
+                inner join dim_penelitian_pkm dpp on dp.id_penelitian_pkm = dpp.id_penelitian_pkm
+            where jenis='PKM'
+                  and tahun_sitasi between %(start)s and %(end)s
+            group by tahun_sitasi
+            order by tahun_sitasi;
+        ''', {'start': valueFrom, 'end': valueTo})
+        figperth = px.bar(dfperth, x=dfperth['Tahun Sitasi'], y=dfperth['Jumlah Sitasi'], color=dfperth['Tahun Sitasi'])
+        return figperth
+    elif radioValue == 'topdosen':
+        dftopdosen = data.getDataFrameFromDBwithParams(f'''
+        select sub.`Tahun Sitasi`, `Nama Dosen`, `Jumlah Sitasi`
+        from (select tahun_sitasi                                                                 'Tahun Sitasi',
+                     dd.nama                                                                      'Nama Dosen',
+                     sum(jumlah_sitasi)                                                           'Jumlah Sitasi',
+                     row_number() over (partition by tahun_sitasi order by jumlah_sitasi desc) as row
+              from fact_publikasi_sitasi fps
+                       inner join dim_publikasi dp on fps.id_publikasi = dp.id_publikasi
+                       inner join dim_penelitian_pkm dpp on dp.id_penelitian_pkm = dpp.id_penelitian_pkm
+                       inner join br_pub_dosen bpd on dp.id_publikasi = bpd.id_publikasi
+                       inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+              where dd.id_prodi = 9
+                    and jenis='PKM'
+                    and tahun_sitasi between %(start)s and %(end)s
+              group by dd.nama, tahun_sitasi) sub
+        where row <= 1
+        order by `Tahun Sitasi`;
+        ''', {'start': valueFrom, 'end': valueTo})
+        figtopds = px.bar(dftopdosen, x=dftopdosen['Tahun Sitasi'], y=dftopdosen['Jumlah Sitasi'], color=dftopdosen['Nama Dosen'])
+        return figtopds
+
+#luaran penelitian
 @app.callback(
     Output('grf_hkiDs', 'figure'),
     Input('fltrLuaranStart', 'value'),
     Input('fltrLuaranEnd', 'value'),
     Input('fltrHKIDsNama', 'value')
 )
-def grafPubDs(start, end, namads):
-    df = data.getDataFrameFromDBwithParams(f'''
+def grafPubPenDs(start, end, namads):
+    dfhki = data.getDataFrameFromDBwithParams(f'''
     select  tahun Tahun, nama 'Nama Dosen',
-            count(dpp.id_penelitian_pkm) 'Jumlah Judul' 
+            count(dpp.id_penelitian_pkm) 'Jumlah HKI' 
     from dim_penelitian_pkm dpp
     inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
     inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
@@ -1746,177 +2970,388 @@ def grafPubDs(start, end, namads):
     group by tahun, nama,jenis_luaran
     order by tahun
     ''',{'start':start, 'end':end, 'nama':namads})
-    fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Judul'], color=df['Nama Dosen'])
-    fig.update_layout(barmode='group')
+    dfttgu = data.getDataFrameFromDBwithParams(f'''
+        select  tahun 'Tahun', 
+                nama 'Nama Dosen',
+                count(dpp.id_penelitian_pkm) 'Jumlah TTGU' 
+        from dim_penelitian_pkm dpp
+        inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+        inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+        inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+        INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+        where jenis_luaran like 'TEKNOLOGI TEPAT GUNA' 
+            and nama like %(nama)s
+            and tahun between %(start)s and %(end)s
+        group by tahun, nama,jenis_luaran
+        order by tahun
+        ''', {'start': start, 'end': end, 'nama': namads})
+    dfbuku = data.getDataFrameFromDBwithParams(f'''
+        select  tahun Tahun, 
+                nama 'Nama Dosen',
+                count(dpp.id_penelitian_pkm) 'Jumlah Buku'
+        from dim_penelitian_pkm dpp
+        inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+        inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+        inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+        INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+        where not(jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA') 
+            and nama like %(nama)s
+            and tahun between %(start)s and %(end)s
+        group by tahun, nama, jenis_luaran
+        order by tahun
+        ''', {'start': start, 'end': end, 'nama': namads})
+    fig = px.bar(dfhki, x=dfhki['Tahun'], y=dfhki['Jumlah HKI'],color=px.Constant('Hak Kekayaan Intelektual'),
+                      labels=dict(x='Tahun', y='Jumlah HKI', color='Keterangan'))
+    fig.add_bar(x=dfttgu['Tahun'], y=dfttgu['Jumlah TTGU'],name='Teknologi Tepat Guna')
+    fig.add_bar(x=dfbuku['Tahun'], y=dfbuku['Jumlah Buku'],name='Buku')
+    fig.update_traces(hovertemplate='Tahun : %{x}<br>Jumlah : %{value}')
     return fig
 
-
+#luaran PKM
 @app.callback(
-    Output('grf_ttguDs', 'figure'),
-    Input('fltrLuaranStart', 'value'),
-    Input('fltrLuaranEnd', 'value'),
-    Input('fltrTTGUDsNama', 'value')
+    Output('grf_hkiPKMDs', 'figure'),
+    Input('fltrLuaranPKMStart', 'value'),
+    Input('fltrLuaranPKMEnd', 'value'),
+    Input('fltrHKIPKMDsNama', 'value')
 )
-def grafTTGUDs(start, end, namads):
-    df = data.getDataFrameFromDBwithParams(f'''
-    select  tahun 'Tahun', 
-            nama 'Nama Dosen',
-            count(dpp.id_penelitian_pkm) 'Jumlah Judul' 
+def grafPubPKMDs(start, end, namads):
+    dfhki = data.getDataFrameFromDBwithParams(f'''
+    select tahun                        Tahun,
+           nama                         'Nama Dosen',
+           count(dpp.id_penelitian_pkm) 'Jumlah HKI'
     from dim_penelitian_pkm dpp
-    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-    where jenis_luaran like 'TEKNOLOGI TEPAT GUNA' 
-        and nama like %(nama)s
-        and tahun between %(start)s and %(end)s
-    group by tahun, nama,jenis_luaran
-    order by tahun
-    ''',{'start':start,'end':end,'nama':namads})
-    fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Judul'], color=df['Nama Dosen'])
-    # fig.update_layout(barmode='group', xaxis={'categoryorder':'total ascending'})
-    return fig
-
-@app.callback(
-    Output('grf_bukuDs', 'figure'),
-    Input('fltrLuaranStart', 'value'),
-    Input('fltrLuaranEnd', 'value'),
-    Input('fltrBukuDsNama', 'value')
-)
-def grafBukuDs(start,end,namads):
-    df = data.getDataFrameFromDBwithParams(f'''
-    select  tahun Tahun, 
-            nama 'Nama Dosen',
-            count(dpp.id_penelitian_pkm) Jumlah 
-    from dim_penelitian_pkm dpp
-    inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
-    inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
-    inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
-    INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
-    where not(jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA') 
-        and nama like %(nama)s
-        and tahun between %(start)s and %(end)s
+             inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+             inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+             inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+             INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+    where jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' and dpp.jenis='PKM'
+       and nama like %(nama)s
+       and tahun between %(start)s and %(end)s
     group by tahun, nama, jenis_luaran
     order by tahun
-    ''',{'start':start,'end':end,'nama':namads})
-    fig = px.bar(df, x=df['Tahun'], y=df['Jumlah'], color=df['Nama Dosen'])
-    # fig.update_layout(barmode='group', xaxis={'categoryorder':'total ascending'})
+    ''',{'start':start, 'end':end, 'nama':namads})
+    dfttgu = data.getDataFrameFromDBwithParams(f'''
+        select tahun                        'Tahun',
+               nama                         'Nama Dosen',
+               count(dpp.id_penelitian_pkm) 'Jumlah TTGU'
+        from dim_penelitian_pkm dpp
+                 inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+                 inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+                 inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+                 INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+        where jenis_luaran like 'TEKNOLOGI TEPAT GUNA' and dpp.jenis='PKM'
+          and nama like %(nama)s
+                and tahun between %(start)s and %(end)s
+        group by tahun, nama, jenis_luaran
+        order by tahun
+        ''', {'start': start, 'end': end, 'nama': namads})
+    dfbuku = data.getDataFrameFromDBwithParams(f'''
+        select tahun                        Tahun,
+               nama                         'Nama Dosen',
+               count(dpp.id_penelitian_pkm) 'Jumlah Buku'
+        from dim_penelitian_pkm dpp
+                 inner join br_pp_luaranlainnya bpl on dpp.id_penelitian_pkm = bpl.id_penelitian_pkm
+                 inner join br_pp_dosen bpd on bpl.id_penelitian_pkm = bpd.id_penelitian_pkm
+                 inner join dim_dosen dd on bpd.id_dosen = dd.id_dosen
+                 INNER JOIN dim_date dt on dpp.id_tanggal_selesai = dt.id_date
+        where not (jenis_luaran like 'HAK ATAS KEKAYAAN INTELEKTUAL' or jenis_luaran like 'TEKNOLOGI TEPAT GUNA')
+            and dpp.jenis='PKM'
+            and nama like %(nama)s
+            and tahun between %(start)s and %(end)s
+        group by tahun, nama, jenis_luaran
+        order by tahun
+        ''', {'start': start, 'end': end, 'nama': namads})
+    fig = px.bar(dfhki, x=dfhki['Tahun'], y=dfhki['Jumlah HKI'],color=px.Constant('Hak Kekayaan Intelektual'),
+                      labels=dict(x='Tahun', y='Jumlah HKI', color='Keterangan'))
+    fig.add_bar(x=dfttgu['Tahun'], y=dfttgu['Jumlah TTGU'],name='Teknologi Tepat Guna')
+    fig.add_bar(x=dfbuku['Tahun'], y=dfbuku['Jumlah Buku'],name='Buku')
+    fig.update_traces(hovertemplate='Tahun : %{x}<br>Jumlah : %{value}')
     return fig
 
-# @app.callback(
-#     Output('grf_pubMhs', 'figure'),
-#     Input('grf_pubMhs', 'id')
-# )
-# def grafPubMhs(id):
-#     df = dfpublikasimhs
-#     fig = px.line(df, x=df['Tahun Ajaran'], y=df['Jumlah Publikasi'])
-#     fig.update_traces(mode='lines+markers')
-#     return fig
+#penelitian dana
+@app.callback(
+    Output('grf_penDana', 'figure'),
+    Input('fltrPenDanaStart', 'value'),
+    Input('fltrPenDanaEnd', 'value'),
+    Input('radio_penDana', 'value')
+)
+def MitraPen(start, end, radiopendana):
+    if radiopendana == 'wilayah':
+        dfwil = data.getDataFrameFromDBwithParams(f'''
+        select Tahun,
+               dim_penelitian_pkm.wilayah_nama "Nama Wilayah",
+               count(*) 'Jumlah Penelitian'
+        from fact_penelitian fact
+            inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
+            inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+            inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+            inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+        where tahun between %(start)s and %(end)s
+        group by `Nama Wilayah`,tahun
+        order by tahun
+        ''',{'start':start,'end':end})
+        figwil = px.bar(dfwil, x=dfwil['Tahun'], y=dfwil['Jumlah Penelitian'], color=dfwil['Nama Wilayah'])
+        figwil.update_layout(yaxis_title='Jumlah Penelitian', xaxis_title='Tahun, Nama Wilayah',
+                                legend_title='Nama Wilayah')
+        return figwil
+    elif radiopendana == 'sumber':
+        dfsumber = data.getDataFrameFromDBwithParams(f'''
+        select Tahun,
+               dim_sumber_dana.jenis_sumber_dana "Sumber Dana",
+               count(*) 'Jumlah Penelitian'
+        from fact_penelitian fact
+            inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
+            inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+            inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+            inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+        where tahun between %(start)s and %(end)s
+        group by `Sumber Dana`,tahun
+        order by tahun
+        ''',{'start':start, 'end':end})
+        figsumber = px.bar(dfsumber, x=dfsumber['Tahun'], y=dfsumber['Jumlah Penelitian'], color=dfsumber['Sumber Dana'])
+        figsumber.update_layout(yaxis_title='Jumlah Penelitian', xaxis_title='Tahun, Sumber Dana',
+                                legend_title='Sumber Dana')
+        return figsumber
+    elif radiopendana == 'asal':
+        dfasal = data.getDataFrameFromDBwithParams(f'''
+        select Tahun,
+               dim_sumber_dana.status "Asal Sumber Dana",
+               count(*) 'Jumlah Penelitan'
+        from fact_penelitian fact
+            inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
+            inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+            inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+            inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+        where tahun between %(start)s and %(end)s
+        group by `Asal Sumber Dana`,tahun
+        order by tahun
+        ''',{'start':start, 'end':end})
+        figasal = px.bar(dfasal, x=dfasal['Tahun'], y=dfasal['Jumlah Penelitian'], color=dfasal['Asal Sumber Dana'])
+        figasal.update_layout(yaxis_title='Jumlah Penelitian', xaxis_title='Tahun, Asal Sumber Dana',
+                              legend_title='Asal Sumber Dana')
+        return figasal
 
+@app.callback(
+    Output('grf_pkmDana', 'figure'),
+    Input('fltrPKMDanaStart', 'value'),
+    Input('fltrPKMDanaEnd', 'value'),
+    Input('radio_pkmDana', 'value')
+)
+def MitraPen(start, end, radiopkmdana):
+    if radiopkmdana == 'wilayah':
+        dfwil = data.getDataFrameFromDBwithParams(f'''
+        select Tahun,
+               dim_penelitian_pkm.wilayah_nama "Nama Wilayah",
+               count(*) 'Jumlah PKM'
+        from fact_pkm fact
+        inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
+        inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+        inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+        inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+        group by Tahun, `Nama Wilayah`
+        order by tahun
+        ''',{'start':start,'end':end})
+        figwil = px.bar(dfwil, x=dfwil['Tahun'], y=dfwil['Jumlah PKM'], color=dfwil['Nama Wilayah'])
+        figwil.update_layout(yaxis_title='Jumlah PKM', xaxis_title='Tahun, Nama Wilayah',
+                                legend_title='Nama Wilayah')
+        return figwil
+    elif radiopkmdana == 'sumber':
+        dfsumber = data.getDataFrameFromDBwithParams(f'''
+        select Tahun,
+               dim_sumber_dana.jenis_sumber_dana "Sumber Dana",
+               count(*) 'Jumlah PKM'
+        from fact_pkm fact
+        inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
+        inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+        inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+        inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+        group by Tahun, `Sumber Dana`
+        order by tahun
+        ''',{'start':start, 'end':end})
+        figsumber = px.bar(dfsumber, x=dfsumber['Tahun'], y=dfsumber['Jumlah PKM'], color=dfsumber['Sumber Dana'])
+        figsumber.update_layout(yaxis_title='Jumlah PKM', xaxis_title='Tahun, Sumber Dana',
+                                legend_title='Sumber Dana')
+        return figsumber
+    elif radiopkmdana == 'asal':
+        dfasal = data.getDataFrameFromDBwithParams(f'''
+        select Tahun,
+               dim_sumber_dana.status "Asal Sumber Dana",
+               count(*) 'Jumlah PKM'
+        from fact_pkm fact
+        inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
+        inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+        inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+        inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+        group by Tahun, `Asal Sumber Dana`
+        order by tahun
+        ''',{'start':start, 'end':end})
+        figasal = px.bar(dfasal, x=dfasal['Tahun'], y=dfasal['Jumlah PKM'], color=dfasal['Asal Sumber Dana'])
+        figasal.update_layout(yaxis_title='Jumlah PKM', xaxis_title='Tahun, Asal Sumber Dana',
+                              legend_title='Asal Sumber Dana')
+        return figasal
 
-# @app.callback(
-#     Output('grf_ttguMhs', 'figure'),
-#     Input('grf_ttguMhs', 'id')
-# )
-# def grafTTGUMhs(id):
-#     df = dfttguadopsimhs
-#     fig = px.line(df, x=df['Tahun'], y=df['Jumlah Judul'])
-#     fig.update_traces(mode='lines+markers')
-#     return fig
+@app.callback(
+    Output('cll_rerataPen', 'is_open'),
+    Output('cll_rerataPen', 'children'),
+    Input('cll_grfreTelitiDosen', 'n_clicks'),
+    [State('cll_rerataPen', 'is_open')]
+)
+def toggle_collapse(rtPen, is_open):
+    df = data.getDataFrameFromDB('''
+        select pp.tahun Tahun, pp.jumlah 'Jumlah Judul', dosen.jumlah 'Jumlah Dosen', round(pp.jumlah/dosen.jumlah) Rerata
+        from (select dd.tahun tahun, count(bpd.id_penelitian_pkm) jumlah
+              from br_pp_dosen bpd
+                       inner join dim_penelitian_pkm dpp on bpd.id_penelitian_pkm = dpp.id_penelitian_pkm
+                       inner join dim_date dd on dpp.id_tanggal_selesai = dd.id_date
+              where bpd.jenis = 'Penelitian'
+              group by dd.tahun) pp,
+             (select dd.tahun tahun, count(distinct bpd.id_dosen) jumlah
+              from br_pp_dosen bpd
+                    inner join dim_penelitian_pkm dpp on bpd.id_penelitian_pkm = dpp.id_penelitian_pkm
+                    inner join dim_date dd on dpp.id_tanggal_selesai = dd.id_date
+                    inner join dim_dosen dd2 on bpd.id_dosen=dd2.id_dosen
+              where bpd.jenis = 'Penelitian'
+              group by dd.tahun)dosen
+        where pp.tahun=dosen.tahun and (pp.tahun>year(now())-6)
+        group by pp.tahun, pp.jumlah, dosen.jumlah, `Rerata`
+        order by pp.tahun desc ;''')
+    isi = dbc.Card(
+        dt.DataTable(
+            id='tbl_penDM',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if rtPen:
+        return not is_open, isi
+    return is_open, None
 
+@app.callback(
+    Output('cll_rerataPKM', 'is_open'),
+    Output('cll_rerataPKM', 'children'),
+    Input('cll_grfrePubDosen', 'n_clicks'),
+    [State('cll_rerataPKM', 'is_open')]
+)
+def toggle_collapse(rtPKM, is_open):
+    df = data.getDataFrameFromDB('''
+    select dd.tahun Tahun, count(distinct dp.id_publikasi) 'Jumlah Judul'
+    from br_pp_publikasi bpp
+             inner join dim_publikasi dp on bpp.id_penelitian_pkm = dp.id_penelitian_pkm
+             inner join dim_date dd on dp.tahun_publikasi = dd.tahun
+    where dd.tahun and (dd.tahun>year(now())-6)
+    group by dd.tahun''')
+    isi = dbc.Card(
+        dt.DataTable(
+            id='tbl_penDM',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if rtPKM:
+        return not is_open, isi
+    return is_open, None
 
-# @app.callback(
-#     Output('grf_hkiMhs', 'figure'),
-#     Input('grf_hkiMhs', 'id')
-# )
-# def grafHKIMhs(id):
-#     df = dfluaranhkimhs
-#     fig = px.line(df, x=df['Tahun'], y=df['Jumlah Judul'])
-#     fig.update_traces(mode='lines+markers')
-#     return fig
+#sini
+@app.callback(
+    Output('cll_penDana', 'is_open'),
+    Output('cll_penDana', 'children'),
+    Input('cll_grfpenDana', 'n_clicks'),
+    [State('cll_penDana', 'is_open')]
+)
+def toggle_collapse(penmitra, is_open):
+    df = data.getDataFrameFromDB('''
+    select Tahun,
+           judul_penelitian as "Judul Penelitan",
+           dim_penelitian_pkm.wilayah_nama "Nama Wilayah",
+           dim_sumber_dana.jenis_sumber_dana "Sumber Dana",
+           dim_sumber_dana.status "Asal Sumber Dana",
+           br_pp_dana.besaran_dana "Jumlah Dana"
+    from fact_penelitian fact
+        inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
+        inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+        inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+        inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+    where tahun>=year(now())-5
+    order by tahun, judul_penelitian''')
+    isi = dbc.Card(
+        dt.DataTable(
+            id='tbl_penMitra',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if penmitra:
+        return not is_open, isi
+    return is_open, None
 
-# @app.callback(
-#     Output('grf_reTelitiDosen', 'figure'),
-#     Input('grf_reTelitiDosen', 'id')
-# )
-# def grafReTelitiDosen(id):
-#     df = dfratajumlpenelitiandosen
-#     fig = px.line(df, x=df['Tahun'], y=df['Rerata'], color=px.Constant('Penelitian /Dosen'))
-#     fig.update_traces(mode='lines+markers')
-#     fig.add_bar(x=df['Tahun'], y=df['Jumlah Judul'], name='Penelitian')
-#     return fig
-
-
-# @app.callback(
-#     Output('grf_rePubDosen', 'figure'),
-#     Input('grf_rePubDosen', 'id')
-# )
-# def grafRePubDosen(id):
-#     df = dfratajumlpublikasidosen
-#     fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Judul'])
-#     fig.update_yaxes(categoryorder='category descending')
-#     fig.update_layout(barmode='group')
-#     return fig
-
-# @app.callback(
-#     Output("grf_DosenPenelitian", 'figure'), Input('grf_DosenPenelitian', 'id')
-# )
-# def FillPenelitianDosen(id):
-#     df = pd.read_sql('''select tahun, count(*) as Jumlah
-# from fact_penelitian fact
-# inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
-# inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-# group by tahun
-# order by tahun''', con)
-#     fig = px.line(df, x=df['tahun'], y=df['Jumlah'])
-#     fig.update_traces(mode='lines+markers')
-#     return fig
-
-
-# @app.callback(
-#     Output("grf_bdgDosenPenelitian", 'figure'), Input('grf_bdgDosenPenelitian', 'id')
-# )
-# def FillbdgPenelitianDosen(id):
-#     df = pd.read_sql('''select Tahun, dim_sumber_dana.status "Asal Sumber Dana", count(*) as Jumlah
-# from fact_penelitian fact
-# inner join dim_penelitian_pkm on fact.id_penelitian = dim_penelitian_pkm.id_penelitian_pkm
-# inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
-# inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
-# inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-# group by Tahun, "Asal Sumber Dana"
-# order by Tahun''', con)
-#     fig = px.bar(df, x=df['Tahun'], y=df['Jumlah'], color=df['Asal Sumber Dana'])
-#     fig.update_layout(barmode='group')
-#     return fig
-
-
-# @app.callback(
-#     Output("grf_DosenPkm", 'figure'), Input('grf_DosenPkm', 'id')
-# )
-# def FillPkmDosen(id):
-#     df = pd.read_sql('''select tahun, count(*) as Jumlah
-# from fact_pkm fact
-# inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
-# inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-# group by tahun
-# order by tahun''', con)
-#     fig = px.line(df, x=df['tahun'], y=df['Jumlah'])
-#     fig.update_traces(mode='lines+markers')
-#     return fig
-
-
-# @app.callback(
-#     Output("grf_bdgDosenPkm", 'figure'), Input('grf_bdgDosenPkm', 'id')
-# )
-# def FillbdgPkmDosen(id):
-#     df = pd.read_sql('''select Tahun, dim_sumber_dana.status "Asal Sumber Dana", count(*) as Jumlah
-# from fact_pkm fact
-# inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
-# inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
-# inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
-# inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
-# group by Tahun, "Asal Sumber Dana"
-# order by Tahun''', con)
-#     fig = px.bar(df, x=df['Tahun'], y=df['Jumlah'], color=df['Asal Sumber Dana'])
-#     fig.update_layout(barmode='group')
-#     return fig
+@app.callback(
+    Output('cll_pkmDana', 'is_open'),
+    Output('cll_pkmDana', 'children'),
+    Input('cll_grfpkmDana', 'n_clicks'),
+    [State('cll_pkmDana', 'is_open')]
+)
+def toggle_collapse(pkmdana, is_open):
+    df = data.getDataFrameFromDB('''
+    select Tahun,
+           judul as "Judul Penelitan",
+           dim_penelitian_pkm.wilayah_nama "Nama Wilayah",
+           dim_sumber_dana.jenis_sumber_dana "Sumber Dana",
+           dim_sumber_dana.status "Asal Sumber Dana",
+           br_pp_dana.besaran_dana "Jumlah Dana"
+    from fact_pkm fact
+        inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
+        inner join br_pp_dana on dim_penelitian_pkm.id_penelitian_pkm = br_pp_dana.id_penelitian_pkm
+        inner join dim_sumber_dana on br_pp_dana.id_sumber_dana = dim_sumber_dana.id_sumber_dana
+        inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+    where tahun>=year(now())-5
+    order by tahun, judul''')
+    isi = dbc.Card(
+        dt.DataTable(
+            id='tbl_pkmMitra',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if pkmdana:
+        return not is_open, isi
+    return is_open, None

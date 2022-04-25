@@ -57,6 +57,46 @@ where tahun>year(now())-5
 group by tahun, nama
 order by tahun desc, nama''', con)
 
+def getJumlahPKM(): return pd.read_sql('''
+select Tahun, Nama, max(Penelitian) Penelitian, max(pkm) as PKM , max(publikasi) as "Publikasi Penelitan dan PKM", max(LuaranLainnya) as "Luaran Lainnya" from 
+(
+   ( select nama, dim_dosen.id_dosen, tahun, count(*) as Penelitian, null as pkm, null as publikasi, null as LuaranLainnya from fact_penelitian fact
+        inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_penelitian
+        inner join br_pp_dosen on fact.id_penelitian = br_pp_dosen.id_penelitian_pkm
+        inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
+        inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+        group by nama,dim_dosen.id_dosen, tahun
+        order by nama, tahun)
+        union 
+    (select nama, dim_dosen.id_dosen, tahun, null as Penelitian, count(*) as pkm , null as publikasi, null as LuaranLainnya  from fact_pkm fact
+        inner join dim_penelitian_pkm dim on dim.id_penelitian_pkm = fact.id_pkm
+        inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
+        inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen and id_prodi = 9 
+        inner join dim_date on dim_date.id_date = dim.id_tanggal_mulai
+        group by dim_dosen.id_dosen, nama, tahun
+        order by nama, tahun)
+    union
+    (select nama, dimdos.id_dosen, tahun_publikasi as tahun, null as Penelitian, null as pkm, count(*) as publikasi, null as LuaranLainnya from fact_publikasi fact
+        inner join dim_publikasi dimpub on fact.id_publikasi = dimpub.id_publikasi
+        inner join br_pub_dosen brpub on fact.id_publikasi = brpub.id_publikasi
+        inner join dim_dosen dimdos on brpub.id_dosen = dimdos.id_dosen and id_prodi = 9  
+        group by nama, dimdos.id_dosen, tahun_publikasi
+        order by nama)        
+    union
+    (select nama, dim_dosen.id_dosen, tahun, 
+        null as Penelitian, null as pkm, null as publikasi ,  
+        count(*) LuaranLainnya
+        from fact_luaran_lainnya fatl
+        inner join dim_luaran_lainnya diml on fatl.id_luaran_lainnya = diml.id_luaran_lainnya
+        inner join br_pp_luaranlainnya brl on fatl.id_luaran_lainnya = brl.id_luaranlainnya
+        inner join br_pp_dosen brpp on brpp.id_penelitian_pkm = brl.id_penelitian_pkm
+        inner join dim_dosen on brpp.id_Dosen = dim_dosen.id_dosen and id_prodi = 9  
+        inner join dim_date on dim_date.id_date = diml.id_tanggal_luaran
+        group by  nama, dim_dosen.id_dosen, tahun)
+) data
+where tahun>year(now())-5
+group by tahun, nama
+order by tahun desc, nama''', con)
 
 # pendanaan
 def getPenelitianDana(): return pd.read_sql('''
