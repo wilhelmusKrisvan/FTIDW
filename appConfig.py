@@ -20,7 +20,7 @@ db = SQLAlchemy()
 
 #app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.BOOTSTRAP])
 #app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,dbc.icons.FONT_AWESOME])
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.COSMO,'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'])
 server = app.server
 app.config.suppress_callback_exceptions = True
 
