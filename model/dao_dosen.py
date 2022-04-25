@@ -31,14 +31,22 @@ def getDataFrameFromDBwithParams(query, parameter):
 #         group by tahun) data
 #         where data.tahun<=2020) dosen
 #     where dosen.tahun=data.tahun''', con)
-
-def getDosenS3():
+def getDosenTetapINF():
     return pd.read_sql('''
-    select dim_dosen.id_dosen, nama, max(tingkat_pendidikan) tingkat_pendidikan from fact_pendidikan_dosen
-        inner join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
-        where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null
-        group by dim_dosen.id_dosen, nama
-        order by nama''',con)
+    select nama, nik, nomor_induk,
+    tipe_nomor_induk,jenis_kelamin,
+    no_sertifikat, status_yayasan from dim_dosen
+    where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
+    order by nama''', con)
+
+# keknya ini belom bener
+def getDosenIndustriPraktisi():
+    return pd.read_sql(''' select nama, nik, kode_dosen, 
+    jenis_kelamin,no_sertifikat,status_dosen,
+    status_dikti,status_yayasan
+    from dim_dosen
+    where is_praktisi="1"
+    order by nama''',con)
 
 
 # def getJabfungperTahun():
@@ -102,7 +110,7 @@ def getPersenJabfungAkumulasiperTahun():
     where jabatan_dosen not like 'KONTRAK' and tahun>=2019 and id_prodi=9
     group by tahun) jabatan
     where jabatan.tahun=dosen.tahun
-    order by tahun asc''', con)
+    order by tahun desc''', con)
 
 def getPersenJabfungperTahun():
     return pd.read_sql('''
@@ -148,20 +156,10 @@ def getPersenJabfungperTahun():
     order by Tahun desc,Jabatan;
     ''',con)
 
-
-def getDosenTetapINF():
+def getDosenS3():
     return pd.read_sql('''
-    select nama, nik, nomor_induk,
-    tipe_nomor_induk,jenis_kelamin,
-    no_sertifikat, status_yayasan from dim_dosen
-    where id_prodi = 9 and status_dosen = "TETAP" and tanggal_keluar is null
-    order by nama''', con)
-
-# keknya ini belom bener
-def getDosenIndustriPraktisi():
-    return pd.read_sql(''' select nama, nik, kode_dosen, 
-    jenis_kelamin,no_sertifikat,status_dosen,
-    status_dikti,status_yayasan
-    from dim_dosen
-    where is_praktisi="1"
-    order by nama''',con)
+    select dim_dosen.id_dosen, nama, max(tingkat_pendidikan) tingkat_pendidikan from fact_pendidikan_dosen
+        inner join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
+        where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null
+        group by dim_dosen.id_dosen, nama
+        order by nama''',con)

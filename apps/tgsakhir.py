@@ -27,9 +27,8 @@ dfjumllulusan = data.getJmlLulusan()
 dfjumllulusanot = data.getJumlLulusSkripsiOntime()
 
 dfskripmhs = data.getMhahasiswaSkripsipkm()
-dfskripsi = data.getMhahasiswaSkripsi()
 dfmitra = data.getMitraKP()
-dfmitraSkripsi = data.getMitraSkripsi()
+dfmitraSkripsi=data.getMitraSkripsi()
 dfttgumhs = data.getTTGU()
 dfpersen_mhsLulus = data.getMahasiswaLulus()
 dfpersen_mhsLulusAngkt = data.getMahasiswaLulusBandingTotal()
@@ -139,7 +138,7 @@ for x in range(0, 5):
 #------------KP------------
 kp_prodi = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Mahasiswa KP/Magang per Semester',
+        html.H5('KP Prodi Informatika',
                 style=ttlgrf_style),
         dbc.Row([
             dbc.Col([
@@ -164,7 +163,7 @@ kp_prodi = dbc.Container([
             ])
         ], style={'padding': '15px'}),
         dcc.Tabs([
-            dcc.Tab(label='Jumlah Seluruh KP Prodi Informatika', value='all',
+            dcc.Tab(label='All', value='all',
                     children=[
                         html.Div([
                             dcc.Loading(
@@ -175,7 +174,7 @@ kp_prodi = dbc.Container([
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Jumlah KP Terlibat PKM Dosen', value='PKMDosen',
+            dcc.Tab(label='PKM Dosen', value='PKMDosen',
                     children=[
                         html.Div([
                             dcc.Loading(
@@ -252,66 +251,9 @@ ttguKP = dbc.Container([
 ], style=cont_style)
 
 #------------SKRIPSI------------
-skripsiall = dbc.Container([
-    dbc.Card([
-        html.H5('Jumlah Mahasiswa Skripsi', style=ttlgrf_style),
-        html.Div([
-            dbc.Row([
-                dbc.Col([
-                    html.P('Dari : ', style={'marginBottom': 0}),
-                    dcc.Dropdown(
-                        id='fltrSkripsiStart',
-                        options=[{'label': i, 'value': i} for i in listDropdownTh],
-                        value=listDropdownTh[0],
-                        style={'color': 'black'},
-                        clearable=False
-                    )
-                ]),
-                dbc.Col([
-                    html.P('Sampai : ', style={'marginBottom': 0}),
-                    dcc.Dropdown(
-                        id='fltrSkripsiEnd',
-                        options=[{'label': i, 'value': i} for i in listDropdownTh],
-                        value=listDropdownTh[3],
-                        style={'color': 'black'},
-                        clearable=False
-                    )
-                ])
-            ])
-        ]),
-        html.Div([
-            dcc.Loading(
-                id='loading-1',
-                type="default",
-                children=dcc.Graph(id='grf_skripsi')),
-            dbc.Button('Lihat Semua Data', id='cll_grfskripsi', n_clicks=0,
-                        style=button_style)
-        ])
-    ], style=cardgrf_style),
-    dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_skripsi',
-                columns=[{"name": i, "id": i} for i in dfskripsi.columns],
-                data=dfskripsi.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'height': '100%', 'padding': '10px',
-                             'overflowY': 'auto', 'margin-top': '25px'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                export_format='xlsx',
-                page_size=5
-            ), style=cardtbl_style
-        ),
-        id='cll_tblskripsi',
-        is_open=False
-    )
-], style=cont_style)
-
 skripsi = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Mahasiswa Skripsi Terlibat PKM Dosen', style=ttlgrf_style),
+        html.H5('Mahasiswa Skripsi Terlibat PKM', style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
@@ -365,6 +307,29 @@ skripsi = dbc.Container([
         is_open=False
     )
 ], style=cont_style)
+# skripsii = dbc.Container([
+#     dbc.Row([
+#         dbc.Col(
+#             dbc.Card([
+#                 html.H5('Mahasiswa Skripsi Terlibat PKM',
+#                         style=ttlgrf_style),
+#                 dt.DataTable(
+#                     id='tbl_skripmhs',
+#                     columns=[{"name": i, "id": i} for i in dfskripmhs.columns],
+#                     data=dfskripmhs.to_dict('records'),
+#                     sort_action='native',
+#                     sort_mode='multi',
+#                     style_table={'width': '100%', 'height': '100%', 'padding': '10px',
+#                                  'overflowY': 'auto', 'margin-top': '25px'},
+#                     style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+#                     style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+#                     page_size=5
+#                 )
+#             ], style=cardgrf_style
+#             ),
+#         )
+#     ], style={'margin-top': '10px'})
+# ], style=cont_style)
 
 dosbing = dbc.Container([
     dbc.Card([
@@ -374,29 +339,14 @@ dosbing = dbc.Container([
                 dbc.Row(
                     dbc.Col([
                         html.Div([
-                            dbc.Row([
-                                dbc.Col([
-                                    html.P('Semester:', style={'marginBottom': 0}),
-                                    dcc.Dropdown(
-                                        id='fltrDosbingS',
-                                        options=[{'label': i, 'value': i} for i in listDropdownSem],
-                                        value=listDropdownSem[0],
-                                        style={'color': 'black'},
-                                        clearable=False
-                                    )
-                                ]),
-                                dbc.Col([
-                                    html.P('Tahun Ajaran :', style={'marginBottom': 0}),
-                                    dcc.Dropdown(
-                                        id='fltrDosbing',
-                                        options=[{'label': i, 'value': i} for i in listDropdownTA],
-                                        value=listDropdownTA[0],
-                                        style={'color': 'black'},
-                                        clearable=False
-                                    )
-                                ])
-                            ])
-
+                            html.P('Tahun Ajaran :', style={'marginBottom': 0}),
+                            dcc.Dropdown(
+                                id='fltrDosbing',
+                                options=[{'label': i, 'value': i} for i in listDropdownTA],
+                                value=listDropdownTA[0],
+                                style={'color': 'black'},
+                                clearable=False
+                            )
                         ])
                     ])
                 ),
@@ -632,7 +582,7 @@ persen_mhsLulus = dbc.Container([
 
 ipk_lulusan = dbc.Container([
     dbc.Card([
-        html.H5('IPK Lulusan',
+        html.H5('8.a. IPK Lulusan',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
@@ -796,9 +746,9 @@ masa_studi = dbc.Container([
         is_open=False)
 ], style=cont_style)
 
-mitraKP = dbc.Container([
+mitra = dbc.Container([
     dbc.Card([
-        html.H5('Mitra yang Terlibat KP',style=ttlgrf_style),
+        html.H5('Mitra yang Terlibat KP-Skripsi-Yudisium',style=ttlgrf_style),
         html.Div([
             dbc.Row([
                 dbc.Col([
@@ -973,24 +923,22 @@ tgsakhir = dbc.Container([
             dcc.Tab(label='Kerja Praktik', value='kp',
                     children=[
                         kp_prodi,
-                        ttguKP,
-                        mitraKP
+                        ttguKP
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Skripsi', value='skripsi',
                     children=[
-                        skripsiall,
                         skripsi,
-                        dosbing,
-                        mitraSkripsi
+                        dosbing
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Yudisium', value='yudisium',
                     children=[
                         persen_mhsLulus,
-                        juml_lulusan,
                         ipk_lulusan,
-                        masa_studi
+                        juml_lulusan,
+                        masa_studi,
+                        mitra
                     ],
                     style=tab_style, selected_style=selected_style)
         ], style=tabs_styles, value='kp')
@@ -999,7 +947,7 @@ tgsakhir = dbc.Container([
 
 layout = html.Div([
     html.Div(
-        html.H1('KP, Skripsi, Yudisium',
+        html.H1('Analisis KP, Skripsi, Yudisium',
                 style={'margin-top': '30px', 'textAlign': 'center'}
                 )
     ),
@@ -1082,7 +1030,17 @@ def graphKPProdi(thstart, thend):
     group by dim_semester.tahun_ajaran, dim_semester.semester_nama
     order by dim_semester.tahun_ajaran, dim_semester.semester_nama ''', {'start': thstart, 'end': thend})
     figPKM = px.bar(dfPKM, y=dfPKM['Jumlah KP'], x=dfPKM['Tahun Ajaran'], color=dfPKM['Semester'], barmode='group')
-    return figAll, figPKM
+    fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                     font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                     yshift=10)
+    if (len(dfPKM['Tahun Ajaran']) != 0 and len(dfAll['Tahun Ajaran']) != 0):
+        return figAll, figPKM
+    elif(len(dfPKM['Tahun Ajaran']) != 0 and len(dfAll['Tahun Ajaran']) == 0):
+        return fig, figPKM
+    elif (len(dfPKM['Tahun Ajaran']) == 0 and len(dfAll['Tahun Ajaran']) != 0):
+        return figAll, fig
+    else:
+        return fig,fig
 
 @app.callback(
     Output("cll_tblkpttgu", "is_open"),
@@ -1107,23 +1065,20 @@ def graphMhsKPTTGU(start,end):
     group by tahun_ajaran, semester_nama
     order by tahun_ajaran, semester_nama
     ''',{'start':start,'end':end})
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Semester'], barmode='group')
-    return fig
+    if (len(df['Semester']) != 0):
+        fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Semester'], barmode='group')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 #------------SKRIPSI------------
 @app.callback(
     Output("cll_tbldosbing", "is_open"),
     [Input("cll_grfdosbing", "n_clicks")],
     [State("cll_tbldosbing", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-@app.callback(
-    Output("cll_tblskripsi", "is_open"),
-    [Input("cll_grfskripsi", "n_clicks")],
-    [State("cll_tblskripsi", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
@@ -1137,36 +1092,6 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
-
-@app.callback(
-    Output('grf_skripsi','figure'),
-    Input('fltrSkripsiStart','value'),
-    Input('fltrSkripsiEnd','value')
-)
-def graphSkripsiPKM(start,end):
-    df = data.getDataFrameFromDBwithParams('''
-        select c.Semester, `Mahasiswa Skripsi`, Penelitian
-        from
-        (select concat(semester_nama, ' ', tahun_ajaran) 'Semester', count(distinct fs.id_mahasiswa) as 'Penelitian'
-            from fact_skripsi fs
-            inner join dim_semester ds on fs.id_semester = ds.id_semester
-            inner join br_pp_skripsi bps on fs.id_mahasiswa = bps.id_mahasiswa
-            inner join dim_penelitian_pkm dpp on bps.id_penelitian_pkm = dpp.id_penelitian_pkm
-        where dpp.jenis='PENELITIAN' and tahun_ajaran between %(start)s and %(end)s
-        group by Semester, kode_semester
-        order by kode_semester desc, Semester) b,
-        (select concat(semester_nama, ' ', tahun_ajaran) 'Semester', count(distinct fs.id_mahasiswa) as 'Mahasiswa Skripsi'
-        from fact_skripsi fs
-            inner join dim_semester ds on fs.id_semester = ds.id_semester
-        where tahun_ajaran between %(start)s and %(end)s
-        group by Semester, kode_semester
-        order by kode_semester asc, Semester) c
-        where b.Semester=c.Semester
-        ''', {'start': start, 'end': end})
-    fig = px.bar(df, y=df['Mahasiswa Skripsi'], x=df['Semester'])
-    fig.add_scatter(y=df['Penelitian'], x=df['Semester'], name='Penelitian',
-                    hovertemplate="Penelitian <br>Jumlah Mahasiswa=%{y} </br> Semester= %{x}")
-    return fig
 
 @app.callback(
     Output('grf_skripsipkm','figure'),
@@ -1183,25 +1108,35 @@ def graphSkripsiPKM(start,end):
     group by semester_nama, tahun_ajaran
     order by tahun_ajaran asc,semester_nama asc
         ''', {'start': start, 'end': end})
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Semester'], barmode='group')
-    return fig
+    if (len(df['Semester']) != 0):
+        fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Semester'], barmode='group')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_dosbing', 'figure'),
     Input('fltrDosbing', 'value'),
-    Input('fltrDosbingS', 'value'),
 )
-def graphDosbing(value, valueS):
-    df = data.getDataFrameFromDBwithParams('''
-    select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',count(id_mahasiswa) 'Jumlah Mahasiswa', nama 'Nama Dosen' 
+def graphDosbing(value):
+    df = data.getDataFrameFromDBwithParams('''select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',count(id_mahasiswa) 'Jumlah Mahasiswa', nama 'Nama Dosen' 
     from fact_skripsi fs
-    inner join dim_dosen dd on fs.id_dosen_pembimbing1=dd.id_dosen
-    inner join dim_semester ds on fs.id_semester = ds.id_semester
-    where tahun_ajaran=%(tahun_ajaran)s and semester_nama=%(semester_nama)s
-    group by tahun_ajaran,semester_nama,nama
-    order by `Jumlah Mahasiswa` asc''', {'tahun_ajaran': value, 'semester_nama':valueS})
-    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Mahasiswa'])
-    return fig
+inner join dim_dosen dd on fs.id_dosen_pembimbing1=dd.id_dosen
+inner join dim_semester ds on fs.id_semester = ds.id_semester
+where tahun_ajaran=%(tahun_ajaran)s
+group by tahun_ajaran,semester_nama,nama
+order by tahun_ajaran desc, semester_nama asc''', {'tahun_ajaran': value})
+    if (len(df['Semester']) != 0):
+        fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Mahasiswa'], color=df['Semester'], barmode='group')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 #------------YUDISIUM------------
 @app.callback(
@@ -1286,8 +1221,15 @@ def graphPersenMHSLulusOT(start, end, radio):
               and tahun_ajaran between %(start)s and %(end)s
             order by tahun_ajaran asc;
             ''', {'start': start, 'end': end})
-        figOnTime = px.bar(dfOnTimeLlsn, y=dfOnTimeLlsn.columns[2:4], x=dfOnTimeLlsn['Tahun Ajaran'], barmode='group')
-        return figOnTime
+        if (len(dfOnTimeLlsn['Tahun Ajaran']) != 0):
+            figOnTime = px.bar(dfOnTimeLlsn, y=dfOnTimeLlsn.columns[2:4], x=dfOnTimeLlsn['Tahun Ajaran'],
+                               barmode='group')
+            return figOnTime
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig
     elif radio=='persenot':
         dfPersenOTLulusan = data.getDataFrameFromDBwithParams(f'''
         select tahun_ajaran                     'Tahun Ajaran',
@@ -1315,8 +1257,15 @@ def graphPersenMHSLulusOT(start, end, radio):
               and tahun_ajaran between %(start)s and %(end)s
             order by tahun_ajaran asc;
         ''',{'start': start, 'end': end})
-        figPersenOT = px.line(dfPersenOTLulusan, y=dfPersenOTLulusan['Persentase'], x=dfPersenOTLulusan['Tahun Ajaran'])
-        return figPersenOT
+        if (len(dfPersenOTLulusan['Tahun Ajaran']) != 0):
+            figPersenOT = px.line(dfPersenOTLulusan, y=dfPersenOTLulusan['Persentase'],
+                                  x=dfPersenOTLulusan['Tahun Ajaran'])
+            return figPersenOT
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig
 
 
 @app.callback(
@@ -1347,8 +1296,14 @@ def graphPersenMHSLulusOT(start, end, radio):
         where lulus.tahun_angkatan = total.tahun_angkatan 
         order by lulus.tahun_angkatan desc;
         ''',{'start':start, 'end':end})
-        figtot = px.bar(dftot, y=dftot.columns[2:4], x=dftot['Angkatan'])
-        return figtot
+        if (len(dftot['Angkatan']) != 0):
+            figtot = px.bar(dftot, y=dftot.columns[2:4], x=dftot['Angkatan'])
+            return figtot
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig
     elif radio == 'persentot':
         dftotpersen = data.getDataFrameFromDBwithParams(f'''
         select lulus.tahun_angkatan                'Angkatan',
@@ -1369,8 +1324,14 @@ def graphPersenMHSLulusOT(start, end, radio):
             and lulus.tahun_angkatan between %(start)s and %(end)s
         order by lulus.tahun_angkatan desc;
         ''',{'start':start, 'end':end})
-        figtotpersen = px.line(dftotpersen, y=dftotpersen['Persentase'], x=dftotpersen['Angkatan'])
-        return figtotpersen
+        if (len(dftotpersen['Angkatan']) != 0):
+            figtotpersen = px.line(dftotpersen, y=dftotpersen['Persentase'], x=dftotpersen['Angkatan'])
+            return figtotpersen
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig
 
 
 @app.callback(
@@ -1406,13 +1367,20 @@ def graphIPKLulusan(thstart, thend):
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by tahun_ajaran_yudisium
     order by tahun_ajaran_yudisium;''', {'start': thstart, 'end': thend})
-    fig = px.bar(dfavg, y=dfavg['Rata-rata IPK'], x=dfavg['Tahun Ajaran Yudisium'], color=px.Constant('Rata-rata IPK'),
-                 labels=dict(x="Tahun Ajaran Yudisium", y="IPK", color="IPK"))
-    fig.add_scatter(y=dfmax['IPK'], x=dfmax['Tahun Ajaran Yudisium'], name='IPK Tertinggi',
-                    hovertemplate="IPK=Tertinggi <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
-    fig.add_scatter(y=dfmin['IPK'], x=dfmin['Tahun Ajaran Yudisium'], name='IPK Terendah',
-                    hovertemplate="IPK=Terendah <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
-    return fig
+    if (len(dfavg['Tahun Ajaran Yudisium']) != 0):
+        fig = px.bar(dfavg, y=dfavg['Rata-rata IPK'], x=dfavg['Tahun Ajaran Yudisium'],
+                     color=px.Constant('Rata-rata IPK'),
+                     labels=dict(x="Tahun Ajaran Yudisium", y="IPK", color="IPK"))
+        fig.add_scatter(y=dfmax['IPK'], x=dfmax['Tahun Ajaran Yudisium'], name='IPK Tertinggi',
+                        hovertemplate="IPK=Tertinggi <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
+        fig.add_scatter(y=dfmin['IPK'], x=dfmin['Tahun Ajaran Yudisium'], name='IPK Terendah',
+                        hovertemplate="IPK=Terendah <br>IPK=%{y} </br> Tahun Ajaran= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -1471,9 +1439,16 @@ def graphJLulusan(thstart, thend):
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by kode_semester, Semester
     order by kode_semester desc, Semester''', {'start': thstart, 'end': thend})
-    fig = px.bar(df, y=df['Jumlah Mahasiswa Yudisium'], x=df['Semester'], color=px.Constant('Jumlah Mahasiswa Yudisium'),
-                 labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
-    return fig
+    if (len(df['Semester']) != 0):
+        fig = px.bar(df, y=df['Jumlah Mahasiswa Yudisium'], x=df['Semester'],
+                     color=px.Constant('Jumlah Mahasiswa Yudisium'),
+                     labels=dict(x="Tahun Ajaran", y="Jumlah", color="Keterangan"))
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_skripsiontime', 'figure'),
@@ -1495,8 +1470,14 @@ def graphJLulusanOT(thstart, thend):
     where id_dosen_penguji1 <>'' and (dim_semester.tahun_ajaran between %(start)s and %(end)s)
     group by dim_semester.tahun_ajaran, dim_mahasiswa.tahun_angkatan
     order by dim_semester.tahun_ajaran,dim_mahasiswa.tahun_angkatan''', {'start': thstart, 'end': thend})
-    fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Angkatan'], barmode='stack')
-    return fig
+    if (len(df['Tahun Ajaran']) != 0):
+        fig = px.bar(df, y=df['Jumlah Mahasiswa'], x=df['Tahun Ajaran'], color=df['Angkatan'], barmode='stack')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output("cll_tblallmasa", "is_open"),
@@ -1582,9 +1563,15 @@ def graphMSLulusan(start, end):
     ) mhsditerima on mhsditerima.`Tahun Ajaran` = `Tahun Masuk`
     order by `Tahun Masuk` desc
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Masuk'], y=df.columns[1:6],
-                 labels=dict(x="Tahun Ajaran Masuk", y="Masa Studi (Bulan)", color="Keterangan"))
-    return fig
+    if (len(df['Tahun Masuk']) != 0):
+        fig = px.bar(df, x=df['Tahun Masuk'], y=df.columns[1:6],
+                     labels=dict(x="Tahun Ajaran Masuk", y="Masa Studi (Bulan)", color="Keterangan"))
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_msrerata', 'figure'),
@@ -1598,23 +1585,20 @@ def graphMSLulusan(start, end):
     where tahun_ajaran_yudisium between %(start)s and %(end)s
     group by tahun_ajaran_yudisium
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, y=df['Masa Studi (Bulanan)'], x=df['TA Yudisium'], color=px.Constant('Masa Studi (Bulanan)'),
-                 labels=dict(x="TA Yudisium", y="Masa Studi (Bulanan)", color="Keterangan"))
-    return fig
+    if (len(df['Masa Studi (Bulanan)']) != 0):
+        fig = px.bar(df, y=df['Masa Studi (Bulanan)'], x=df['TA Yudisium'], color=px.Constant('Masa Studi (Bulanan)'),
+                     labels=dict(x="TA Yudisium", y="Masa Studi (Bulanan)", color="Keterangan"))
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output("cll_tblmitra", "is_open"),
     [Input("cll_grfmitra", "n_clicks")],
     [State("cll_tblmitra", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-@app.callback(
-    Output("cll_tblmitraS", "is_open"),
-    [Input("cll_grfmitraS", "n_clicks")],
-    [State("cll_tblmitraS", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
@@ -1635,12 +1619,17 @@ def PKMDM(sem, ta, radiomitrakp):
             inner join dim_mitra dm on fk.id_mitra = dm.id_mitra
         where tahun_ajaran=%(ta)s and semester_nama=%(sem)s
         group by nama_mitra
-        order by Jumlah desc 
+        order by Jumlah desc
         limit 10;
         ''',{'sem':sem,'ta':ta})
-        figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
-        figkpsummitra.update_xaxes(categoryorder='category descending')
-        return figkpsummitra
+        if (len(dfsumkp['Jumlah']) != 0):
+            figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
+            return figkpsummitra
+        else:
+            figkpsummitra = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return figkpsummitra
     elif radiomitrakp == 'jenis':
         dfjeniskp = data.getDataFrameFromDBwithParams(f'''
         select concat(semester_nama,' ',tahun_ajaran) Semester,
@@ -1660,10 +1649,17 @@ def PKMDM(sem, ta, radiomitrakp):
         group by semester_nama, `Jenis Mitra`, Semester
         order by semester_nama desc, `Jenis Mitra`, Semester;
         ''',{'sem':sem,'ta':ta})
-        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Semester'], y=dfjeniskp['Jumlah KP'], color=dfjeniskp['Jenis Mitra'])
-        figjenis.update_layout(barmode='group', yaxis_title='Jumlah KP', xaxis_title='Tahun, Jenis Mitra',
-                               legend_title='Mitra')
-        return figjenis
+        if (len(dfjeniskp['Semester']) != 0):
+            figjenis = px.bar(dfjeniskp, x=dfjeniskp['Semester'], y=dfjeniskp['Jumlah KP'],
+                              color=dfjeniskp['Jenis Mitra'])
+            figjenis.update_layout(barmode='group', yaxis_title='Jumlah KP', xaxis_title='Tahun, Jenis Mitra',
+                                   legend_title='Mitra')
+            return figjenis
+        else:
+            figjenis = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return figjenis
     elif radiomitrakp == 'wilayah':
         dfkpwilayah = data.getDataFrameFromDBwithParams(f'''
         select concat(semester_nama,' ',tahun_ajaran) Semester,
@@ -1681,10 +1677,17 @@ def PKMDM(sem, ta, radiomitrakp):
         group by kode_semester,`Wilayah Mitra`,Semester
         order by kode_semester desc,`Wilayah Mitra`,Semester
         ''', {'sem':sem,'ta':ta})
-        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Semester'], y=dfkpwilayah['Jumlah KP'], color=dfkpwilayah['Wilayah Mitra'])
-        figwilayah.update_layout(yaxis_title='Jumlah KP', xaxis_title='Semester, Wilayah Mitra',
-                               legend_title='Mitra')
-        return figwilayah
+        if (len(dfkpwilayah['Semester']) != 0):
+            figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Semester'], y=dfkpwilayah['Jumlah KP'],
+                                color=dfkpwilayah['Wilayah Mitra'])
+            figwilayah.update_layout(yaxis_title='Jumlah KP', xaxis_title='Semester, Wilayah Mitra',
+                                     legend_title='Mitra')
+            return figwilayah
+        else:
+            figwilayah = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return figwilayah
 
 @app.callback(
     Output('grf_mitraS', 'figure'),
@@ -1706,9 +1709,15 @@ def PKMDM(sem, ta, radiomitrakp):
         order by Jumlah desc
         limit 10;
         ''',{'ta':ta,'sem':sem})
-        figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
-        figkpsummitra.update_xaxes(categoryorder='category descending')
-        return figkpsummitra
+        if (len(dfsumkp['Jumlah']) != 0):
+            figkpsummitra = px.bar(dfsumkp, y=dfsumkp['Nama Mitra'], x=dfsumkp['Jumlah'])
+            figkpsummitra.update_xaxes(categoryorder='category descending')
+            return figkpsummitra
+        else:
+            figkpsummitra = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return figkpsummitra
     elif radiomitrakp == 'jenis':
         dfjeniskp = data.getDataFrameFromDBwithParams(f'''
         select concat(semester_nama,' ',tahun_ajaran) Semester,
@@ -1730,10 +1739,17 @@ def PKMDM(sem, ta, radiomitrakp):
         group by semester_nama, `Jenis Mitra`, Semester
         order by semester_nama desc, `Jenis Mitra`, Semester;
         ''',{'ta':ta,'sem':sem})
-        figjenis = px.bar(dfjeniskp, x=dfjeniskp['Semester'], y=dfjeniskp['Jumlah Skripsi'], color=dfjeniskp['Jenis Mitra'])
-        figjenis.update_layout(barmode='group', yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Jenis Mitra',
-                               legend_title='Mitra')
-        return figjenis
+        if (len(dfjeniskp['Semester']) != 0):
+            figjenis = px.bar(dfjeniskp, x=dfjeniskp['Semester'], y=dfjeniskp['Jumlah Skripsi'],
+                              color=dfjeniskp['Jenis Mitra'])
+            figjenis.update_layout(barmode='group', yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Jenis Mitra',
+                                   legend_title='Mitra')
+            return figjenis
+        else:
+            figjenis = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return figjenis
     elif radiomitrakp == 'wilayah':
         dfkpwilayah = data.getDataFrameFromDBwithParams(f'''
         select concat(semester_nama,' ',tahun_ajaran) Semester,
@@ -1753,7 +1769,14 @@ def PKMDM(sem, ta, radiomitrakp):
         group by semester_nama, `Wilayah Mitra`, Semester
         order by semester_nama desc, `Wilayah Mitra`, Semester;
         ''', {'ta':ta,'sem':sem})
-        figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Semester'], y=dfkpwilayah['Jumlah Skripsi'], color=dfkpwilayah['Wilayah Mitra'])
-        figwilayah.update_layout(yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Wilayah Mitra',
-                               legend_title='Mitra')
-        return figwilayah
+        if (len(dfkpwilayah['Semester']) != 0):
+            figwilayah = px.bar(dfkpwilayah, x=dfkpwilayah['Semester'], y=dfkpwilayah['Jumlah Skripsi'],
+                                color=dfkpwilayah['Wilayah Mitra'])
+            figwilayah.update_layout(yaxis_title='Jumlah Skripsi', xaxis_title='Tahun, Wilayah Mitra',
+                                     legend_title='Mitra')
+            return figwilayah
+        else:
+            figwilayah = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return figwilayah

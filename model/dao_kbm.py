@@ -22,71 +22,55 @@ where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat
 group by ds.tahun_ajaran, ds.semester_nama
 order by ds.tahun_ajaran, ds.semester_nama''', con)
 
-
-def getMatkulKurikulumBaru():
-    return pd.read_sql('''
-    select kode_matakuliah Kode, 
-    kelompok_matakuliah 'Kelompok Matakuliah',
-    dk.kode_kurikulum as Kurikulum, 
-    upper(nama_matakuliah) Matakuliah, sks SKS 
-    from fact_matakuliah_kurikulum fmk
-inner join dim_matakuliah dm on fmk.id_matakuliah = dm.id_matakuliah
-inner join dim_kurikulum dk on dk.id_kurikulum = fmk.id_kurikulum
-order by kode_kurikulum,kelompok_matakuliah desc''', con)
-
-
-def getMatkulBatal():
-    return pd.read_sql('''
-    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, 
-    dd.nama Nama, dm.nama_matakuliah Matakuliah,dm.kelompok_matakuliah
-from fact_dosen_mengajar
-inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
-inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
-inner join dim_matakuliah dm on dm.id_matakuliah = fact_dosen_mengajar.id_matakuliah
-where is_batal = 1 and ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-order by ds.tahun_ajaran, ds.semester, dd.nama''', con)
-
-
-def getMatkulTawar():
-    return pd.read_sql('''select ds.semester_nama, ds.tahun_ajaran Semester
-     , dm.kode_matakuliah Kode, dm.nama_matakuliah Matakuliah, dm.sks SKS, dm.kelompok_matakuliah 'Kelompok Matakuliah'
-from fact_registrasi_matakuliah
-inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
-inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
-where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-order by ds.tahun_ajaran, ds.semester, kelompok_matakuliah, nama_matakuliah''', con)
-
-
-# def getMahasiswaAktif():
-#     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
-# inner join dim_semester ds on ds.id_semester = fms.id_semester
-# where fms.status = 'AK' and
-# ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-# group by ds.tahun_ajaran, ds.semester_nama
-# order by ds.tahun_ajaran, ds.semester_nama''', con)
-
-
-def getMahasiswaAsing():
-    return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', 
-    count(*) as 'Jumlah Mahasiswa Asing' from fact_mahasiswa_status fms
-inner join dim_semester ds on ds.id_semester = fms.id_semester
-inner join dim_mahasiswa dm on dm.id_mahasiswa = fms.id_mahasiswa
-where warga_negara ='WNA'and 
-tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-group by tahun_ajaran
-order by tahun_ajaran ''', con)
-
+def getPersentaseMahasiswaTidakAktif():
+    return pd.read_sql('''select ak.tahun_angkatan 'Tahun Angkatan', 
+    ak.tahun_ajaran, 
+    ak.jumlah 'Mahasiswa Aktif',
+    concat(if(substr(ak.kode_semester,5,1)='1','Ganjil','Genap')) Semester,
+    ifnull(ta.jumlah,0) 'Mahasiswa Tidak Aktif',IFNULL(ta.jumlah / ak.jumlah * 100,'0')"persen"
+from (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester,count(distinct (dm.nim)) jumlah
+      from fact_mahasiswa_status fms
+               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+               inner join dim_semester ds on fms.id_semester= ds.id_semester
+      where tahun_angkatan >= year(now()) -7
+        and (status = 'AK'or status='CS')
+        and ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+        and id_prodi=9
+      group by ds.tahun_ajaran,tahun_angkatan,ds.kode_semester) ak
+    left join
+     (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester, count(distinct (dm.nim)) jumlah
+      from fact_mahasiswa_status fms
+               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+               inner join dim_semester ds on fms.id_semester= ds.id_semester
+      where tahun_angkatan >= year(now()) -7
+        and status = 'TA'
+        and ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+        and id_prodi=9
+      group by ds.tahun_ajaran,tahun_angkatan, ds.kode_semester) ta
+on ak.tahun_angkatan = ta.tahun_angkatan
+and ak.kode_semester=ta.kode_semester
+order by ak.tahun_angkatan desc, Semester asc''', con)
 
 def getDosenMengajar():
-    return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester',
+    return pd.read_sql('''
+    select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester','NON INFORMATIKA' as Prodi,
     count(distinct fdm.id_dosen) 'Jumlah' from fact_dosen_mengajar fdm
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
-where ds.tahun_ajaran between 
+where id_prodi!=9 and tahun_ajaran between 
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
 group by tahun_ajaran, semester_nama
-order by tahun_ajaran desc,semester_nama asc''', con)
-
+    union all
+    select tahun_ajaran 'Tahun Ajaran',semester_nama 'Semester','INFORMATIKA' as Prodi,
+    count(distinct fdm.id_dosen) 'Jumlah' from fact_dosen_mengajar fdm
+inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
+inner join dim_semester ds on fdm.id_semester = ds.id_semester
+where id_prodi=9 and tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+group by tahun_ajaran, semester_nama
+order by 1 asc,2 asc''', con)
 
 def getPersentaseDosenTidakTetap():
     return pd.read_sql('''select semua.tahun_ajaran 'Tahun Ajaran',semua.semester_nama 'Semester',
@@ -104,28 +88,6 @@ group by tahun_ajaran, semester_nama) semua
 where semua.semester_nama=tetap.semester_nama and
       semua.tahun_ajaran=tetap.tahun_ajaran
 order by semua.tahun_ajaran desc, semua.semester_nama asc''', con)
-
-
-def getTingkatKepuasanDosen():
-    return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran', semester_nama Semester, nama 'Nama Dosen', 
-    Rata2 'Rata-rata',
-       case
-        when round(Rata2)>=0 and round(Rata2)<=25 then 'KURANG BAIK'
-        when round(Rata2)>=26 and round(Rata2)<=50 then 'CUKUP BAIK'
-        when round(Rata2)>51 and round(Rata2)<=75 then 'BAIK'
-        when round(Rata2)>=76 and round(Rata2)<=100 then 'SANGAT BAIK'
-       END AS Predikat
-from
-(select tahun_ajaran,semester_nama, nama,((avg(q1)+avg(q2)+avg(q3)+avg(q4)+avg(q5)+avg(q6)+
-       avg(q7)+avg(q8)+avg(q9)+avg(q10)+avg(q11)+avg(q12))/12) Rata2
-from fact_dosen_mengajar fdm
-inner join dim_semester ds on fdm.id_semester = ds.id_semester
-inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
-where ds.tahun_ajaran between 
-concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and id_prodi=9
-group by tahun_ajaran,semester_nama,nama) kepuasan
-order by nama asc,tahun_ajaran asc, semester_nama asc''', con)
-
 
 def getRasioDosenMahasiswa():
     return pd.read_sql('''select data.tahun Tahun, concat(data.semester_nama,' ',data.tahun_ajaran) as Semester,
@@ -202,37 +164,80 @@ on data.kode_semester=dosen.kode_semester
 order by tahun asc
 ''', con)
 
+def getTingkatKepuasanDosen():
+    return pd.read_sql('''select tahun_ajaran 'Tahun Ajaran', semester_nama Semester, nama 'Nama Dosen', 
+    Rata2 'Rata-rata',
+       case
+        when round(Rata2)>=0 and round(Rata2)<=25 then 'KURANG BAIK'
+        when round(Rata2)>=26 and round(Rata2)<=50 then 'CUKUP BAIK'
+        when round(Rata2)>51 and round(Rata2)<=75 then 'BAIK'
+        when round(Rata2)>=76 and round(Rata2)<=100 then 'SANGAT BAIK'
+       END AS Predikat
+from
+(select tahun_ajaran,semester_nama, nama,((avg(q1)+avg(q2)+avg(q3)+avg(q4)+avg(q5)+avg(q6)+
+       avg(q7)+avg(q8)+avg(q9)+avg(q10)+avg(q11)+avg(q12))/12) Rata2
+from fact_dosen_mengajar fdm
+inner join dim_semester ds on fdm.id_semester = ds.id_semester
+inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
+where ds.tahun_ajaran between 
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and id_prodi=9
+group by tahun_ajaran,semester_nama,nama) kepuasan
+order by tahun_ajaran desc, semester_nama asc,nama asc''', con)
 
-def getPersentaseMahasiswaTidakAktif():
-    return pd.read_sql('''select ak.tahun_angkatan 'Tahun Angkatan', 
-    ak.tahun_ajaran, 
-    ak.jumlah 'Mahasiswa Aktif',
-    concat(if(substr(ak.kode_semester,5,1)='1','Ganjil','Genap')) Semester,
-    ifnull(ta.jumlah,0) 'Mahasiswa Tidak Aktif',IFNULL(ta.jumlah / ak.jumlah * 100,'0')"persen"
-from (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester,count(distinct (dm.nim)) jumlah
-      from fact_mahasiswa_status fms
-               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
-               inner join dim_semester ds on fms.id_semester= ds.id_semester
-      where tahun_angkatan >= year(now()) -7
-        and (status = 'AK'or status='CS')
-        and ds.tahun_ajaran between 
-concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-        and id_prodi=9
-      group by ds.tahun_ajaran,tahun_angkatan,ds.kode_semester) ak
-    left join
-     (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester, count(distinct (dm.nim)) jumlah
-      from fact_mahasiswa_status fms
-               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
-               inner join dim_semester ds on fms.id_semester= ds.id_semester
-      where tahun_angkatan >= year(now()) -7
-        and status = 'TA'
-        and ds.tahun_ajaran between 
-concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
-        and id_prodi=9
-      group by ds.tahun_ajaran,tahun_angkatan, ds.kode_semester) ta
-on ak.tahun_angkatan = ta.tahun_angkatan
-and ak.kode_semester=ta.kode_semester
-order by ak.tahun_angkatan desc, Semester asc''', con)
+def getMatkulKurikulumBaru():
+    return pd.read_sql('''
+    select kode_matakuliah Kode, 
+    kelompok_matakuliah 'Kelompok Matakuliah',
+    dk.kode_kurikulum as Kurikulum, 
+    upper(nama_matakuliah) Matakuliah, sks SKS 
+    from fact_matakuliah_kurikulum fmk
+inner join dim_matakuliah dm on fmk.id_matakuliah = dm.id_matakuliah
+inner join dim_kurikulum dk on dk.id_kurikulum = fmk.id_kurikulum
+order by kode_kurikulum desc,kelompok_matakuliah desc''', con)
+
+def getMatkulTawar():
+    return pd.read_sql('''select ds.semester_nama, ds.tahun_ajaran Semester
+     , dm.kode_matakuliah Kode, dm.nama_matakuliah Matakuliah, dm.sks SKS, dm.kelompok_matakuliah 'Kelompok Matakuliah'
+from fact_registrasi_matakuliah
+inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
+inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
+where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+order by ds.tahun_ajaran desc, ds.semester, kelompok_matakuliah desc, nama_matakuliah''', con)
+
+def getMatkulBatal():
+    return pd.read_sql('''
+    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, 
+    dd.nama Nama, dm.nama_matakuliah Matakuliah,
+    if(dm.kelompok_matakuliah is null,'-',dm.kelompok_matakuliah) Kelompok
+from fact_dosen_mengajar
+inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
+inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
+inner join dim_matakuliah dm on dm.id_matakuliah = fact_dosen_mengajar.id_matakuliah
+where is_batal = 1 and ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+order by ds.tahun_ajaran desc, ds.semester, 'Kelompok' asc''', con)
+
+
+# def getMahasiswaAktif():
+#     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
+# inner join dim_semester ds on ds.id_semester = fms.id_semester
+# where fms.status = 'AK' and
+# ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+# group by ds.tahun_ajaran, ds.semester_nama
+# order by ds.tahun_ajaran, ds.semester_nama''', con)
+
+
+# def getMahasiswaAsing():
+#     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran',
+#     count(*) as 'Jumlah Mahasiswa Asing' from fact_mahasiswa_status fms
+# inner join dim_semester ds on ds.id_semester = fms.id_semester
+# inner join dim_mahasiswa dm on dm.id_mahasiswa = fms.id_mahasiswa
+# where warga_negara ='WNA'and
+# tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+# group by tahun_ajaran
+# order by tahun_ajaran ''', con)
+
+
+
 
 
 #--------------df for graph----------------------#
@@ -324,11 +329,11 @@ def getKurikulum():
 
 def dfBatalTawar(tahun,smt):
     return pd.read_sql('''
-select data.Semester, kode_semester, sum(Jumlah) Jumlah, Tipe from
+select data.Semester, kode_semester, sum(Jumlah) 'Jumlah Matakuliah Yang Ditawarkan', Tipe from
     (select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester,
     ds.kode_semester,
     count(dm.kode_matakuliah) Jumlah,
-    'TAWAR' Tipe
+    'Matakuliah Yang Diambil Mahasiswa' Tipe
     from fact_registrasi_matakuliah
     inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
     inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
@@ -341,7 +346,7 @@ union all
     select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester,
     ds.kode_semester,
     count(distinct dm.kode_matakuliah) Jumlah,
-    'TAWAR' Tipe
+    'Matakuliah Yang Diambil Mahasiswa' Tipe
     from fact_registrasi_matakuliah
     inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
     inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
@@ -354,7 +359,7 @@ union all
     (select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester, 
     ds.kode_semester,
     count(dm.kode_matakuliah) Jumlah, 
-    'BATAL' Tipe
+    'Matakuliah Yang Dibatalkan' Tipe
     from fact_dosen_mengajar
     inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
     inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester

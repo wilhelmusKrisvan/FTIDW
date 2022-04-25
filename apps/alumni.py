@@ -114,7 +114,7 @@ for x in range(0, 5):
 
 masatunggu = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Lulusan Berdasarkan Masa Tunggu',
+        html.H5('Masa Tunggu Lulusan',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
@@ -142,35 +142,34 @@ masatunggu = dbc.Container([
                 ])
             ])
         ]),
-        dbc.CardBody([
-            html.Div([
-                dcc.Loading(
-                    id='loading-1',
-                    type="default",
-                    children=dcc.Graph(id='grf_MsTgglulusan')),
-                dbc.Button('Lihat Semua Data', id='cll_MsTgglulusan', n_clicks=0,
-                           style=button_style)
-            ])
-        ], style=tabs_styles)
+        dcc.Tabs([
+            #ini
+            dcc.Tab(label='Jumlah Lulusan per Kategori', value='MsTgglulusan',
+                    children=[
+                        html.Div([
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_MsTgglulusan')),
+                            dbc.Button('Lihat Semua Data', id='cll_MsTgglulusan', n_clicks=0,
+                                       style=button_style)
+                        ])
+                    ], style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Rata-rata Jumlah Lulusan per Kategori', value='rateGol',
+                    children=[
+                        html.Div([
+                            dcc.Loading(
+                                id='loading-1',
+                                type="default",
+                                children=dcc.Graph(id='grf_rateGol')),
+                            dbc.Button('Lihat Semua Data', id='cll_rateGol', n_clicks=0,
+                                       style=button_style)
+                        ])
+                    ],
+                    style=tab_style, selected_style=selected_style),
+        ], style=tabs_styles, id='tab_masatunggu', value='MsTgglulusan'),
     ], style=cardgrf_style),
     dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_MsTgglulusan',
-                columns=[
-                    {'name': i, 'id': i} for i in dfmasatunggu.columns
-                ],
-                data=dfmasatunggu.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'padding': '10px', 'overflowX': 'auto'},
-                style_header={'textAlign': 'center'},
-                style_data={'font-size': '80%', 'textAlign': 'center'},
-                style_cell={'width': 95},
-                page_size=10,
-                export_format='xlsx'
-            ), style=cardtbl_style
-        ),
         id='cll_tblmasatunggu',
         is_open=False
     )
@@ -178,7 +177,7 @@ masatunggu = dbc.Container([
 
 lulusan = dbc.Container([
     dbc.Card([
-        html.H5('Analisis Lulusan & Pekerjaan',
+        html.H5('Lulusan',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
@@ -250,7 +249,7 @@ lulusan = dbc.Container([
 
 kepuasan = dbc.Container([
     dbc.Card([
-        html.H5('Kepuasan Lulusan & Pengguna Lulusan',
+        html.H5('Kepuasan',
                 style=ttlgrf_style),
         html.Div([
             dcc.Tabs([
@@ -268,7 +267,6 @@ kepuasan = dbc.Container([
                         style=tab_style, selected_style=selected_style),
                 dcc.Tab(label='Kepuasan Pengguna Terhadap Jenis Kemampuan Lulusan', value='skill',
                         children=[
-                            html.P('Jenis Kemampuan : ', style={'margin-bottom': '0', 'margin-top': '10px'}),
                             dcc.Dropdown(
                                 id='drpdwn_skill',
                                 options=[{'label': 'INTEGRITAS', 'value': 'integritas'},
@@ -302,7 +300,7 @@ kepuasan = dbc.Container([
 ], style=cont_style)
 
 layout = html.Div([
-    html.Div(html.H1('Alumni',
+    html.Div(html.H1('Analisis Alumni',
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
@@ -319,13 +317,53 @@ layout = html.Div([
 
 # CONTROL COLLAPSE
 @app.callback(
-    Output("cll_tblmasatunggu", "is_open"),
-    [Input("cll_MsTgglulusan", "n_clicks")],
-    [State("cll_tblmasatunggu", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+    Output('cll_tblmasatunggu', 'is_open'),
+    Output('cll_tblmasatunggu', 'children'),
+    [Input('cll_MsTgglulusan', 'n_clicks'),
+     Input('cll_rateGol', 'n_clicks'),
+     Input('tab_masatunggu', 'value')],
+    [State('cll_tblmasatunggu', 'is_open')]
+)
+def toggle_collapse(mstgg, msrerata, n, is_open):
+    isiMasaTunggu = dbc.Card(
+        dt.DataTable(
+            id='tbl_MsTgglulusan',
+            columns=[
+                {'name': i, 'id': i} for i in dfmasatunggu.columns
+            ],
+            data=dfmasatunggu.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ),style=cardtbl_style
+    ),
+    isiRerataMasaTunggu = dbc.Card(
+        dt.DataTable(
+            id='tbl_rateGol',
+            columns=[
+                {'name': i, 'id': i} for i in dfmasaTungguGol.columns
+            ],
+            data=dfmasaTungguGol.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if n and mstgg == 'MsTgglulusan':
+        return not is_open, isiMasaTunggu
+    elif n and msrerata == 'rateGol':
+        return not is_open, isiRerataMasaTunggu
+    return is_open, None
 
 
 @app.callback(
@@ -439,7 +477,7 @@ def graphBidKerja(start, end):
     order by data2.tahun_lulus
     ''',{'start':start,'end':end})
     fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
-    fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
+    fig.update_layout(barmode='group', yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
     return fig
 
 @app.callback(
@@ -449,7 +487,7 @@ def graphBidKerja(start, end):
 )
 def graphWirausaha(start, end):
     df = data.getDataFrameFromDBwithParams('''
-    select tahun_lulus 'Tahun Lulus', count(distinct fts.id_lulusan) 'Jumlah Lulusan Berwirausaha'
+    select tahun_lulus 'Tahun Lulus', count(distinct fts.id_lulusan) 'Jumlah Wirausahawan'
     from fact_tracer_study fts
              inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
              inner join dim_organisasi_pengguna_lulusan dopl
@@ -459,9 +497,8 @@ def graphWirausaha(start, end):
     group by tahun_lulus
     order by tahun_lulus;
     ''',{'start':start,'end':end})
-    fig = px.line(df, x=df['Tahun Lulus'],y=df['Jumlah Lulusan Berwirausaha'])
+    fig = px.line(df, x=df['Tahun Lulus'],y=df['Jumlah Wirausahawan'])
     fig.update_traces(mode='lines+markers')
-    fig.update_layout(yaxis=dict(tickformat=",d"))
     return fig
 
 @app.callback(
@@ -471,7 +508,7 @@ def graphWirausaha(start, end):
 )
 def graphGaji(start, end):
     df = data.getDataFrameFromDBwithParams('''
-    select tahun_lulus 'Tahun Lulus',ceiling(avg(pendapatan_utama)) 'Rerata Rupiah Pendapatan' 
+    select tahun_lulus 'Tahun Lulus',ceiling(avg(pendapatan_utama)) 'Rerata Pendapatan' 
     from fact_tracer_study fts
         inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
     where waktu_tunggu like 'KURANG 6 BULAN'
@@ -479,9 +516,8 @@ def graphGaji(start, end):
     group by tahun_lulus
     order by tahun_lulus
     ''',{'start':start,'end':end})
-    fig = px.line(df, x=df['Tahun Lulus'],y=df['Rerata Rupiah Pendapatan'])
+    fig = px.line(df, x=df['Tahun Lulus'],y=df['Rerata Pendapatan'])
     fig.update_traces(mode='lines+markers')
-    fig.update_layout(yaxis=dict(tickformat=",.2f"))
     return fig
 
 @app.callback(
@@ -571,9 +607,16 @@ def graphMSLulusan(start, end):
     where terlacak.tahun_lulus between %(start)s and %(end)s
     order by data2.`Tahun Lulus`;   
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
-    fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Masa Tunggu')
-    return fig
+    if (len(df['Tahun Lulus']) != 0):
+        fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
+        fig.update_layout(barmode='group', yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus',
+                          legend_title='Waktu Tunggu')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_rateGol', 'figure'),
@@ -588,9 +631,15 @@ def graphRataMS(tglstart, tglend):
         group by waktu_tunggu,tahun_lulus
         order by tahun_lulus asc
     ''', {'start': tglstart, 'end': tglend})
-    fig = px.line(df, x=df['Tahun'], y=df['Jumlah'], color=df['Waktu'])
-    fig.update_traces(mode='lines+markers')
-    return fig
+    if (len(df['Tahun']) != 0):
+        fig = px.line(df, x=df['Tahun'], y=df['Jumlah'], color=df['Waktu'])
+        fig.update_traces(mode='lines+markers')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_layananukdw', 'figure'),
@@ -598,8 +647,14 @@ def graphRataMS(tglstart, tglend):
 )
 def graphLayanan(id):
     df = dfKepuasanPelayanan
-    fig = px.pie(df, values=df['Persen'], names=df['Nilai'], color=df['Nilai'])
-    return fig
+    if (len(df['Persen']) != 0):
+        fig = px.pie(df, values=df['Persen'], names=df['Nilai'], color=df['Nilai'])
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_skill', 'figure'),
@@ -630,8 +685,14 @@ def graphSkill(id, valueDropDown, labelSkill):
     values = [f"{df['Sangat Baik'].iloc[-1]:,.1f}", f"{df['Baik'].iloc[-1]:,.1f}",
               f"{df['Cukup'].iloc[-1]:,.1f}", f"{df['Kurang'].iloc[-1]:,.1f}"]
     label = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang']
-    fig = go.Figure(data=[go.Pie(labels=label, values=values)])
-    return fig
+    if (len(df['Kriteria']) != 0):
+        fig = go.Figure(data=[go.Pie(labels=label, values=values)])
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -653,11 +714,17 @@ def graphBidangKerja(id):
     )lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
     group by dim_lulusan.tahun_lulus,`Kesesuaian Bidang Kerja`,`Jumlah Lulusan`
     order by dim_lulusan.tahun_lulus asc''')
-    fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"],
-                 labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
-    fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
-                    hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
-    return fig
+    if (len(df['Tahun Lulus']) != 0):
+        fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"], barmode='stack',
+                     labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
+        fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
+                        hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 # @app.callback(
 #     Output('grf_tempatkerja', 'figure'),

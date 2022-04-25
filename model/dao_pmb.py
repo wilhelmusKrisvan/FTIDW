@@ -16,9 +16,8 @@ def getDataFrameFromDBwithParams(query,parameter):
 def getSeleksi():
     return pd.read_sql('''select 
 dataMahasiswa.tahun_aka as 'Tahun Ajaran', dy_tampung as 'Daya Tampung',jml_pendaftar as 'Pendaftar', 
-lolos as 'Lolos Seleksi', baru as 'Baru Reguler', Barutransfer as 'Baru Transfer', 
-aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
-    select dataPendaftar.*, count(id_tanggal_lolos_seleksi) as lolos, count(id_mahasiswa) as baru,  
+lolos as 'Lolos Seleksi', registrasi as 'Registrasi' from (
+    select dataPendaftar.*, count(id_tanggal_lolos_seleksi) as lolos, count(id_tanggal_registrasi) as registrasi,count(id_mahasiswa) as baru,  
     0 as Barutransfer
     from(
     select dy.id_semester, tahun_ajaran as tahun_aka, dy.jumlah as dy_tampung, count(fpmbDaftar.id_pmb)  as jml_pendaftar 
@@ -27,7 +26,8 @@ aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
     inner join dim_prodi prodi on prodi.id_prodi = dy.id_prodi
     left join fact_pmb fpmbDaftar on dy.id_semester = fpmbDaftar.id_semester and (fpmbDaftar.id_prodi_pilihan_1 || fpmbDaftar.id_prodi_pilihan_3 || fpmbDaftar.id_prodi_pilihan_3 = 9)
     where kode_prodi = '71' and dy.id_semester <= (select id_semester from dim_semester where tahun_ajaran=concat(year(now())-1,'/',year(now())) limit 1)
-    group by tahun_aka, dy_tampung, dy.id_semester
+    group 
+    by tahun_aka, dy_tampung, dy.id_semester
     ) dataPendaftar
     left join fact_pmb fpmbLolos on dataPendaftar.id_semester = fpmbLolos.id_semester and fpmbLolos.id_prodi_diterima = 9
     group by id_semester, tahun_aka,dy_tampung, jml_pendaftar
@@ -38,7 +38,8 @@ select count(*) as jmlaktif, tahun_ajaran from fact_mahasiswa_status
 left join dim_semester on fact_mahasiswa_status.id_semester = dim_semester.id_semester
 where status = 'AK' 
 group by tahun_ajaran
-)aktif on aktif.tahun_ajaran = tahun_aka''',con)
+)aktif on aktif.tahun_ajaran = tahun_aka
+where tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)''',con)
 
 def getMahasiswaAktif():
     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms

@@ -186,6 +186,67 @@ mhsseleksi = dbc.Container([
     )
 ], style=cont_style)
 
+mhsPersenNaik = dbc.Container([
+    dbc.Card([
+        html.H5('Persentase Kenaikan Penerimaan Mahasiswa Baru',
+                style=ttlgrf_style),
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.P('Dari', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Fromdrpdwn_mhsPersenNaik',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[0],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Dari',
+                        ),
+                    ]),
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.P('Sampai', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Todrpdwn_mhsPersenNaik',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[len(listDropdown) - 1],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Sampai',
+                        ),
+                    ]),
+                ], width=6),
+            ]),
+            dcc.Loading([
+                dcc.Graph(id='grf_mhsPersenNaik'),
+            ], type="default"),
+            dbc.Button('Lihat Semua Data', id='cll_grfPersenNaik',
+                       n_clicks=0, style=button_style),
+        ])
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_PersenNaik',
+                columns=[{"name": i, "id": i} for i in dfmhsPersenNaik.columns],
+                data=dfmhsPersenNaik.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                export_format='xlsx',
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 70},
+                page_size=10
+            ), style=cardtbl_style
+        ),
+        id='cll_tblPersenNaik',
+        is_open=False
+    )
+], style=cont_style)
+
 mhsAktif = dbc.Container([
     dbc.Card([
         html.H5('Mahasiswa Aktif',
@@ -316,66 +377,6 @@ mhsasing = dbc.Container([
         is_open=False,
     )
 ], style=cont_style)
-
-# mhsrasio = dbc.Container([
-#     dbc.Card([
-#         html.H5('Rasio Daya Tampung : Pendaftar Registrasi Mahasiswa',
-#                 style=ttlgrf_style),
-#         dbc.CardBody([
-#             dbc.Row([
-#                 dbc.Col([
-#                     html.Div([
-#                         html.P('Dari', style={'color': 'black'}),
-#                         dcc.Dropdown(
-#                             id='Fromdrpdwn_mhsrasio',
-#                             options=[{'label': i, 'value': i} for i in listDropdown],
-#                             value=listDropdown[0],
-#                             style={'color': 'black'},
-#                             clearable=False,
-#                             placeholder='Dari',
-#                         ),
-#                     ]),
-#                 ], width=6),
-#                 dbc.Col([
-#                     html.Div([
-#                         html.P('Sampai', style={'color': 'black'}),
-#                         dcc.Dropdown(
-#                             id='Todrpdwn_mhsrasio',
-#                             options=[{'label': i, 'value': i} for i in listDropdown],
-#                             value=listDropdown[len(listDropdown) - 1],
-#                             style={'color': 'black'},
-#                             clearable=False,
-#                             placeholder='Sampai',
-#                         ),
-#                     ]),
-#                 ], width=6),
-#             ]),
-#             dcc.Loading([
-#                 dcc.Graph(id='grf_mhsrasio'),
-#             ], type="default"),
-#             dbc.Button('Lihat Semua Data', id='cll_grfrasio', n_clicks=0, style=button_style),
-#         ])
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         dbc.Card(
-#             dt.DataTable(
-#                 id='tbl_mhsrasio',
-#                 columns=[{"name": i, "id": i} for i in dfmhsrasio.columns],
-#                 data=dfmhsrasio.to_dict('records'),
-#                 sort_action='native',
-#                 sort_mode='multi',
-#                 style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-#                 export_format='xlsx',
-#                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                 style_cell={'width': 70},
-#                 page_size=10
-#             ), style=cardtbl_style
-#         ),
-#         id='cll_tblrasio',
-#         is_open=False
-#     )
-# ], style=cont_style)
 
 mhsasmasmk = dbc.Container([
     dbc.Card([
@@ -616,127 +617,6 @@ mhsprovinsi = dbc.Container([
     ),
 ], style=cont_style)
 
-# mhsKembangJml = dbc.Container([
-#     dbc.Card([
-#         html.H5('Perkembangan Jumlah Penerimaan Mahasiswa Baru',
-#                 style=ttlgrf_style),
-#         dbc.CardBody([
-#             dbc.Row([
-#                 dbc.Col([
-#                     html.Div([
-#                         html.P('Dari', style={'color': 'black'}),
-#                         dcc.Dropdown(
-#                             id='Fromdrpdwn_mhsJml',
-#                             options=[{'label': i, 'value': i} for i in listDropdown],
-#                             value=listDropdown[0],
-#                             style={'color': 'black'},
-#                             clearable=False,
-#                             placeholder='Dari',
-#                         ),
-#                     ]),
-#                 ], width=6),
-#                 dbc.Col([
-#                     html.Div([
-#                         html.P('Sampai', style={'color': 'black'}),
-#                         dcc.Dropdown(
-#                             id='Todrpdwn_mhsJml',
-#                             options=[{'label': i, 'value': i} for i in listDropdown],
-#                             value=listDropdown[len(listDropdown) - 1],
-#                             style={'color': 'black'},
-#                             clearable=False,
-#                             placeholder='Sampai',
-#                         ),
-#                     ]),
-#                 ], width=6)
-#             ]),
-#             dcc.Loading([
-#                 dcc.Graph(id='grf_mhsJml'),
-#             ], type="default"),
-#             dbc.Button('Lihat Semua Data', id='cll_grfJml', n_clicks=0, style=button_style),
-#         ])
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         dbc.Card(
-#             dt.DataTable(
-#                 id='tbl_Jml',
-#                 columns=[{"name": i, "id": i} for i in dfmhsJml.columns],
-#                 data=dfmhsJml.to_dict('records'),
-#                 sort_action='native',
-#                 sort_mode='multi',
-#                 style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-#                 export_format='xlsx',
-#                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-#                 style_cell={'width': 70},
-#                 page_size=10
-#             ), style=cardtbl_style
-#         ),
-#         id='cll_tblJml',
-#         is_open=False
-#     )
-# ], style=cont_style)
-
-mhsPersenNaik = dbc.Container([
-    dbc.Card([
-        html.H5('Persentase Kenaikan Penerimaan Mahasiswa Baru',
-                style=ttlgrf_style),
-        dbc.CardBody([
-            dbc.Row([
-                dbc.Col([
-                    html.Div([
-                        html.P('Dari', style={'color': 'black'}),
-                        dcc.Dropdown(
-                            id='Fromdrpdwn_mhsPersenNaik',
-                            options=[{'label': i, 'value': i} for i in listDropdown],
-                            value=listDropdown[0],
-                            style={'color': 'black'},
-                            clearable=False,
-                            placeholder='Dari',
-                        ),
-                    ]),
-                ], width=6),
-                dbc.Col([
-                    html.Div([
-                        html.P('Sampai', style={'color': 'black'}),
-                        dcc.Dropdown(
-                            id='Todrpdwn_mhsPersenNaik',
-                            options=[{'label': i, 'value': i} for i in listDropdown],
-                            value=listDropdown[len(listDropdown) - 1],
-                            style={'color': 'black'},
-                            clearable=False,
-                            placeholder='Sampai',
-                        ),
-                    ]),
-                ], width=6),
-            ]),
-            dcc.Loading([
-                dcc.Graph(id='grf_mhsPersenNaik'),
-            ], type="default"),
-            dbc.Button('Lihat Semua Data', id='cll_grfPersenNaik',
-                       n_clicks=0, style=button_style),
-        ])
-    ], style=cardgrf_style),
-    dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_PersenNaik',
-                columns=[{"name": i, "id": i} for i in dfmhsPersenNaik.columns],
-                data=dfmhsPersenNaik.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-                export_format='xlsx',
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_cell={'width': 70},
-                page_size=10
-            ), style=cardtbl_style
-        ),
-        id='cll_tblPersenNaik',
-        is_open=False
-    )
-], style=cont_style)
-
 layout = html.Div([
     html.Div(html.H1('Analisis Mahasiswa Baru Prodi Informatika',
                      style={'margin-top': '30px', 'textAlign': 'center'}
@@ -750,8 +630,6 @@ layout = html.Div([
     # html.Div([mhsrasio]),
     html.Div([mhsasmasmk]),
     html.Div([mhsprovinsi], style={'margin-bottom': '50px'}),
-    # html.Div([mhsKembangJml]),
-    # html.Div([mhsPersenNaik], style={'margin-bottom': '50px'}),
     dbc.Container([
         dcc.Link([
             dbc.Button('^', style=buttonLink_style),
@@ -765,6 +643,26 @@ layout = html.Div([
     Output("cll_tblseleksi", "is_open"),
     [Input("cll_grfseleksi", "n_clicks")],
     [State("cll_tblseleksi", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblPersenNaik", "is_open"),
+    [Input("cll_grfPersenNaik", "n_clicks")],
+    [State("cll_tblPersenNaik", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblmahasiswaAktif", "is_open"),
+    [Input("cll_grfmhsaktif", "n_clicks")],
+    [State("cll_tblmahasiswaAktif", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
@@ -802,16 +700,6 @@ def toggle_collapse(nall, ninf, nsi, mhs, is_open):
     if nsi and mhs == 'SI':
         return not is_open, isiMhsAsing
     return is_open, None
-
-
-@app.callback(
-    Output("cll_tblrasio", "is_open"),
-    [Input("cll_grfrasio", "n_clicks")],
-    [State("cll_tblrasio", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
 
 
 @app.callback(
@@ -887,27 +775,8 @@ def toggle_collapse(ndaftar, nlolos, nregis, prov, is_open):
     return is_open, None
 
 
-@app.callback(
-    Output("cll_tblJml", "is_open"),
-    [Input("cll_grfJml", "n_clicks")],
-    [State("cll_tblJml", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-
-@app.callback(
-    Output("cll_tblPersenNaik", "is_open"),
-    [Input("cll_grfPersenNaik", "n_clicks")],
-    [State("cll_tblPersenNaik", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-
 # SHOW GRAPHIC ANALYSIS
+# SELEKSI MAHASISWA
 @app.callback(
     Output('grf_mhsseleksi', 'figure'),
     Input('Fromdrpdwn_mhsseleksi', 'value'),
@@ -916,8 +785,7 @@ def toggle_collapse(n, is_open):
 def graphSeleksi(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''select 
 dataMahasiswa.tahun_aka as 'Tahun Ajaran', dy_tampung as 'Daya Tampung',jml_pendaftar as 'Pendaftar', 
-lolos as 'Lolos Seleksi', registrasi as 'Registrasi',baru as 'Baru Reguler', Barutransfer as 'Baru Transfer', 
-aktif.jmlaktif as 'Aktif Reguler', 0 as 'Aktif Transfer' from (
+lolos as 'Lolos Seleksi', registrasi as 'Registrasi' from (
     select dataPendaftar.*, count(id_tanggal_lolos_seleksi) as lolos, count(id_tanggal_registrasi) as registrasi,count(id_mahasiswa) as baru,  
     0 as Barutransfer
     from(
@@ -953,18 +821,6 @@ where tahun_ajaran between
         fig.add_scatter(x=df['Tahun Ajaran'], y=df['Registrasi'], name='Registrasi',
                         line=dict(color='green'),
                         hovertemplate="Jenis Pendaftar=Registrasi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-        # fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Reguler'], name='Baru Reguler',
-        #                 line=dict(color='rgb(0, 143, 245)'),
-        #                 hovertemplate="Jenis Pendaftar=Baru Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-        # fig.add_scatter(x=df['Tahun Ajaran'], y=df['Baru Transfer'], name='Baru Transfer',
-        #                 line=dict(color='rgb(35, 68, 145)'),
-        #                 hovertemplate="Jenis Pendaftar=Baru Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-        # fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Reguler'], name='Aktif Reguler',
-        #                 line=dict(color='rgb(54, 235, 54)'),
-        #                 hovertemplate="Jenis Pendaftar=Aktif Reguler <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
-        # fig.add_scatter(x=df['Tahun Ajaran'], y=df['Aktif Transfer'], name='Aktif Transfer',
-        #                 line=dict(color='rgb(35, 145, 35)'),
-        #                 hovertemplate="Jenis Pendaftar=Aktif Transfer <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -973,6 +829,40 @@ where tahun_ajaran between
         return fig
 
 
+# KENAIKAN MAHASISWA
+@app.callback(
+    Output('grf_mhsPersenNaik', 'figure'),
+    Input('Fromdrpdwn_mhsPersenNaik', 'value'),
+    Input('Todrpdwn_mhsPersenNaik', 'value')
+)
+def graphPersentaseKenaikanMaba(valueFrom, valueTo):
+    df = data.getDataFrameFromDBwithParams('''select tahun_ajaran as 'Tahun Ajaran',
+       if(@last_entry = 0, 0, format(((entry-@last_entry)/@last_entry)*100,2)) as 'Persentase Pertumbuhan',
+        @last_entry := entry 'Jumlah'
+from
+      (select @last_entry := 0) x,
+      (select tahun_ajaran, count(distinct fp.id_mahasiswa) entry
+       from   fact_pmb fp
+         inner join dim_date dd on dd.id_date = fp.id_tanggal_registrasi
+         inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
+         inner join dim_mahasiswa dm on fp.id_mahasiswa = dm.id_mahasiswa
+         where id_tanggal_registrasi is not null and ds.tahun_ajaran between %(From)s and %(To)s
+       group by tahun_ajaran) y
+order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
+    if (len(df['Tahun Ajaran']) != 0):
+        fig = px.line(df, x=df['Tahun Ajaran'], y=df['Persentase Pertumbuhan'].apply(pd.to_numeric))
+        fig.update_layout(yaxis_title="Persentase Pertumbuhan (%)")
+        fig.update_traces(mode='lines+markers')
+        fig.update_yaxes(categoryorder='category ascending')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
+
+
+# MAHASISWA AKTIF
 @app.callback(
     Output("grf_mahasiswaAktif", 'figure'),
     Input('Fromdrpdwn_mhsAktif', 'value'),
@@ -997,6 +887,7 @@ order by ds.tahun_ajaran, ds.semester_nama
         return fig
 
 
+# MAHASISWA ASING
 @app.callback(
     Output('grf_mhsasing', 'figure'),
     Input('Fromdrpdwn_mhsasing', 'value'),
@@ -1100,56 +991,7 @@ order by nama_prodi, tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
         return fig
 
 
-# @app.callback(
-#     Output('grf_mhsrasio', 'figure'),
-#     Input('Fromdrpdwn_mhsrasio', 'value'),
-#     Input('Todrpdwn_mhsrasio', 'value'),
-# )
-# def graphRasioDTPR(valueFrom, valueTo):
-#     df_dayaTampung = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran as 'Tahun Ajaran', ddt.jumlah as "Jumlah Daya Tampung" from dim_daya_tampung ddt
-# inner join dim_semester ds on ddt.id_semester = ds.id_semester
-# where id_prodi = 9 and ds.tahun_ajaran between
-# %(From)s and %(To)s''', {'From': valueFrom, 'To': valueTo})
-#     df_pendaftarRegistrasi = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
-# inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
-# where fpmb.id_tanggal_registrasi is not null and fpmb.id_prodi_diterima = 9
-# and ds.tahun_ajaran between
-# %(From)s and %(To)s
-# group by ds.tahun_ajaran
-# order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-#     df_lolosSeleksi = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar' from fact_pmb fpmb
-# inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
-# where fpmb.id_tanggal_lolos_seleksi is not null and fpmb.id_prodi_diterima = 9
-# and ds.tahun_ajaran between
-# %(From)s and %(To)s
-# group by ds.tahun_ajaran
-# order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-#     df_pendaftar = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran as 'Tahun Ajaran', count(*)  as 'Jumlah Pendaftar'  from fact_pmb fpmb
-# inner join  dim_semester ds on fpmb.id_semester = ds.id_semester
-# where ds.tahun_ajaran between
-# %(From)s and %(To)s
-# group by ds.tahun_ajaran
-# order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-#     if (len(df_dayaTampung['Tahun Ajaran']) != 0 and len(df_pendaftarRegistrasi['Tahun Ajaran']) != 0 and len(
-#             df_lolosSeleksi['Tahun Ajaran']) != 0 and len(df_pendaftar['Tahun Ajaran']) != 0):
-#         fig = px.bar(df_dayaTampung, x=df_dayaTampung['Tahun Ajaran'], y=df_dayaTampung['Jumlah Daya Tampung'],
-#                      color=px.Constant('Daya Tampung'),
-#                      labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
-#         fig.add_scatter(x=df_pendaftarRegistrasi['Tahun Ajaran'], y=df_pendaftarRegistrasi['Jumlah Pendaftar'],
-#                         name='Teregistrasi',
-#                         hovertemplate="Jenis Pendaftar=Teregistrasi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
-#         fig.add_scatter(x=df_lolosSeleksi['Tahun Ajaran'], y=df_lolosSeleksi['Jumlah Pendaftar'], name='Lolos Seleksi',
-#                         hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
-#         fig.add_scatter(x=df_pendaftar['Tahun Ajaran'], y=df_pendaftar['Jumlah Pendaftar'], name='Pendaftar',
-#                         hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Akdemik= %{x}")
-#         return fig
-#     else:
-#         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
-#                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
-#                                          yshift=10)
-#         return fig
-
-
+# MAHASISWA ASAL SEKOLAH
 @app.callback(
     Output('grf_mhssmasmk', 'figure'),
     Input('Fromdrpdwn_mhssmasmk', 'value'),
@@ -1170,11 +1012,17 @@ and ds.tahun_ajaran between
 %(From)s and %(To)s
 group by ds.tahun_ajaran,'Tipe Sekolah Asal'
 order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'], color=df['Tipe Sekolah Asal'])
-    fig.update_layout(barmode='group')
-    return fig
+    if (len(df['Tahun Ajaran']) != 0):
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'], color=df['Tipe Sekolah Asal'])
+        fig.update_layout(barmode='group')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
-
+# LOKASI ASAL MAHASISWA
 @app.callback(
     Output('grf_mhsprovdaftar', 'figure'),
     Output('visiFrom_TAdaftar', 'hidden'),
@@ -1316,62 +1164,3 @@ order by provinsi''', {'From': valueFrom, 'To': valueTo})
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
             return fig, False, False
-
-
-# @app.callback(
-#     Output('grf_mhsJml', 'figure'),
-#     Input('Fromdrpdwn_mhsJml', 'value'),
-#     Input('Todrpdwn_mhsJml', 'value')
-# )
-# def graphPerkembanganJumlahMaba(valueFrom, valueTo):
-#     df = data.getDataFrameFromDBwithParams(
-#         '''select tahun_ajaran "Tahun Ajaran",
-#         count(distinct fp.id_mahasiswa) Jumlah
-#         from fact_pmb fp
-#         inner join dim_date dd on dd.id_date = fp.id_tanggal_registrasi
-#         inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
-#         inner join dim_mahasiswa dm on fp.id_mahasiswa = dm.id_mahasiswa
-#         where nim like %(TI)s and ds.tahun_ajaran between %(From)s and %(To)s
-#         group by tahun_ajaran
-#         order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo, 'TI': '71%'})
-#     if (len(df['Tahun Ajaran']) != 0):
-#         fig = px.line(df, x=df['Tahun Ajaran'], y=df['Jumlah'], )
-#         fig.update_traces(mode='lines+markers')
-#         return fig
-#     else:
-#         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
-#                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
-#                                          yshift=10)
-#         return fig
-
-
-@app.callback(
-    Output('grf_mhsPersenNaik', 'figure'),
-    Input('Fromdrpdwn_mhsPersenNaik', 'value'),
-    Input('Todrpdwn_mhsPersenNaik', 'value')
-)
-def graphPersentaseKenaikanMaba(valueFrom, valueTo):
-    df = data.getDataFrameFromDBwithParams('''select tahun_ajaran as 'Tahun Ajaran',
-       if(@last_entry = 0, 0, format(((entry-@last_entry)/@last_entry)*100,2)) as 'Persentase Pertumbuhan',
-        @last_entry := entry 'Jumlah'
-from
-      (select @last_entry := 0) x,
-      (select tahun_ajaran, count(distinct fp.id_mahasiswa) entry
-       from   fact_pmb fp
-         inner join dim_date dd on dd.id_date = fp.id_tanggal_registrasi
-         inner join dim_semester ds on ds.kode_semester = concat(tahun, if(bulan >= 7, 2, 1))
-         inner join dim_mahasiswa dm on fp.id_mahasiswa = dm.id_mahasiswa
-         where id_tanggal_registrasi is not null and ds.tahun_ajaran between %(From)s and %(To)s
-       group by tahun_ajaran) y
-order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
-    if (len(df['Tahun Ajaran']) != 0):
-        fig = px.line(df, x=df['Tahun Ajaran'], y=df['Persentase Pertumbuhan'].apply(pd.to_numeric))
-        fig.update_layout(yaxis_title="Persentase Pertumbuhan (%)")
-        fig.update_traces(mode='lines+markers')
-        fig.update_yaxes(categoryorder='category ascending')
-        return fig
-    else:
-        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
-                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
-                                         yshift=10)
-        return fig
