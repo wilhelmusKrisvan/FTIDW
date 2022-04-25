@@ -68,7 +68,7 @@ menu = dbc.CardGroup([
         dbc.Card(
             dbc.CardLink([
                 html.Center(html.Div(className="fa-solid fa-book-bookmark fa-5x")),
-                html.H5('KP',
+                html.H5('KP, Skripsi, Yudisium',
                         style=title_style),
                 html.P('KP Penelitian Pengabdian, Masa Studi, Jumlah Kelulusan',
                        style=desc_style)
@@ -90,7 +90,7 @@ menu = dbc.CardGroup([
         dbc.Card(
             dbc.CardLink([
                 html.Center(html.Div(className="fa-solid fa-magnifying-glass fa-5x")),
-                html.H5('PPP',
+                html.H5('Penelitian, PKM, Publikasi, dan Luaran lainnya',
                         style=title_style),
                 html.P('Penelitian, Pengabdian kepada Masyarakat, Publikasi dan Luaran',
                        style=desc_style)
