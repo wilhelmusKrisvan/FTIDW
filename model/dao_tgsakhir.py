@@ -26,23 +26,36 @@ group by tahun_ajaran_yudisium
 order by tahun_ajaran_yudisium desc''', con)
 
 def getJmlLulusan():
-    return pd.read_sql('''select count(*) as 'Jumlah Mahasiswa', tahun_ajaran_yudisium
-from fact_yudisium
-group by tahun_ajaran_yudisium
-order by tahun_ajaran_yudisium''',con)
+    return pd.read_sql('''
+    select  concat(tahun_ajaran_yudisium,' ',semester_yudisium) Semester, 
+            count(*) as 'Jumlah Mahasiswa Yudisium'
+    from fact_yudisium fy
+    inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+    where tahun_ajaran_yudisium between concat(year(now()) - 5, '/', year(now()) - 4) and concat(year(now()), '/', year(now()) + 1)
+    group by kode_semester, Semester
+    order by kode_semester desc, Semester
+    ''',con)
 
 def getJumlLulusSkripsiOntime():
-    return ('''
-    select count(*) as jumlah_mahasiswa, dim_semester.tahun_ajaran
-    from fact_skripsi
-        inner join(
-            select count(*) as jumlah, id_mahasiswa from fact_skripsi
-            group by id_mahasiswa
-        ) data_skripsi on data_skripsi.id_mahasiswa = fact_skripsi.id_mahasiswa AND data_skripsi.jumlah=1
-        inner join dim_semester on dim_semester.id_semester = fact_skripsi.id_semester
-    where id_dosen_penguji1 <>''
-    group by dim_semester.tahun_ajaran
-    order by dim_semester.tahun_ajaran
+    return pd.read_sql('''
+    select a.Semester, `Tepat Waktu`, `Tidak Tepat Waktu`
+    from
+    (select concat(tahun_ajaran_yudisium, ' ', semester_yudisium) Semester,
+               count(id_mahasiswa)                               'Tepat Waktu'
+        from fact_yudisium fy
+                 inner join dim_semester ds on fy.id_semester_yudisium = ds.id_semester
+        where (masa_studi_dalam_bulan >= 42 and masa_studi_dalam_bulan <= 54)
+          and tahun_ajaran_yudisium between concat(year(now()) - 5, '/', year(now()) - 4) and concat(year(now()), '/', year(now()) + 1)
+        group by Semester, kode_semester)a
+    join
+        (select concat(tahun_ajaran_yudisium, ' ', semester_yudisium) Semester,
+               count(*) as                                           'Tidak Tepat Waktu'
+        from fact_yudisium fy
+                 inner join dim_semester_yudisium dsy on fy.id_semester_yudisium = dsy.id_semester_yudisium
+        where not(masa_studi_dalam_bulan >= 42 and masa_studi_dalam_bulan <= 54)
+            and tahun_ajaran_yudisium between concat(year(now()) - 5, '/', year(now()) - 4) and concat(year(now()), '/', year(now()) + 1)
+        group by kode_semester, Semester
+        order by Semester) b on a.Semester=b.Semester
     ''',con)
 
 def getRateMasaStudi():

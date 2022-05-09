@@ -2209,7 +2209,7 @@ def graphPPMhs(tglstart, tglend):
 )
 def graphHKIMhs(tglstart, tglend):
     dfHKIMhs = data.getDataFrameFromDBwithParams('''
-    select tahun 'Tahun', count(distinct fll.id_luaran_lainnya) 'Jumlah Judul'
+    select tahun 'Tahun', count(distinct fll.id_luaran_lainnya) 'Jumlah HKI'
     from br_ll_mahasiswa blm
              inner join fact_luaran_lainnya fll on blm.id_luaran_lainnya = fll.id_luaran_lainnya
              inner join dim_luaran_lainnya dll on blm.id_luaran_lainnya = dll.id_luaran_lainnya
@@ -2221,7 +2221,7 @@ def graphHKIMhs(tglstart, tglend):
     group by tahun
     order by tahun;
     ''', {'start': tglstart, 'end': tglend})
-    fig = px.line(dfHKIMhs, x=dfHKIMhs['Tahun'], y=dfHKIMhs['Jumlah Judul'])
+    fig = px.line(dfHKIMhs, x=dfHKIMhs['Tahun'], y=dfHKIMhs['Jumlah HKI'])
     fig.update_traces(mode='lines+markers')
     return fig
 
