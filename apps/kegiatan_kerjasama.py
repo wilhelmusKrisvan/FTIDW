@@ -44,6 +44,8 @@ listTahunKulumMOU = dfTahunKulumMOU['tahun']
 dfTahunTipeKegiatan = data.getListTahunTipeKegiatan()
 listTahunTipeKegiatan = dfTahunTipeKegiatan['Tahun']
 
+
+
 # dfkerjasama = data.getKerjasama()
 # dfkerjasamakegiatan = data.getKerjasamaKegiatan()
 # dfkerjasamakp = data.getKerjasamaKP()
@@ -895,7 +897,7 @@ def graphTipeKegiatan(id,valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''
     select ddselesai.tahun as Tahun,CASE WHEN dp.tipe_perjanjian = 'MO' THEN 'MOU'
 		WHEN dp.tipe_perjanjian = 'PK' THEN 'PERJANJIAN KERJASAMA'
-		ELSE 'NONE' END AS 'Tipe Kerjasama', count(dp.tipe_perjanjian) as Jumlah
+		ELSE 'SURAT PERJANJIAN' END AS 'Tipe Kerjasama', count(dp.tipe_perjanjian) as Jumlah
         from dim_kegiatan
             inner join dim_perjanjian dp on dim_kegiatan.id_perjanjian = dp.id_perjanjian
             inner join br_mitra_perjanjian bmp on bmp.id_perjanjian = dim_kegiatan.id_perjanjian
@@ -904,9 +906,26 @@ def graphTipeKegiatan(id,valueFrom, valueTo):
             inner join dim_date ddselesai on ddselesai.id_date = dim_kegiatan.id_tanggal_selesai
     where dim_kegiatan.id_perjanjian is not null
     and ddselesai.tahun between %(From)s and %(To)s
-    group by `Tipe Kerjasama`,Tahun
-    order by ddselesai.tahun asc;
+    group by ddselesai.tahun, `Tipe Kerjasama`
+    order by ddselesai.tahun asc ;
     ''',{'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, y=df['Jumlah'], x=df['Tahun'],color=df['Tipe Kerjasama'], orientation='v')
+    
+    dfTotal = df.groupby(['Tahun']).sum().reset_index()
+    fig = px.bar(
+        df,
+        y=df['Jumlah'],
+        x=df['Tahun'],
+        color=df['Tipe Kerjasama'],
+        orientation='v',
+    )
+    fig.add_scatter(
+        x=dfTotal['Tahun'],
+        y=dfTotal['Jumlah'],
+        showlegend=False,
+        mode='text',
+        text=dfTotal['Jumlah'],
+        textposition="top center"
+    )
+
     fig.update_layout()
     return fig
