@@ -17,6 +17,7 @@ dfmasaTungguGol = data.getMasaTungguperGol()
 dfbidangkerja = data.getBidangKerja()
 dfwirausaha = data.getWirausaha()
 dfGaji = data.getGajiLulusan()
+dfGajii = data.getGajiLulusanTab()
 
 dfskill = data.getSkill()
 dfKepuasanPelayanan = data.getKepuasanLayanan()
@@ -229,7 +230,7 @@ lulusan = dbc.Container([
                                        style=button_style)
                         ])
                     ], style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Rerata Gaji Alumni Pekerjaan <6 Bulan ', value='gaji6bln',
+            dcc.Tab(label='Rata-rata Gaji Alumni Pekerjaan <6 Bulan ', value='gaji6bln',
                     children=[
                         html.Div([
                             dcc.Loading(
@@ -471,7 +472,7 @@ def graphWirausaha(start, end):
 )
 def graphGaji(start, end):
     df = data.getDataFrameFromDBwithParams('''
-    select tahun_lulus 'Tahun Lulus',ceiling(avg(pendapatan_utama)) 'Rerata Rupiah Pendapatan' 
+    select tahun_lulus 'Tahun Lulus',ceiling(avg(pendapatan_utama))/1000000 'Rata-rata Pendapatan (Jutaan)' 
     from fact_tracer_study fts
         inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
     where waktu_tunggu like 'KURANG 6 BULAN'
@@ -479,9 +480,10 @@ def graphGaji(start, end):
     group by tahun_lulus
     order by tahun_lulus
     ''',{'start':start,'end':end})
-    fig = px.line(df, x=df['Tahun Lulus'],y=df['Rerata Rupiah Pendapatan'])
+    fig = px.line(df, x=df['Tahun Lulus'],y=df['Rata-rata Pendapatan (Jutaan)'])
     fig.update_traces(mode='lines+markers')
-    fig.update_layout(yaxis=dict(tickformat=",.2f"))
+    fig.update_layout(yaxis=dict(tickformat=".2f"))
+    # fig.update_layout(yaxis_tickformat = "%d")
     return fig
 
 @app.callback(

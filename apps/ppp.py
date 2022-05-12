@@ -363,7 +363,8 @@ penMhs = dbc.Container([
                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
                         dcc.RadioItems(
                             id='radio_pendm',
-                            options=[{'label': 'Rerata', 'value': 'rata'},
+                            options=[{'label': 'Jumlah', 'value': 'jumlah'},
+                                     {'label': 'Rata-rata', 'value': 'rata'},
                                      {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
                                      ],
                             value='rata',
@@ -422,7 +423,8 @@ pkmMhs = dbc.Container([
                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
                         dcc.RadioItems(
                             id='radio_pkmdm',
-                            options=[{'label': 'Rerata', 'value': 'rata'},
+                            options=[{'label': 'Jumlah', 'value': 'jumlah'},
+                                     {'label': 'Rata-rata', 'value': 'rata'},
                                      {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
                                      ],
                             value='rata',
@@ -1898,7 +1900,24 @@ def graphPKMDosen(namads):
     Input('radio_pendm','value')
 )
 def graphPenDM(start, end, radiopendm):
-    if radiopendm == 'rata':
+    if radiopendm == 'jumlah' :
+        dfjumlpendm = data.getDataFrameFromDBwithParams(f'''
+        select tahun Tahun,
+               count(distinct id_penelitian) 'Jumlah Penelitian'
+        from fact_penelitian fc
+            inner join dim_penelitian_pkm dpp on fc.id_tanggal_mulai = dpp.id_tanggal_mulai
+            inner join br_pp_mahasiswa bpm on dpp.id_penelitian_pkm = bpm.id_penelitian_pkm
+            inner join dim_mahasiswa dm on bpm.id_mahasiswa = dm.id_mahasiswa
+            inner join dim_date dd on dd.id_date = dpp.id_tanggal_mulai
+        where tahun between %(start)s and %(end)s
+        group by tahun
+        order by tahun
+        ''',{'start':start,'end':end})
+        figjumlpendm = px.line(dfjumlpendm, x=dfjumlpendm['Tahun'], y=dfjumlpendm['Jumlah Penelitian'])
+        figjumlpendm.update_layout(yaxis_title='Jumlah Penelitian')
+        figjumlpendm.update_traces(mode='lines+markers')
+        return figjumlpendm
+    elif radiopendm == 'rata':
         dfratapendm = data.getDataFrameFromDBwithParams(f'''
             select tahun                           'Tahun',
                    round(avg(jumlah_Dosen))        'Dosen',
@@ -1949,7 +1968,24 @@ def graphPenDM(start, end, radiopendm):
     Input('radio_pkmdm', 'value')
 )
 def PKMDM(start, end, radiopkmdm):
-    if radiopkmdm == 'rata':
+    if radiopkmdm == 'jumlah':
+        dfjumlpkmdm = data.getDataFrameFromDBwithParams(f'''
+        select tahun Tahun,
+               count(distinct id_pkm) 'Jumlah PKM'
+        from fact_pkm fp
+        inner join dim_penelitian_pkm dpp on fp.id_tanggal_mulai = dpp.id_tanggal_mulai
+        inner join br_pp_mahasiswa bpm on dpp.id_penelitian_pkm = bpm.id_penelitian_pkm
+        inner join dim_mahasiswa dm on bpm.id_mahasiswa = dm.id_mahasiswa
+        inner join dim_date dd on dd.id_date = dpp.id_tanggal_mulai
+        where tahun between %(start)s and %(end)s
+        group by tahun
+        order by tahun
+        ''',{'start':start,'end':end})
+        figjumlpkmdm = px.line(dfjumlpkmdm, x=dfjumlpkmdm['Tahun'], y=dfjumlpkmdm['Jumlah PKM'])
+        figjumlpkmdm.update_layout(yaxis_title='Jumlah PKM')
+        figjumlpkmdm.update_traces(mode='lines+markers')
+        return figjumlpkmdm
+    elif radiopkmdm == 'rata':
         dfratapkmdm = data.getDataFrameFromDBwithParams(f'''
         select Tahun,
                round(avg(jumlah_Dosen))     "Dosen",

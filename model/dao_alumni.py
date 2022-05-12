@@ -326,23 +326,32 @@ def getMasaTungguperGol():
     ''', con)
 
 def getGajiLulusan():
-    return pd.read_sql('''select tahun_lulus 'Tahun',ceiling(avg(pendapatan_utama)) 'Rerata Pendapatan' from fact_tracer_study fts
-inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
-where waktu_tunggu like 'KURANG 6 BULAN'
-group by tahun_lulus
-order by tahun_lulus desc''',con)
+    return pd.read_sql('''
+    select tahun_lulus 'Tahun',ceiling(avg(pendapatan_utama)) 'Rerata Pendapatan' from fact_tracer_study fts
+        inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+    where waktu_tunggu like 'KURANG 6 BULAN'
+    group by tahun_lulus
+    order by tahun_lulus desc''',con)
+
+def getGajiLulusanTab():
+    return pd.read_sql('''
+    select tahun_lulus 'Tahun',ceiling(avg(pendapatan_utama)) 'Rerata Pendapatan' from fact_tracer_study fts
+        inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+    where waktu_tunggu like 'KURANG 6 BULAN'
+    group by tahun_lulus
+    order by tahun_lulus desc''',con)
 
 def getWirausaha():
     return pd.read_sql('''
     select tahun_lulus 'Tahun LUlus', nama 'Nama Alumni', nama_organisasi 'Nama Usaha'
-from fact_tracer_study fts
-         inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
-         inner join dim_organisasi_pengguna_lulusan dopl
-                    on dl.id_organisasi_pengguna_lulusan = dopl.id_organisasi_pengguna_lulusan
-         inner join dim_mahasiswa dm on dl.id_mahasiswa = dm.id_mahasiswa
-where jenis_organisasi = 'WIRASWASTA'
-group by tahun_lulus, nama, nama_organisasi
-order by tahun_lulus desc;
+    from fact_tracer_study fts
+             inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+             inner join dim_organisasi_pengguna_lulusan dopl
+                        on dl.id_organisasi_pengguna_lulusan = dopl.id_organisasi_pengguna_lulusan
+             inner join dim_mahasiswa dm on dl.id_mahasiswa = dm.id_mahasiswa
+    where jenis_organisasi = 'WIRASWASTA'
+    group by tahun_lulus, nama, nama_organisasi
+    order by tahun_lulus desc;
     ''',con)
 
 # # NONE
