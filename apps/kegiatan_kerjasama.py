@@ -22,6 +22,7 @@ dfprestasinonakademik = data.getPrestasiNonAkademik()
 # Kulum
 dfKulum = data.getKegKulUmMOU()
 dfTableKulum = data.getTableKegKulUmMOU()
+dfJumlahMhsKuliahUmum = data.getRawJumlahMhsKuliahUmum()
 
 dfrerataKulum = data.getRerataJumlPesertaKulUm()
 dfRekognisiDosenGraf = data.getRekognisiDosen()
@@ -504,7 +505,7 @@ kerjasama = dbc.Container([
     html.Br(),
     dbc.Card([
         dcc.Tabs([
-            dcc.Tab(label='Jumlah Kegiatan Yang Mempunyai MoU', value='Kulum',
+            dcc.Tab(label='Jumlah Kegiatan Kuliah Umum Yang Mempunyai MoU atau Kerja Sama', value='Kulum',
                     children=[
                         dbc.Row([
                             dbc.Col([
@@ -562,7 +563,7 @@ kerjasama = dbc.Container([
                         )
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Jumlah Peserta Kegiatan Yang Mempunyai MoU', value='pesertaKulum',
+            dcc.Tab(label='Jumlah Peserta Kegiatan Kuliah Umum Yang Mempunyai MoU atau Kerja Sama', value='pesertaKulum',
                     children=[
                         dbc.Col([
                             html.Br(),
@@ -588,6 +589,26 @@ kerjasama = dbc.Container([
                                        style=button_style)
                         ], id='cll_grfpesertaKulum',
                             n_clicks=0),
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Rata-rata Peserta Kegiatan Kuliah Umum Yang Mempunyai MoU atau Kerja Sama',
+                    value='rerataPesertaKulum',
+                    children=[
+                        dbc.CardLink(
+                            dbc.CardBody([
+                                dcc.Loading(
+                                    id='loading-2',
+                                    type="default",
+                                    children=dcc.Graph(id='grf_reratamhskulum'),
+                                ),
+                                # dbc.Button('Lihat Semua Data',
+                                #            id='cll_grf_persentasimhsmbkm',
+                                #            n_clicks=0,
+                                #            style=button_style)
+                            ]),
+                            id='cll_grf_reratamhskulum',
+                            n_clicks=0
+                        ),
                     ],
                     style=tab_style, selected_style=selected_style),
         ], style=tabs_styles, id='tab_Kegkulum', value='Kulum'),
@@ -741,7 +762,7 @@ where tahun = %(tahun)s and d.id_prodi = 9
 group by tahun,nama
 order by `Jumlah Kegiatan` asc
     ''', {'tahun': waktu})
-    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Kegiatan'],orientation='h')
+    fig = px.bar(df, y=df['Nama Dosen'], x=df['Jumlah Kegiatan'],orientation='h',text_auto=True)
     fig.update_layout(
         yaxis=dict(tickvals=df['Nama Dosen'].unique())
     )
@@ -768,8 +789,9 @@ def graphKulum(id,valueFrom, valueTo):
     group by ddselesai.tahun
     order by ddselesai.tahun asc
             ''', {'From': valueFrom, 'To': valueTo})
-    fig = px.line(df, x=df['Tahun'], y=df['Jumlah Kegiatan'])
-    fig.update_traces(mode='lines+markers')
+    fig = px.line(df, x=df['Tahun'], y=df['Jumlah Kegiatan'],text=df['Jumlah Kegiatan'])
+    fig.update_traces(mode='lines+markers+text',textposition="top center")
+    #fig.update_traces(textposition="top center")
     return fig
 
 
@@ -790,7 +812,7 @@ order by tahun asc
     ''', {'tahun': waktu})
 
     if (len(df['Nama Kegiatan'])) != 0:
-        fig = px.bar(df, y=df['Nama Kegiatan'], x=df['jumlah'],orientation='h')
+        fig = px.bar(df, y=df['Nama Kegiatan'], x=df['jumlah'],orientation='h',text_auto=True)
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
@@ -820,7 +842,7 @@ order by tahun asc
         ''', {'wilayah': wilayahValue,'From': valueFrom, 'To': valueTo})
     print(len(df['Tahun']))
     if (len(df['Tahun'])) != 0:
-        fig = px.bar(df, y=df['Jumlah Rekognisi'], x=df['Tahun'], orientation='v')
+        fig = px.bar(df, y=df['Jumlah Rekognisi'], x=df['Tahun'], orientation='v',text_auto=True)
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
@@ -848,7 +870,7 @@ order by tahun asc
         ''', {'wilayah': wilayahValue,'From': valueFrom, 'To': valueTo})
 
     if (len(df['Tahun'])) != 0:
-        fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v')
+        fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v',text_auto=True)
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
@@ -876,8 +898,17 @@ def graphPrestasiAkademik(id,wilayahValue,valueFrom, valueTo):
 group by fact.wilayah_nama,tahun
 order by tahun asc
         ''', {'wilayah': wilayahValue,'From': valueFrom, 'To': valueTo})
+
+    df1 = dfJumlahMhsKuliahUmum
+    df2 = pd.DataFrame()
+    print(df2)
+    # df2['tahun'] = df1['tahun'].unique()
+    df2['total_mhs'] = df1.groupby(['tahun']).sum()
+    df2['jumlah_kuliah_umum'] = df1.groupby(['tahun']).count()
+    df2['rata-rata'] = (df2['total_mhs'] / df2['jumlah_kuliah_umum'])
+    print(df2)
     if (len(df['Tahun'])) != 0:
-        fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v')
+        fig = px.bar(df, y=df['Jumlah Prestasi Mahasiswa'], x=df['Tahun'], orientation='v',text_auto=True)
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
@@ -928,4 +959,22 @@ def graphTipeKegiatan(id,valueFrom, valueTo):
     )
 
     fig.update_layout()
+    return fig
+
+
+@app.callback(
+    Output('grf_reratamhskulum', 'figure'),
+    Input('grf_reratamhskulum','id')
+)
+def grafRerataPersentasiMhsMbkm(id):
+    df1 = dfJumlahMhsKuliahUmum
+    df2 = pd.DataFrame()
+    print(df2)
+    #df2['tahun'] = df1['tahun'].unique()
+    df2['total_mhs'] = df1.groupby(['tahun']).sum()
+    df2['jumlah_kuliah_umum'] = df1.groupby(['tahun']).count()
+    df2['rata-rata'] = round((df2['total_mhs'] / df2['jumlah_kuliah_umum']),2)
+    print(df2)
+    fig = px.bar(df2, y=df2['rata-rata'], x=df2.index, orientation='v',text_auto=True)
+    #fig.update_traces(textposition="top center")
     return fig

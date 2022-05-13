@@ -301,3 +301,13 @@ def getListTahunTipeKegiatan():
     order by ddselesai.tahun asc
     ''', con)
 
+
+def getRawJumlahMhsKuliahUmum():
+    return pd.read_sql('''select tahun,count(id_mahasiswa) jumlah
+from fact_kegiatan_mahasiswa fkm
+inner join dim_kegiatan dk on fkm.id_kegiatan = dk.id_kegiatan
+inner join dim_date dd on dd.id_date=dk.id_tanggal_mulai
+where jenis_kegiatan = 'KULIAH UMUM' and tahun between '2017' and '2021'
+group by tahun,dk.id_kegiatan
+order by tahun asc
+    ''', con)
