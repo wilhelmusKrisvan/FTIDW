@@ -611,11 +611,11 @@ def graphLayanan(id):
 )
 def graphSkill(id, valueDropDown, labelSkill):
     df = data.getDataFrameFromDB('''
-    select kriteria as Kriteria,
-    round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Sangat Baik",
-    round(BAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Baik",
-    round(CUKUP/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Cukup",
-    round(IF(KURANG=NULL,0,KURANG)/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Kurang"
+    select  kriteria as Kriteria,
+            round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Sangat Baik",
+            round(BAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Baik",
+            round(CUKUP/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Cukup",
+            round(IF(KURANG=NULL,0,KURANG)/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Kurang"
     from (
     select 'KRITERIA' as kriteria,
         sum(case when {kolom} = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",

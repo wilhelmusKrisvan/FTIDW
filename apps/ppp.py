@@ -283,53 +283,6 @@ pkmDs = dbc.Container([
     )
 ], style=cont_style)
 
-# pppDs = dbc.Container([
-#     dbc.Card([
-#         html.H5('Penelitian PKM Publikasi Dosen',
-#                 style=ttlgrf_style),
-#         html.Div([
-#             dbc.Row([
-#                 dbc.Col([
-#                     html.P('Nama Dosen :', style={'margin-bottom': '0'}),
-#                     dcc.Dropdown(
-#                         id='fltrPPPDsNama',
-#                         options=[{'label': i, 'value': i} for i in dosen],
-#                         value=dosen[1],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ]),
-#                 dbc.Col([
-#                     html.P('Visualisasi :', style={'margin-bottom': '0'}),
-#                     dcc.RadioItems(
-#                         id='radio_ppp',
-#                         options=[{'label': 'Penelitian', 'value': 'pen'},
-#                                  {'label': 'PKM', 'value': 'pkm'},
-#                                  {'label': 'Publikasi', 'value': 'pub'},
-#                                  {'label': 'Luaran Lainnya', 'value': 'luaran'}
-#                                  ],
-#                         value='pen',
-#                         style={'width': '100%', 'padding': '0px', },
-#                         className='card-body',
-#                         labelStyle={'display': 'block', 'display': 'inline-block',
-#                                     'margin-right': '10%', 'margin-top': '5px'}
-#                     )
-#                 ])
-#             ])
-#         ]),
-#         dbc.CardBody([
-#             dcc.Loading(
-#                 id='loading-1',
-#                 type="default",
-#                 children=dcc.Graph(id='grf_pppDosen')),
-#             dbc.Button('Lihat Semua Data', id='cll_grfpppDosen', n_clicks=0, style=button_style)
-#         ], style={'padding': '0px'})
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         id='cll_PPPDosen',
-#         is_open=False
-#     )
-# ], style=cont_style)
 penMhs = dbc.Container([
     dbc.Card([
         html.H5('Penelitian Dosen yang Melibatkan Mahasiswa',
@@ -450,97 +403,6 @@ pkmMhs = dbc.Container([
     )
 ], style=cont_style)
 
-# pppMhs = dbc.Container([
-#     dbc.Card([
-#         html.H5('Penelitian PKM Publikasi Dosen & Mahasiswa',
-#                 style=ttlgrf_style),
-#         html.Div([
-#             dbc.Row([
-#                 dbc.Col([
-#                     html.P('Dari :', style={'marginBottom': 0}),
-#                     dcc.Dropdown(
-#                         id='fltrPPPDMStart',
-#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
-#                         value=listDropdownTh[1],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ]),
-#                 dbc.Col([
-#                     html.P('Sampai :', style={'marginBottom': 0}),
-#                     dcc.Dropdown(
-#                         id='fltrPPPDMEnd',
-#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
-#                         value=listDropdownTh[4],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ])
-#             ]),
-#             dcc.Tabs([
-#                 dcc.Tab(label='Penelitian Dosen & Mahasiswa', value='telitidosenmhs',
-#                         children=[
-#                             html.Div([
-#                                 dbc.Row([
-#                                     dbc.Col([
-#                                         html.P('Visualisasi :', style={'margin-bottom': '0','margin-top':'10px'}),
-#                                         dcc.RadioItems(
-#                                             id='radio_pendm',
-#                                             options=[{'label': 'Rerata', 'value': 'rata'},
-#                                                      {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
-#                                                      ],
-#                                             value='rata',
-#                                             style={'width': '100%', 'padding': '0px', },
-#                                             className='card-body',
-#                                             labelStyle={'display': 'block', 'display': 'inline-block',
-#                                                         'margin-right': '10%', 'margin-top': '5px'}
-#                                         )
-#                                     ],style={'padding-left':'5%'})
-#                                 ],style={'padding-left':'5%','margin-bottom':'0px'}),
-#                                 dcc.Loading(
-#                                     id='loading-1',
-#                                     type="default",
-#                                     children=dcc.Graph(id='grf_telitiDsMhs')),
-#                                 dbc.Button('Lihat Semua Data', id='cll_grftelitiDM', n_clicks=0,
-#                                            style=button_style)
-#                             ],style={'textAlign':'center'})
-#                         ], style=tab_style, selected_style=selected_style
-#                         ),
-#                 dcc.Tab(label='PKM Dosen & Mahasiswa', value='pkmdosenmhs',
-#                         children=[
-#                             html.Div([
-#                                 dbc.Row([
-#                                     dbc.Col([
-#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-#                                         dcc.RadioItems(
-#                                             id='radio_pkmdm',
-#                                             options=[{'label': 'Rerata', 'value': 'rata'},
-#                                                      {'label': 'Top 10 Partisipan Terbanyak', 'value': 'top'}
-#                                                      ],
-#                                             value='rata',
-#                                             style={'width': '100%', 'padding': '0px', },
-#                                             className='card-body',
-#                                             labelStyle={'display': 'block', 'display': 'inline-block',
-#                                                         'margin-right': '10%', 'margin-top': '5px'}
-#                                         )
-#                                     ], style={'padding-left': '5%'})
-#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dcc.Loading(
-#                                     id='loading-1',
-#                                     type="default",
-#                                     children=dcc.Graph(id='grf_pkmDsMhs')),
-#                                 dbc.Button('Lihat Semua Data', id='cll_grfpkmDM', n_clicks=0,
-#                                            style=button_style)
-#                             ],style={'textAlign':'center'})
-#                         ], style=tab_style, selected_style=selected_style)
-#             ], style=tabs_styles, id='tab_pppDM', value='telitidosenmhs')
-#         ])
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         id='cll_PPPDM',
-#         is_open=False
-#     )
-# ], style=cont_style)
 penMitra = dbc.Container([
     dbc.Card([
         html.H5('Penelitian dengan Mitra',
@@ -659,175 +521,6 @@ pkmMitra = dbc.Container([
     )
 ], style=cont_style)
 
-# kerjasamaPPP = dbc.Container([
-#     dbc.Card([
-#         html.H5('Kegiatan dengan Mitra',
-#                 style=ttlgrf_style),
-#         html.Div([
-#             dbc.Row([
-#                 dbc.Col([
-#                     html.P('Dari :', style={'marginBottom': 0}),
-#                     dcc.Dropdown(
-#                         id='fltrMitraStart',
-#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
-#                         value=listDropdownTh[0],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ]),
-#                 dbc.Col([
-#                     html.P('Sampai :', style={'marginBottom': 0}),
-#                     dcc.Dropdown(
-#                         id='fltrMitraEnd',
-#                         options=[{'label': i, 'value': i} for i in listDropdownTh],
-#                         value=listDropdownTh[4],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ])
-#             ]),
-#             dcc.Tabs([
-#                 dcc.Tab(label='Penelitian', value='kerjaTeliti',
-#                         children=[
-#                             html.Div([
-#                                 dbc.Row([
-#                                     dbc.Col([
-#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-#                                         dcc.RadioItems(
-#                                             id='radio_penmitra',
-#                                             options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
-#                                                      {'label': 'Jenis Mitra', 'value': 'jenis'},
-#                                                      {'label': 'Wilayah Mitra', 'value':'wilayah'}
-#                                                      ],
-#                                             value='top',
-#                                             style={'width': '100%', 'padding': '0px', },
-#                                             className='card-body',
-#                                             labelStyle={'display': 'block', 'display': 'inline-block',
-#                                                         'margin-right': '10%', 'margin-top': '5px'}
-#                                         )
-#                                     ], style={'padding-left': '5%'})
-#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dcc.Loading(
-#                                     id='loading-1',
-#                                     type="default",
-#                                     children=dcc.Graph(id='grf_MitraTeliti')),
-#                                 dbc.Button('Lihat Semua Data', id='cll_grfMitraTeliti', n_clicks=0, style=button_style)
-#                             ],style={'textAlign':'center'})
-#                         ],
-#                         style=tab_style, selected_style=selected_style),
-#                 dcc.Tab(label='PKM', value='kerjaPKM',
-#                         children=[
-#                             html.Div([
-#                                 dbc.Row([
-#                                     dbc.Col([
-#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-#                                         dcc.RadioItems(
-#                                             id='radio_pkmmitra',
-#                                             options=[{'label': 'Top 10 Mitra (Judul Terbanyak)', 'value': 'top'},
-#                                                      {'label': 'Jenis Mitra', 'value': 'jenis'},
-#                                                      {'label': 'Wilayah Mitra', 'value':'wilayah'}
-#                                                      ],
-#                                             value='top',
-#                                             style={'width': '100%', 'padding': '0px', },
-#                                             className='card-body',
-#                                             labelStyle={'display': 'block', 'display': 'inline-block',
-#                                                         'margin-right': '10%', 'margin-top': '5px'}
-#                                         )
-#                                     ], style={'padding-left': '5%'})
-#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dcc.Loading(
-#                                     id='loading-1',
-#                                     type="default",
-#                                     children=dcc.Graph(id='grf_MitraPKM')),
-#                                 dbc.Button('Lihat Semua Data', id='cll_grfMitraPKM', n_clicks=0, style=button_style)
-#                             ], style={'textAlign': 'center'})
-#                         ], style=tab_style, selected_style=selected_style),
-#             ], style=tabs_styles, id='tab_Mitra', value='kerjaTeliti'),
-#         ])
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         id='cll_Mitra',
-#         is_open=False
-#     )
-# ], style=cont_style)
-
-# sitasi = dbc.Container([
-#     dbc.Card([
-#         html.H5('Jumlah Karya Ilmiah yang Disitasi',
-#                 style=ttlgrf_style),
-#         dbc.CardBody([
-#             dbc.Row([
-#                 dbc.Col(
-#                     html.Div([
-#                         dbc.Row([
-#                             dbc.Col([
-#                                 html.P('Dari :', style={'marginBottom': 0}),
-#                                 dcc.Dropdown(
-#                                     id='fltrSitasiStart',
-#                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
-#                                     value=listDropdownTh[0],
-#                                     style={'color': 'black'},
-#                                     clearable=False
-#                                 )
-#                             ]),
-#                             dbc.Col([
-#                                 html.P('Sampai :', style={'marginBottom': 0}),
-#                                 dcc.Dropdown(
-#                                     id='fltrSitasiEnd',
-#                                     options=[{'label': i, 'value': i} for i in listDropdownTh],
-#                                     value=listDropdownTh[3],
-#                                     style={'color': 'black'},
-#                                     clearable=False
-#                                 )
-#                             ])
-#                         ])
-#                     ])
-#                 ),
-#                 dbc.Col([
-#                     html.P('Visualisasi :', style={'margin-bottom': '0'}),
-#                     dcc.RadioItems(
-#                         id='radioSitasi',
-#                         options=[{'label': 'Per Tahun', 'value': 'tahun'},
-#                                  {'label': 'Dosen Top', 'value': 'topdosen'}
-#                                  ],
-#                         value='tahun',
-#                         style={'width': '100%', 'padding': '0px', },
-#                         className='card-body',
-#                         labelStyle={'display': 'block', 'display': 'inline-block',
-#                                     'margin-right': '10%', 'margin-top': '5px'},
-#                     )
-#                 ])
-#             ]),
-#             dcc.Loading(
-#                 id='loading-1',
-#                 type="default",
-#                 children=dcc.Graph(id='grf_sitasi')),
-#             dbc.Button('Lihat Semua Data', id='cll_grfsitasi', n_clicks=0, style=button_style),
-#         ]),
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         dbc.Card(
-#             dt.DataTable(
-#                 id='tbl_Sitasi',
-#                 columns=[
-#                     {'name': i, 'id': i} for i in dfkisitasi3th.columns
-#                 ],
-#                 data=dfkisitasi3th.to_dict('records'),
-#                 sort_action='native',
-#                 sort_mode='multi',
-#                 style_table={'padding': '10px', 'overflowX': 'auto'},
-#                 style_header={'textAlign': 'center'},
-#                 style_data={'font-size': '80%', 'textAlign': 'center'},
-#                 style_cell={'width': 95},
-#                 page_size=10,
-#                 export_format='xlsx'
-#             ), style=cardtbl_style
-#         ),
-#         id='cll_tblsitasi',
-#         is_open=False
-#     )
-# ], style=cont_style)
-
 penSitasi = dbc.Container([
     dbc.Card([
         html.H5('Jumlah Penelitian yang Disitasi',
@@ -945,7 +638,7 @@ pkmSitasi = dbc.Container([
                                  {'label': 'Dosen Sitasi Terbanyak', 'value': 'topdosen'}
                                  ],
                         value='tahun',
-                        style={'width': '100%', 'padding': '0px', },
+                        style={'width': '100%', 'padding': '0px' },
                         className='card-body',
                         labelStyle={'display': 'block', 'display': 'inline-block',
                                     'margin-right': '10%', 'margin-top': '5px'},
@@ -982,108 +675,90 @@ pkmSitasi = dbc.Container([
     )
 ], style=cont_style)
 
-# luaranDs = dbc.Container([
-#     dbc.Card([
-#         html.H5('Luaran PPP Dosen',
-#                 style=ttlgrf_style),
-#         html.Div([
-#             dbc.Row([
-#                 dbc.Col([
-#                     html.P('Dari :', style={'marginBottom': 0}),
-#                     dcc.Dropdown(
-#                         id='fltrLuaranStart',
-#                         options=[{'label': i, 'value': i} for i in listDropdownTA],
-#                         value=listDropdownTA[0],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ]),
-#                 dbc.Col([
-#                     html.P('Sampai :', style={'marginBottom': 0}),
-#                     dcc.Dropdown(
-#                         id='fltrLuaranEnd',
-#                         options=[{'label': i, 'value': i} for i in listDropdownTA],
-#                         value=listDropdownTA[0],
-#                         style={'color': 'black'},
-#                         clearable=False
-#                     )
-#                 ])
-#             ]),
-#             dcc.Tabs([
-#                 dcc.Tab(label='FTI', value='fti',
-#                         children=[
-#                             html.Div([
-#                                 dbc.Row([
-#                                     dbc.Col([
-#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-#                                         dcc.RadioItems(
-#                                             id='radio_luaranfti',
-#                                             options=[{'label': 'Hak Kekayaan Intelektual (HKI)', 'value': 'hki'},
-#                                                      {'label': 'Teknologi Tepat Guna (TTGU)', 'value': 'ttgu'},
-#                                                      {'label': 'Buku', 'value': 'buku'}
-#                                                      ],
-#                                             value='hki',
-#                                             style={'width': '100%', 'padding': '0px', },
-#                                             className='card-body',
-#                                             labelStyle={'display': 'block', 'display': 'inline-block',
-#                                                         'margin-right': '5%', 'margin-top': '5px'}
-#                                         )
-#                                     ], style={'padding-left': '5%'})
-#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dbc.Spinner([
-#                                       dcc.Graph(id='grf_luarandsfti')
-#                                 ], size='md', color='info', type='grow'),
-#                                 dbc.Button('Lihat Tabel', id='cll_grfluarandsfti', n_clicks=0,
-#                                            style=button_style)
-#                             ],style={'textAlign':'center'})
-#                         ],
-#                         style=tab_style, selected_style=selected_style),
-#                 dcc.Tab(label='Per Dosen', value='dosen',
-#                         children=[
-#                             html.Div([
-#                                 dbc.Row([
-#                                     dbc.Col([
-#                                         html.P('Nama Dosen :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-#                                         dcc.Dropdown(
-#                                             id='fltrLuaranDsNama',
-#                                             options=[{'label': i, 'value': i} for i in dosen],
-#                                             value=dosen[1],
-#                                             style={'color': 'black'},
-#                                             clearable=False
-#                                         )
-#                                     ],width=4),
-#                                     dbc.Col([
-#                                         html.P('Visualisasi :', style={'margin-bottom': '0', 'margin-top': '10px'}),
-#                                         dcc.RadioItems(
-#                                             id='radio_luarands',
-#                                             options=[{'label': 'Hak Kekayaan Intelektual (HKI)', 'value': 'hki'},
-#                                                      {'label': 'Teknologi Tepat Guna (TTGU)', 'value': 'ttgu'},
-#                                                      {'label': 'Buku', 'value': 'buku'}
-#                                                      ],
-#                                             value='hki',
-#                                             style={'width': '100%', 'padding': '0px', },
-#                                             className='card-body',
-#                                             labelStyle={'display': 'block', 'display': 'inline-block',
-#                                                         'margin-right': '5%', 'margin-top': '5px'}
-#                                         )
-#                                     ],width=8, style={'padding-left': '5%'})
-#                                 ], style={'padding-left': '5%', 'margin-bottom': '0px'}),
-#                                 dbc.Spinner([
-#                                       dcc.Graph(id='grf_luarands')
-#                                 ], size='md', color='info', type='grow'),
-#                                 dbc.Button('Lihat Tabel', id='cll_grfluarands', n_clicks=0,
-#                                            style=button_style)
-#                             ],style={'justify-content':'center'})
-#                         ],
-#                         style=tab_style, selected_style=selected_style)
-#             ], style=tabs_styles, id='tab_luaranDosen', value='fti'),
-#         ]),
-#     ], style=cardgrf_style),
-#     dbc.Collapse(
-#         id='cll_luaranPPPDosen',
-#         is_open=False
-#     )
-# ], style=cont_style)
+#edit
+pubPenDs = dbc.Container([
+    dbc.Card([
+        html.H5('Publikasi Penelitian Dosen berdasarkan Media Publikasi',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPubPenStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPubPenEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[4],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        dbc.CardBody([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_pubpenDs')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpubpenDs', n_clicks=0, style=button_style)
+        ], style={'padding': '0px'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PubPenDs',
+        is_open=False
+    )
+], style=cont_style)
+
+pubPKMDs = dbc.Container([
+    dbc.Card([
+        html.H5('Publikasi PKM Dosen berdasarkan Media Publikasi',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPubPKMStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[1],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrPubPKMEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[4],
+                        style={'color': 'black'},
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        dbc.CardBody([
+            dcc.Loading(
+                id='loading-1',
+                type="default",
+                children=dcc.Graph(id='grf_pubpkmDs')),
+            dbc.Button('Lihat Semua Data', id='cll_grfpubpkmDs', n_clicks=0, style=button_style)
+        ], style={'padding': '0px'})
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        id='cll_PubPKMDs',
+        is_open=False
+    )
+], style=cont_style)
 
 luaranPenDs = dbc.Container([
     dbc.Card([
@@ -1656,6 +1331,7 @@ ppkm = dbc.Container([
                         penSitasi,
                         penRerata,
                         penDana,
+                        pubPenDs,
                         luaranPenDs,
                         luaranPenMhs
                     ],
@@ -1669,7 +1345,8 @@ ppkm = dbc.Container([
                         pkmSitasi,
                         pkmRerata,
                         pkmDana,
-                        luaranPKMDs,
+                        pubPKMDs,
+                        # luaranPKMDs,
                         luaranPKMMhs
                     ],
                     style=tab_style, selected_style=selected_style)
@@ -2343,8 +2020,11 @@ def graphHKIMhs(tglstart, tglend):
     Input('fltrPenRerataEnd', 'value')
 )
 def graphRerata(tglstart, tglend):
-    dfPenDs = data.getDataFrameFromDBwithParams('''
-    select pp.tahun Tahun, pp.jumlah 'Jumlah Judul', dosen.jumlah 'Jumlah Dosen', round(pp.jumlah/dosen.jumlah) Rerata
+    dfPenDs = data.getDataFrameFromDBwithParams(f'''
+    select pp.tahun Tahun,
+       pp.jumlah                       'Jumlah Judul',
+       dosen.jumlah                    'Jumlah Dosen',
+       round(pp.jumlah / dosen.jumlah) 'Rata-rata per Dosen'
     from (select dd.tahun tahun, count(bpd.id_penelitian_pkm) jumlah
           from br_pp_dosen bpd
                    inner join dim_penelitian_pkm dpp on bpd.id_penelitian_pkm = dpp.id_penelitian_pkm
@@ -2353,16 +2033,18 @@ def graphRerata(tglstart, tglend):
           group by dd.tahun) pp,
          (select dd.tahun tahun, count(distinct bpd.id_dosen) jumlah
           from br_pp_dosen bpd
-                inner join dim_penelitian_pkm dpp on bpd.id_penelitian_pkm = dpp.id_penelitian_pkm
-                inner join dim_date dd on dpp.id_tanggal_selesai = dd.id_date
-                inner join dim_dosen dd2 on bpd.id_dosen=dd2.id_dosen
+                   inner join dim_penelitian_pkm dpp on bpd.id_penelitian_pkm = dpp.id_penelitian_pkm
+                   inner join dim_date dd on dpp.id_tanggal_selesai = dd.id_date
+                   inner join dim_dosen dd2 on bpd.id_dosen = dd2.id_dosen
           where bpd.jenis = 'Penelitian'
-          group by dd.tahun)dosen
-    where pp.tahun=dosen.tahun and (pp.tahun between %(Start)s and %(End)s)
-    group by pp.tahun, pp.jumlah, dosen.jumlah, `Rerata`
+          group by dd.tahun) dosen
+    where pp.tahun = dosen.tahun
+       and (pp.tahun between %(Start)s and %(End)s)
+    group by pp.tahun, pp.jumlah, dosen.jumlah, `Rata-rata per Dosen`
     order by pp.tahun;''', {'Start': tglstart, 'End': tglend})
-    figPenDs = px.line(dfPenDs, x=dfPenDs['Tahun'], y=dfPenDs['Rerata'], color=px.Constant('Penelitian /Dosen'),
-                       labels=dict(x='Tahun', y='Rerata', color='Keterangan'))
+    figPenDs = px.line(dfPenDs, x=dfPenDs['Tahun'], y=dfPenDs['Rata-rata per Dosen'],
+                       color=px.Constant('Rata-rata Penelitian /Dosen'),
+                       labels=dict(x='Tahun', y='Jumlah', color='Keterangan'))
     figPenDs.update_traces(mode='lines+markers')
     figPenDs.add_bar(x=dfPenDs['Tahun'], y=dfPenDs['Jumlah Judul'], name='Penelitian')
     return figPenDs
@@ -2706,9 +2388,73 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+#edit
+@app.callback(
+    Output('grf_pubpenDs','figure'),
+    Input('fltrPubPenStart','value'),
+    Input('fltrPubPenEnd','value')
+)
+def graphPubPenDs(start, end):
+    dfpp = data.getDataFrameFromDBwithParams(f'''
+        select tahun 'Tahun',
+               a.keterangan_jenis_luaran 'Media Publikasi',
+               count(distinct f.id_publikasi) 'Jumlah Judul Publikasi'
+        from fact_penelitian fp
+        inner join br_pp_publikasi bpp on fp.id_penelitian=bpp.id_penelitian_pkm
+        inner join fact_publikasi f on bpp.id_publikasi = f.id_publikasi
+        inner join dim_publikasi dp on bpp.id_penelitian_pkm = dp.id_penelitian_pkm
+        inner join dim_date dd on dd.id_date=f.id_tanggal_publikasi
+        inner join (
+            select distinct keterangan_jenis_luaran,
+                            id_jenis_luaran
+            from dim_jenis_luaran
+            where keterangan_jenis_luaran like %(JURNAL)s
+               or keterangan_jenis_luaran like %(PROSIDING)s
+               or keterangan_jenis_luaran like %(PUBLIKASI)s
+            order by keterangan_jenis_luaran) a on dp.id_jenis_publikasi=a.id_jenis_luaran
+        where tahun between %(start)s and %(end)s
+        group by `Tahun`, `Media Publikasi`
+        order by `Tahun`, `Media Publikasi`
+    ''',{'start':start,'end':end,
+          'JURNAL':'JURNAL%', 'PROSIDING':'PROSIDING%', 'PUBLIKASI':'PUBLIKASI%'})
+    fig = px.bar(dfpp, x=dfpp['Tahun'], y=dfpp['Jumlah Judul Publikasi'],
+                 color=dfpp['Media Publikasi'])
+    return fig
+
+@app.callback(
+    Output('grf_pubpkmDs','figure'),
+    Input('fltrPubPKMStart','value'),
+    Input('fltrPubPKMEnd','value')
+)
+def graphPubPKMDs(start, end):
+    dfpkmp = data.getDataFrameFromDBwithParams(f'''
+    select tahun 'Tahun',
+           a.keterangan_jenis_luaran 'Media Publikasi',
+           count(distinct f.id_publikasi) 'Jumlah Judul Publikasi'
+    from fact_pkm fp
+    inner join br_pp_publikasi bpp on fp.id_pkm=bpp.id_penelitian_pkm
+    inner join fact_publikasi f on bpp.id_publikasi = f.id_publikasi
+    inner join dim_publikasi dp on bpp.id_penelitian_pkm = dp.id_penelitian_pkm
+    inner join dim_date dd on dd.id_date=f.id_tanggal_publikasi
+    inner join (
+        select distinct keterangan_jenis_luaran,
+                        id_jenis_luaran
+        from dim_jenis_luaran
+        where keterangan_jenis_luaran like %(JURNAL)s
+           or keterangan_jenis_luaran like %(PROSIDING)s
+           or keterangan_jenis_luaran like %(PUBLIKASI)s
+        order by keterangan_jenis_luaran) a on dp.id_jenis_publikasi=a.id_jenis_luaran
+    where tahun between %(start)s and %(end)s
+    group by `Tahun`, `Media Publikasi`
+    order by `Tahun`, `Media Publikasi`
+    ''', {'start': start, 'end': end,
+          'JURNAL':'JURNAL%', 'PROSIDING':'PROSIDING%', 'PUBLIKASI':'PUBLIKASI%'})
+    fig = px.bar(dfpkmp, x=dfpkmp['Tahun'], y=dfpkmp['Jumlah Judul Publikasi'],
+                 color=dfpkmp['Media Publikasi'])
+    return fig
+
 
 #LuaranDosen
-##TABEL INI
 @app.callback(
     Output('cll_luaranPenDosen', 'is_open'),
     Output('cll_luaranPenDosen', 'children'),
