@@ -115,105 +115,135 @@ left join(
 order by terlacak.tahun_lulus''', con)
 
 def getKepuasanLayanan():
-    return pd.read_sql('''select (kepuasan.Semua/total.Semua)*100 'Persen', kepuasan.Nilai 'Nilai' from
-(select sum(Jumlah) Semua,Nilai,1 gabung from
-(select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by fasilitas_kesehatan_poliklinik
-union all
-select count(fasilitas_internet) Jumlah,fasilitas_internet Nilai,'fasilitas_internet' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by fasilitas_internet
-union all
-select count(ketersediaan_fasilitas_olahraga) Jumlah,ketersediaan_fasilitas_olahraga Nilai,'ketersediaan_fasilitas_olahraga' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by ketersediaan_fasilitas_olahraga
-union all
-select count(ketersediaan_fasilitas_makanan) Jumlah,ketersediaan_fasilitas_makanan Nilai,'ketersediaan_fasilitas_makanan' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by ketersediaan_fasilitas_makanan
-union all
-select count(dukungan_terhadap_ukm) Jumlah,dukungan_terhadap_ukm Nilai,'dukungan_terhadap_ukm' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by dukungan_terhadap_ukm
-union all
-select count(fasilitas_ruangan) Jumlah,fasilitas_ruangan Nilai,'fasilitas_ruangan' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by fasilitas_ruangan
-union all
-select count(dukungan_unit_terhadap_keg_mhs) Jumlah,dukungan_unit_terhadap_keg_mhs Nilai,'dukungan_unit_terhadap_keg_mhs' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by dukungan_unit_terhadap_keg_mhs
-union all
-select count(penyediaan_informasi_dan_beasiswa) Jumlah,penyediaan_informasi_dan_beasiswa Nilai,'penyediaan_informasi_dan_beasiswa' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by penyediaan_informasi_dan_beasiswa
-union all
-select count(penyediaan_surat) Jumlah,penyediaan_surat Nilai,'penyediaan_surat' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by penyediaan_surat
-union all
-select count(layanan_print) Jumlah,layanan_print Nilai,'layanan_print' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by layanan_print
-union all
-select count(penyediaan_ruang_publik) Jumlah,penyediaan_ruang_publik Nilai,'penyediaan_ruang_publik' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by penyediaan_ruang_publik
-union all
-select count(pelayanan_kesehatan_dan_askes) Jumlah,pelayanan_kesehatan_dan_askes Nilai,'pelayanan_kesehatan_dan_askes' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by pelayanan_kesehatan_dan_askes) data
-group by data.Nilai) kepuasan,
-(select sum(Jumlah) Semua, 1 gabung from
-(select count(fasilitas_kesehatan_poliklinik) Jumlah,fasilitas_kesehatan_poliklinik Nilai,'fasilitas_kesehatan_poliklinik' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by fasilitas_kesehatan_poliklinik
-union all
-select count(fasilitas_internet) Jumlah,fasilitas_internet Nilai,'fasilitas_internet' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by fasilitas_internet
-union all
-select count(ketersediaan_fasilitas_olahraga) Jumlah,ketersediaan_fasilitas_olahraga Nilai,'ketersediaan_fasilitas_olahraga' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by ketersediaan_fasilitas_olahraga
-union all
-select count(ketersediaan_fasilitas_makanan) Jumlah,ketersediaan_fasilitas_makanan Nilai,'ketersediaan_fasilitas_makanan' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by ketersediaan_fasilitas_makanan
-union all
-select count(dukungan_terhadap_ukm) Jumlah,dukungan_terhadap_ukm Nilai,'dukungan_terhadap_ukm' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by dukungan_terhadap_ukm
-union all
-select count(fasilitas_ruangan) Jumlah,fasilitas_ruangan Nilai,'fasilitas_ruangan' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by fasilitas_ruangan
-union all
-select count(dukungan_unit_terhadap_keg_mhs) Jumlah,dukungan_unit_terhadap_keg_mhs Nilai,'dukungan_unit_terhadap_keg_mhs' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by dukungan_unit_terhadap_keg_mhs
-union all
-select count(penyediaan_informasi_dan_beasiswa) Jumlah,penyediaan_informasi_dan_beasiswa Nilai,'penyediaan_informasi_dan_beasiswa' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by penyediaan_informasi_dan_beasiswa
-union all
-select count(penyediaan_surat) Jumlah,penyediaan_surat Nilai,'penyediaan_surat' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by penyediaan_surat
-union all
-select count(layanan_print) Jumlah,layanan_print Nilai,'layanan_print' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by layanan_print
-union all
-select count(penyediaan_ruang_publik) Jumlah,penyediaan_ruang_publik Nilai,'penyediaan_ruang_publik' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by penyediaan_ruang_publik
-union all
-select count(pelayanan_kesehatan_dan_askes) Jumlah,pelayanan_kesehatan_dan_askes Nilai,'pelayanan_kesehatan_dan_askes' Kategori
-from fact_kepuasan_pengguna_mahasiswa
-group by pelayanan_kesehatan_dan_askes) data) total
-where total.gabung = kepuasan.gabung''',con)
+    return pd.read_sql('''
+    select (kepuasan.Semua / total.Semua) * 100 'Persen',
+           kepuasan.Nilai 'Nilai'
+    from (select sum(Jumlah) Semua, Nilai, 1 gabung
+          from (select count(fasilitas_kesehatan_poliklinik) Jumlah,
+                       fasilitas_kesehatan_poliklinik        Nilai,
+                       'fasilitas_kesehatan_poliklinik'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by fasilitas_kesehatan_poliklinik
+                union all
+                select count(fasilitas_internet) Jumlah, fasilitas_internet Nilai, 'fasilitas_internet' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by fasilitas_internet
+                union all
+                select count(ketersediaan_fasilitas_olahraga) Jumlah,
+                       ketersediaan_fasilitas_olahraga        Nilai,
+                       'ketersediaan_fasilitas_olahraga'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by ketersediaan_fasilitas_olahraga
+                union all
+                select count(ketersediaan_fasilitas_makanan) Jumlah,
+                       ketersediaan_fasilitas_makanan        Nilai,
+                       'ketersediaan_fasilitas_makanan'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by ketersediaan_fasilitas_makanan
+                union all
+                select count(dukungan_terhadap_ukm) Jumlah, dukungan_terhadap_ukm Nilai, 'dukungan_terhadap_ukm' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by dukungan_terhadap_ukm
+                union all
+                select count(fasilitas_ruangan) Jumlah, fasilitas_ruangan Nilai, 'fasilitas_ruangan' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by fasilitas_ruangan
+                union all
+                select count(dukungan_unit_terhadap_keg_mhs) Jumlah,
+                       dukungan_unit_terhadap_keg_mhs        Nilai,
+                       'dukungan_unit_terhadap_keg_mhs'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by dukungan_unit_terhadap_keg_mhs
+                union all
+                select count(penyediaan_informasi_dan_beasiswa) Jumlah,
+                       penyediaan_informasi_dan_beasiswa        Nilai,
+                       'penyediaan_informasi_dan_beasiswa'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by penyediaan_informasi_dan_beasiswa
+                union all
+                select count(penyediaan_surat) Jumlah, penyediaan_surat Nilai, 'penyediaan_surat' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by penyediaan_surat
+                union all
+                select count(layanan_print) Jumlah, layanan_print Nilai, 'layanan_print' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by layanan_print
+                union all
+                select count(penyediaan_ruang_publik) Jumlah,
+                       penyediaan_ruang_publik        Nilai,
+                       'penyediaan_ruang_publik'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by penyediaan_ruang_publik
+                union all
+                select count(pelayanan_kesehatan_dan_askes) Jumlah,
+                       pelayanan_kesehatan_dan_askes        Nilai,
+                       'pelayanan_kesehatan_dan_askes'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by pelayanan_kesehatan_dan_askes) data
+          group by data.Nilai) kepuasan,
+         (select sum(Jumlah) Semua, 1 gabung
+          from (select count(fasilitas_kesehatan_poliklinik) Jumlah,
+                       fasilitas_kesehatan_poliklinik        Nilai,
+                       'fasilitas_kesehatan_poliklinik'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by fasilitas_kesehatan_poliklinik
+                union all
+                select count(fasilitas_internet) Jumlah, fasilitas_internet Nilai, 'fasilitas_internet' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by fasilitas_internet
+                union all
+                select count(ketersediaan_fasilitas_olahraga) Jumlah,
+                       ketersediaan_fasilitas_olahraga        Nilai,
+                       'ketersediaan_fasilitas_olahraga'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by ketersediaan_fasilitas_olahraga
+                union all
+                select count(ketersediaan_fasilitas_makanan) Jumlah,
+                       ketersediaan_fasilitas_makanan        Nilai,
+                       'ketersediaan_fasilitas_makanan'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by ketersediaan_fasilitas_makanan
+                union all
+                select count(dukungan_terhadap_ukm) Jumlah, dukungan_terhadap_ukm Nilai, 'dukungan_terhadap_ukm' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by dukungan_terhadap_ukm
+                union all
+                select count(fasilitas_ruangan) Jumlah, fasilitas_ruangan Nilai, 'fasilitas_ruangan' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by fasilitas_ruangan
+                union all
+                select count(dukungan_unit_terhadap_keg_mhs) Jumlah,
+                       dukungan_unit_terhadap_keg_mhs        Nilai,
+                       'dukungan_unit_terhadap_keg_mhs'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by dukungan_unit_terhadap_keg_mhs
+                union all
+                select count(penyediaan_informasi_dan_beasiswa) Jumlah,
+                       penyediaan_informasi_dan_beasiswa        Nilai,
+                       'penyediaan_informasi_dan_beasiswa'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by penyediaan_informasi_dan_beasiswa
+                union all
+                select count(penyediaan_surat) Jumlah, penyediaan_surat Nilai, 'penyediaan_surat' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by penyediaan_surat
+                union all
+                select count(layanan_print) Jumlah, layanan_print Nilai, 'layanan_print' Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by layanan_print
+                union all
+                select count(penyediaan_ruang_publik) Jumlah,
+                       penyediaan_ruang_publik        Nilai,
+                       'penyediaan_ruang_publik'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by penyediaan_ruang_publik
+                union all
+                select count(pelayanan_kesehatan_dan_askes) Jumlah,
+                       pelayanan_kesehatan_dan_askes        Nilai,
+                       'pelayanan_kesehatan_dan_askes'      Kategori
+                from fact_kepuasan_pengguna_mahasiswa
+                group by pelayanan_kesehatan_dan_askes) data) total
+    where total.gabung = kepuasan.gabung;''',con)
 
 def getSkill():
     return pd.read_sql('''
