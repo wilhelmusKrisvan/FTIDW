@@ -11,6 +11,7 @@ from dash import html, dcc
 import model.dao_mbkm as data
 from datetime import date
 import plotly.graph_objs as go
+import numpy as np
 
 con = create_engine('mysql+pymysql://sharon:TAhug0r3ng!@localhost:3333/datawarehouse')
 
@@ -27,6 +28,17 @@ dfdosbingmbkm = data.getDosbingMBKMperSemester()
 dfreratasksmbkm = data.getRerataSKSMBKMperSemester()
 dfTabelMitraInternal = data.getTableMitraInternal()
 dfTabelMitraEksternal = data.getTableMitraEksternal()
+dfTotalMbkm = data.getTotalMhsMbkm()
+dfTotalMhsAktif = data.getTotalMhsAktifPerSemester()
+
+dfListSemesterMbkm = data.getListSemester()
+listSemesterMbkm = dfListSemesterMbkm['Semester']
+
+#dfPersentaseMhsMbkm = data.getTotalMhsMbkm()
+dfPersentaseMhsMbkm = pd.DataFrame()
+dfRawMbkm = data.getRawDataMBKM()
+dfRawMhsAktif = data.getRawDataMhsAktif()
+dfRawRerataMbkm = data.getRawDataRerataMBKM()
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -487,7 +499,7 @@ jumlmitraMBKM = dbc.Container([
 # +grafcollapse
 dosbingMBKM = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Dosen Pembimbing MBKM',
+        html.H5('Dosen Terlibat Dalam MBKM',
                 style=ttlgrf_style),
         html.Br(),
         dbc.Row([
@@ -560,7 +572,7 @@ dosbingMBKM = dbc.Container([
 # +grafcollapse
 mahasiswaMBKM = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Mahasiswa MBKM per Kegiatan',
+        html.H5('Jumlah Mahasiswa MBKM Berdasarkan Jenis BKP',
                 style=ttlgrf_style),
         html.Br(),
         dbc.Row([
@@ -634,7 +646,7 @@ mahasiswaMBKM = dbc.Container([
 # +grafcollapse
 reratasksMBKM = dbc.Container([
     dbc.Card([
-        html.H5('Rata-rata Konversi SKS MBKM',
+        html.H5('Rata - rata Konversi SKS MBKM',
                 style=ttlgrf_style),
         html.Br(),
         dbc.Row([
@@ -705,6 +717,95 @@ reratasksMBKM = dbc.Container([
     )
 ], style=cont_style)
 
+# +grafcollapse
+persentaseMahasiswaMbkm = dbc.Container([
+    dbc.Card([
+        html.H5('Persentase Mahasiswa Yang Ikut MBKM',
+                style=ttlgrf_style),
+        html.Br(),
+        dbc.Tooltip(
+            "Persentase Mahasiswa Yang Ikut MBKM (Jumlah mahasiswa yang ikut MBKM Internal + Ekternal / Total Mahasiswa Aktif",
+            target="tooltip-target",
+        ),
+        html.Div(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(html.Div(""),width=10),
+                        dbc.Col(html.Div(className="fas fa-question-circle fa-2x"),id="tooltip-target",align='end'),
+                    ]
+                ),
+            ]
+        ),
+        dbc.Row([
+            dbc.Col([
+                html.H6('Dari:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listSemesterMbkm],
+                        value=listSemesterMbkm[0],
+                        id='Fromdrpdwn_persentasemhsmbkm',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ]),
+            dbc.Col([
+                html.H6('Sampai:'),
+                html.Div([
+                    dcc.Dropdown(
+                        options=[{'label': i, 'value': i} for i in listSemesterMbkm],
+                        value=listSemesterMbkm[4],
+                        id='Todrpdwn_persentasemhsmbkm',
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='-',
+                    ),
+                ]),
+            ])
+        ]),
+        dbc.CardLink(
+            dbc.CardBody([
+                dcc.Loading(
+                    id='loading-2',
+                    type="default",
+                    children=dcc.Graph(id='grf_persentasimhsmbkm'),
+                ),
+                dbc.Button('Lihat Semua Data',
+                           id='cll_grf_persentasimhsmbkm',
+                           n_clicks=0,
+                           style=button_style)
+            ]),
+            id='cll_grf_persentasimhsmbkm',
+            n_clicks=0
+        ),
+        dbc.Collapse(
+            dbc.Card(
+                dt.DataTable(
+                    id='tbl_persentasimhsmbkm',
+                    columns=[
+                        {'name': i, 'id': i} for i in dfRawMbkm.columns
+                    ],
+                    data=dfRawMbkm.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto',
+                                 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_cell={'width': 95},
+                    page_size=10,
+                    export_format='xlsx'
+                ), style=cardtbl_style
+            ),
+            id='cll_tblpersentasimhsmbkm',
+            is_open=False
+        )
+
+    ], style=cardgrf_style),
+], style=cont_style)
+
 # layout
 mbkm = dbc.Container([
     html.Div([
@@ -714,7 +815,8 @@ mbkm = dbc.Container([
             dcc.Tab(label='Mahasiswa', value='mahasiswa',
                     children=[
                         mahasiswaMBKM,
-                        reratasksMBKM
+                        reratasksMBKM,
+                        persentaseMahasiswaMbkm
                     ],
                     style=tab_style, selected_style=selected_style),
             dcc.Tab(label='Dosen Pembimbing', value='dosen',
@@ -804,6 +906,15 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+@app.callback(
+    Output("cll_tblpersentasimhsmbkm", "is_open"),
+    [Input("cll_grf_persentasimhsmbkm", "n_clicks")],
+    [State("cll_tblpersentasimhsmbkm", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
 # GRAPH CALLBACK
 @app.callback(
     Output('grf_mahasiswambkm', 'figure'),
@@ -838,8 +949,12 @@ def grafMahasiswaMBKM(valueFrom, valueTo):
     ''', {'From': valueFrom, 'To': valueTo})
 
     if (len(df['Semester'])) != 0:
-        fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk Kegiatan'])
+        fig = px.bar(df, x=df['Semester'], y=df['Jumlah'], color=df['Bentuk Kegiatan'],text_auto=True)
         fig.update_layout(barmode='group')
+        fig.add_hrect(y0=5.1, y1=100.0, line_width=0, fillcolor="green", opacity=0.2)
+        fig.add_hrect(y0=0.1, y1=4.0, line_width=0, fillcolor="yellow", opacity=0.2)
+        fig.add_hrect(y0=0.0,y1=0.1, line_width=0, fillcolor="red", opacity=0.2)
+
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Data Tidak Ditemukan!",
@@ -857,7 +972,7 @@ def grafMahasiswaMBKM(valueFrom, valueTo):
 def grafRerataKonversiSKS(valueFrom, valueTo):
     # df=dfreratasksmbkm
     df = data.getDataFrameFromDBwithParams('''
-    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, AVG((sks)) 'Rata-rata SKS'
+    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,ROUND(AVG((sks)),2) as 'Rata-rata SKS'
     from mbkm_matkul_monev mbm
          inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
          inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
@@ -865,7 +980,19 @@ def grafRerataKonversiSKS(valueFrom, valueTo):
     %(From)s and %(To)s
     group by mbm.kode_semester, Semester
     order by mbm.kode_semester;''', {'From': valueFrom, 'To': valueTo})
-    fig = px.line(df, x=df['Semester'], y=df['Rata-rata SKS'])
+
+    dfRataRata = dfRawRerataMbkm
+    dfRataRataSksMbkm = pd.DataFrame()
+    dfRataRataSksMbkm = dfRataRata.groupby(['kode_semester'])['sks'].count().reset_index(name="Jumlah Total SKS")
+    dfUniqueMhs = dfRataRata.groupby(['kode_semester'])['id_mahasiswa'].nunique().reset_index(name="Total Mahasiswa")
+    dfRataRataSksMbkm = dfRataRataSksMbkm.merge(dfUniqueMhs, on='kode_semester', how='left')
+    dfRataRataSksMbkm['Rerata'] = round((dfRataRataSksMbkm['Jumlah Total SKS'] / dfRataRataSksMbkm['Total Mahasiswa']) * 100,2)
+    dfRataRataSksMbkm['Semester'] = pd.DataFrame(dfRataRata['Semester'].unique())
+    print('Rata-Rata Konversi SKS')
+    print(dfRataRataSksMbkm.to_string())
+
+    fig = px.line(dfRataRataSksMbkm, x=dfRataRataSksMbkm['Semester'], y=dfRataRataSksMbkm['Rerata'],text=dfRataRataSksMbkm['Rerata'])
+    fig.update_traces(textposition="top center")
     return fig
 
 
@@ -889,7 +1016,14 @@ def grafDosbingMBKM(valueFrom, valueTo):
     %(From)s and %(To)s
     group by mbm.kode_semester, Semester
     order by mbm.kode_semester;''', {'From': valueFrom, 'To': valueTo})
-    fig = px.bar(df, x=df['Semester'], y=df['Jumlah Dosen'])
+
+    dfDosbing = df
+    dfDosbing['Total'] = dfDosbing['Jumlah Dosen'].sum()
+    dfDosbing['Persentase'] = round((dfDosbing['Jumlah Dosen'] / dfDosbing['Total']) * 100, 2)
+    print(dfDosbing.to_string())
+
+    fig = px.bar(df, x=df['Semester'], y=df['Persentase'],text_auto=True)
+    #fig = px.line(dfDosbing, x=dfDosbing['Semester'], y=dfDosbing['Persentase'],text=dfDosbing['Persentase'])
     # fig.show
     return fig
 
@@ -922,8 +1056,8 @@ def grafMitraMBKM(valueFrom, valueTo):
 )
 def grafMitraInternal(valueFrom, valueTo):
     # df=dfmahasiswambkm
-    print(valueFrom)
-    print('satno')
+    #print(valueFrom)
+    #print('satno')
     df = data.getDataFrameFromDBwithParams('''
     select mitra 'Top Mitra',count(kode_matakuliah) 'Jumlah Kerjasama Mitra',
        concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
@@ -949,8 +1083,8 @@ limit 5
 )
 def grafMitraEksternal(valueFrom, valueTo):
     # df=dfmahasiswambkm
-    print(valueFrom)
-    print('satno2')
+    #print(valueFrom)
+    #print('satno2')
     df = data.getDataFrameFromDBwithParams('''
     select mitra 'Top Mitra',count(kode_matakuliah) 'Jumlah Kerjasama Mitra',
        concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
@@ -968,3 +1102,73 @@ limit 5
     fig = px.bar(df, x=df['Semester'], y=df['Jumlah Kerjasama Mitra'],color=df['Top Mitra'])
     fig.update_layout(barmode='group')
     return fig
+
+@app.callback(
+    Output('grf_persentasimhsmbkm', 'figure'),
+    Input('grf_persentasimhsmbkm','id')
+)
+def grafRerataPersentasiMhsMbkm(id):
+    # df=dfreratasksmbkm
+    # dfTotMbkm = dfTotalMbkm.reset_index(drop=True)
+    # dfMhsAktif = dfTotalMhsAktif.reset_index(drop=True)
+    # dfAgg = dfTotMbkm
+    #
+    # def get_total_mhs(kode_semester):
+    #     sum = 0
+    #     try:
+    #         test = dfMhsAktif.loc[(dfMhsAktif['tahun_angkatan'] == str(int(kode_semester[:-1]) - 1)) & (
+    #                     dfMhsAktif['kode_semester'] == kode_semester), 'Jumlah Mahasiswa Aktif'].item() + \
+    #                dfMhsAktif.loc[(dfMhsAktif['tahun_angkatan'] == str(int(kode_semester[:-1]) - 2)) & (
+    #                            dfMhsAktif['kode_semester'] == kode_semester), 'Jumlah Mahasiswa Aktif'].item()
+    #     except:
+    #         # print('error')
+    #         sum = 0
+    #     else:
+    #         sum = test
+    #     finally:
+    #         print('exit')
+    #     return sum
+    #
+    # # get_total_mhs('2021')
+    # dfAgg['total_mhs_aktif'] = dfAgg['kode_semester'].apply(get_total_mhs)
+    # #print(dfAgg)
+    # dfAgg['Rerata'] = round(dfAgg['jumlah_mhs_mbkm'] / dfAgg['total_mhs_aktif'], 2)
+    # dfAgg.replace([np.inf, -np.inf], 0, inplace=True)
+    # #print(dfAgg)
+    # #dfPersentaseMhsMbkm['total_mhs_aktif'] = dfAgg['total_mhs_aktif']
+    # #dfPersentaseMhsMbkm['rerata'] = dfAgg['rerata']
+    # #print(dfPersentaseMhsMbkm)
+
+    dfRawDataMBKM = dfRawMbkm.reset_index(drop=True)
+    dfRawDataMhsAktif = dfRawMhsAktif.reset_index(drop=True)
+
+    def getMhsAktif(semester):
+        sum = 0
+        try:
+            getTotal = dfRawDataMhsAktif.loc[(dfRawDataMhsAktif['kode_semester'] == semester), 'Jumlah Mahasiswa Aktif'].item()
+        except:
+            sum = 0
+        else:
+            sum = getTotal
+        finally:
+            print('exit')
+        return sum
+
+    dfPersentaseMhsMbkm1 = pd.DataFrame()
+    dfPersentaseMhsMbkm1 = dfRawDataMBKM.groupby(['kode_semester'])['id_mahasiswa'].count().reset_index(name="Jumlah Mahasiswa")
+    dfPersentaseMhsMbkm1['Total Mahasiswa Aktif']= dfPersentaseMhsMbkm1['kode_semester'].apply(getMhsAktif)
+    dfPersentaseMhsMbkm1['Persentase'] = round((dfPersentaseMhsMbkm1['Jumlah Mahasiswa'] / dfPersentaseMhsMbkm1['Total Mahasiswa Aktif']) * 100,2)
+    dfPersentaseMhsMbkm1.replace([np.inf, -np.inf], 0, inplace=True)
+    dfPersentaseMhsMbkm1['kode_semester'] = pd.DataFrame(dfRawDataMBKM['kode_semester'].unique())
+    dfPersentaseMhsMbkm1.sort_values('kode_semester',ascending=False)
+    dfPersentaseMhsMbkm1['Semester'] = pd.DataFrame(dfRawDataMBKM['Semester'].unique())
+    print('Persentase Mahasiswa MBKM')
+    print(dfPersentaseMhsMbkm1.to_string())
+    dfPersentaseMhsMbkm = dfPersentaseMhsMbkm1
+    fig = px.line(dfPersentaseMhsMbkm1, x=dfPersentaseMhsMbkm1['Semester'], y=dfPersentaseMhsMbkm1['Persentase'],text=dfPersentaseMhsMbkm1['Persentase'])
+    fig.add_hrect(y0=5.0,y1=20.0,line_width=0, fillcolor="green", opacity=0.2)
+    fig.add_hrect(y0=3.0, y1=4.9, line_width=0, fillcolor="yellow", opacity=0.2)
+    fig.add_hrect(y0=0.0, y1=3.0, line_width=0, fillcolor="red", opacity=0.2)
+    fig.update_traces(textposition="top center")
+    return fig
+

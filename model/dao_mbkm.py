@@ -100,3 +100,68 @@ where mmm.mitra not in
           (select distinct mitra from mbkm_matkul_monev
               where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'))
 order by semester ASC''', con)
+
+
+def getTotalMhsMbkm():
+    return pd.read_sql('''
+    select distinct concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+                mbkm_matkul_monev.kode_semester,
+                count(distinct id_mahasiswa) as jumlah_mhs_mbkm
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+group by mbkm_matkul_monev.kode_semester, semester,tahun_ajaran
+order by kode_semester asc ''', con)
+
+def getTotalMhsAktifPerSemester():
+    return pd.read_sql('''
+    select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester,ds.kode_semester,
+       dmhs.tahun_angkatan,
+    count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
+inner join dim_mahasiswa dmhs on fms.id_mahasiswa = dmhs.id_mahasiswa
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where fms.status = 'AK'
+group by ds.tahun_ajaran, ds.semester_nama,dmhs.tahun_angkatan,kode_semester
+order by ds.tahun_ajaran, ds.semester_nama''', con)
+
+def getListSemester():
+    return pd.read_sql('''select distinct concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, ds.kode_semester
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+group by mbkm_matkul_monev.kode_semester, semester,tahun_ajaran,ds.kode_semester
+order by tahun_ajaran asc
+    ''', con)
+
+
+def getRawDataMBKM():
+    return pd.read_sql('''select kode_matakuliah,mitra,id_mahasiswa,concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,ds.kode_semester
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+group by Semester,kode_matakuliah,mitra,id_mahasiswa,tahun_ajaran,ds.kode_semester
+order by tahun_ajaran
+        ''', con)
+
+
+def getRawDataMhsAktif():
+    return pd.read_sql('''select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,ds.kode_semester,
+    count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
+inner join dim_mahasiswa dmhs on fms.id_mahasiswa = dmhs.id_mahasiswa
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where fms.status = 'AK'
+group by ds.tahun_ajaran, ds.semester_nama,Semester,kode_semester
+order by ds.tahun_ajaran, ds.semester_nama''', con)
+
+
+def getRawDataRerataMBKM():
+    return pd.read_sql('''select mbm.kode_matakuliah,
+       dm.sks,
+       mitra,
+       id_mahasiswa,
+       mbm.kode_semester,
+       concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
+    from mbkm_matkul_monev mbm
+         inner join dim_semester ds on mbm.kode_semester = ds.kode_semester
+         inner join dim_matakuliah dm on mbm.kode_matakuliah = dm.kode_matakuliah
+    where ds.tahun_ajaran between
+    '2019/2020' and '2021/2022'
+    group by mbm.kode_semester, Semester,mbm.kode_matakuliah,sks,mitra,id_mahasiswa
+    order by mbm.kode_semester''', con)
