@@ -992,6 +992,9 @@ def grafRerataKonversiSKS(valueFrom, valueTo):
     print(dfRataRataSksMbkm.to_string())
 
     fig = px.line(dfRataRataSksMbkm, x=dfRataRataSksMbkm['Semester'], y=dfRataRataSksMbkm['Rerata'],text=dfRataRataSksMbkm['Rerata'])
+    fig.add_hrect(y0=30.0, y1=200.0, line_width=0, fillcolor="green", opacity=0.2)
+    fig.add_hrect(y0=15.0, y1=29.0, line_width=0, fillcolor="yellow", opacity=0.2)
+    fig.add_hrect(y0=0.0, y1=10.0, line_width=0, fillcolor="red", opacity=0.2)
     fig.update_traces(textposition="top center")
     return fig
 
@@ -1166,7 +1169,7 @@ def grafRerataPersentasiMhsMbkm(id):
     print(dfPersentaseMhsMbkm1.to_string())
     dfPersentaseMhsMbkm = dfPersentaseMhsMbkm1
     fig = px.line(dfPersentaseMhsMbkm1, x=dfPersentaseMhsMbkm1['Semester'], y=dfPersentaseMhsMbkm1['Persentase'],text=dfPersentaseMhsMbkm1['Persentase'])
-    fig.add_hrect(y0=5.0,y1=20.0,line_width=0, fillcolor="green", opacity=0.2)
+    fig.add_hrect(y0=5.0,y1=25.0,line_width=0, fillcolor="green", opacity=0.2)
     fig.add_hrect(y0=3.0, y1=4.9, line_width=0, fillcolor="yellow", opacity=0.2)
     fig.add_hrect(y0=0.0, y1=3.0, line_width=0, fillcolor="red", opacity=0.2)
     fig.update_traces(textposition="top center")
