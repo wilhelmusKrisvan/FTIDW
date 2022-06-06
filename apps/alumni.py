@@ -398,6 +398,59 @@ def toggle_collapse(bidker, wira, gaji, lulusan, is_open):
         return not is_open, isiGaji
     return is_open, None
 
+
+@app.callback(
+    Output('grf_MsTgglulusan', 'figure'),
+    Input('fltrMasaStart', 'value'),
+    Input('fltrMasaEnd', 'value')
+)
+def graphMSLulusan(start, end):
+    df = data.getDataFrameFromDBwithParams('''
+    select data2.`Tahun Lulus`                                  as 'Tahun Lulus',
+           round(data2.`<6 BULAN` / terlacak.jumlah * 100, 2)   as '<6 Bulan',
+           round(data2.`6-18 BULAN` / terlacak.jumlah * 100, 2) as '6-18 Bulan',
+           round(data2.`>18 BULAN` / terlacak.jumlah * 100, 2)  as '>18 Bulan',
+           round(data2.LAINNYA / terlacak.jumlah * 100, 2)      as 'Lainnya',
+           lulusan.jumlah                                       as 'Lulusan',
+           terlacak.jumlah                                      as 'Lulusan Terlacak'
+    from (
+             select tahun_lulus                                                 'Tahun Lulus',
+                    SUM(IF(waktu_tunggu = 'KURANG 6 BULAN', data.jumlah, 0)) AS '<6 BULAN',
+                    SUM(IF(waktu_tunggu = '6 - 18 BULAN', data.jumlah, 0))   AS '6-18 BULAN',
+                    SUM(IF(waktu_tunggu = 'LEBIH 18 BULAN', data.jumlah, 0)) AS '>18 BULAN',
+                    SUM(IF(waktu_tunggu = 'LAINNYA', data.jumlah, 0))        AS 'LAINNYA'
+             from (
+                      select count(*) as jumlah, ifnull(waktu_tunggu, 'LAINNYA') as waktu_tunggu, tahun_lulus
+                      from fact_tracer_study fact
+                               inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+                      group by waktu_tunggu, tahun_lulus
+                      order by tahun_lulus desc
+                  ) data
+             group by tahun_lulus
+             order by tahun_lulus
+         ) data2
+             left join (
+        select count(id_mahasiswa) as jumlah, tahun_lulus
+        from (select *,
+                     if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium, 6, 4),
+                        substr(tahun_ajaran_yudisium, 1, 4)) as tahun_lulus
+              from fact_yudisium) data
+        group by tahun_lulus
+    ) lulusan on lulusan.tahun_lulus = data2.`Tahun Lulus`
+             left join(
+        select count(id_mahasiswa) as jumlah, tahun_lulus
+        from dim_lulusan
+        group by tahun_lulus
+    ) terlacak on terlacak.tahun_lulus = data2.`Tahun Lulus`
+    where terlacak.tahun_lulus between %(start)s and %(end)s
+    order by data2.`Tahun Lulus`;   
+    ''', {'start': start, 'end': end})
+    fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
+    fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Masa Tunggu')
+    fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
+    return fig
+
+
 @app.callback(
     Output('grf_bidangKerja', 'figure'),
     Input('fltrLulusanStart', 'value'),
@@ -405,42 +458,56 @@ def toggle_collapse(bidker, wira, gaji, lulusan, is_open):
 )
 def graphBidKerja(start, end):
     df = data.getDataFrameFromDBwithParams('''
-    select data2.tahun_lulus as "Tahun Lulus", 
-            TINGGI as 'Tinggi', SEDANG as 'Sedang', RENDAH as 'Rendah', LAINNYA as 'Lainnya',
-            lulusan.jumlah as "Lulusan", terlacak.jumlah as "Lulusan Terlacak" 
-     from
-     (
-        select tahun_lulus,
-            SUM(IF( tingkat_kesesuaian_bidang_kerja = "TINGGI", data.jumlah, 0)) AS "TINGGI",
-            SUM(IF( tingkat_kesesuaian_bidang_kerja = "SEDANG", data.jumlah, 0)) AS "SEDANG",
-            SUM(IF( tingkat_kesesuaian_bidang_kerja = "RENDAH", data.jumlah, 0)) AS "RENDAH",
-            SUM(IF( tingkat_kesesuaian_bidang_kerja = "LAINNYA", data.jumlah, 0)) AS "LAINNYA"
-        from (
-            select count(*) as jumlah, ifnull(tingkat_kesesuaian_bidang_kerja,"LAINNYA") as tingkat_kesesuaian_bidang_kerja,tahun_lulus
-            from fact_tracer_study fact
-            inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
-            group by tahun_lulus,tingkat_kesesuaian_bidang_kerja
-            order by tahun_lulus asc
-            )data
-            group by tahun_lulus
-    ) data2
-    left join (
+    select data2.tahun_lulus                         as "Tahun Lulus",
+           round(TINGGI / terlacak.jumlah * 100, 2)  as 'Tinggi',
+           round(SEDANG / terlacak.jumlah * 100, 2)  as 'Sedang',
+           round(RENDAH / terlacak.jumlah * 100, 2)  as 'Rendah',
+           round(LAINNYA / terlacak.jumlah * 100, 2) as 'Lainnya',
+           lulusan.jumlah                            as "Lulusan",
+           terlacak.jumlah                           as "Lulusan Terlacak"
+    from (
+             select tahun_lulus,
+                    SUM(IF(tingkat_kesesuaian_bidang_kerja = "TINGGI", data.jumlah, 0))  AS "TINGGI",
+                    SUM(IF(tingkat_kesesuaian_bidang_kerja = "SEDANG", data.jumlah, 0))  AS "SEDANG",
+                    SUM(IF(tingkat_kesesuaian_bidang_kerja = "RENDAH", data.jumlah, 0))  AS "RENDAH",
+                    SUM(IF(tingkat_kesesuaian_bidang_kerja = "LAINNYA", data.jumlah, 0)) AS "LAINNYA"
+             from (
+                      select count(*)                                           as jumlah,
+                             ifnull(tingkat_kesesuaian_bidang_kerja, "LAINNYA") as tingkat_kesesuaian_bidang_kerja,
+                             tahun_lulus
+                      from fact_tracer_study fact
+                               inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+                      group by tahun_lulus, tingkat_kesesuaian_bidang_kerja
+                      order by tahun_lulus asc
+                  ) data
+             group by tahun_lulus
+         ) data2
+             left join (
         select count(id_mahasiswa) as jumlah, tahun_lulus
-        from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
-        from fact_yudisium) data
+        from (select *,
+                     if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium, 6, 4),
+                        substr(tahun_ajaran_yudisium, 1, 4)) as tahun_lulus
+              from fact_yudisium) data
         group by tahun_lulus
-    )lulusan on lulusan.tahun_lulus = data2.tahun_lulus
-    left join(
+    ) lulusan on lulusan.tahun_lulus = data2.tahun_lulus
+             left join(
         select count(id_mahasiswa) as jumlah, tahun_lulus
         from dim_lulusan
-        inner join fact_tracer_study on dim_lulusan.id_lulusan = fact_tracer_study.id_lulusan
+                 inner join fact_tracer_study on dim_lulusan.id_lulusan = fact_tracer_study.id_lulusan
         group by tahun_lulus
-    )terlacak on terlacak.tahun_lulus = data2.tahun_lulus
+    ) terlacak on terlacak.tahun_lulus = data2.tahun_lulus
     where data2.tahun_lulus between %(start)s and %(end)s
     order by data2.tahun_lulus
     ''',{'start':start,'end':end})
     fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
     fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
+    fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
+    # fig.add_hrect(y0=0, y1=20,
+    #               fillcolor="red", opacity=0.15, line_width=0)
+    # fig.add_hrect(y0=20, y1=70,
+    #               fillcolor="yellow", opacity=0.15, line_width=0)
+    # fig.add_hrect(y0=70, y1=100,
+    #               fillcolor="green", opacity=0.15, line_width=0)
     return fig
 
 @app.callback(
@@ -536,48 +603,6 @@ def toggle_collapse(nlayanan, nskill, puas, is_open):
 
 
 @app.callback(
-    Output('grf_MsTgglulusan', 'figure'),
-    Input('fltrMasaStart', 'value'),
-    Input('fltrMasaEnd', 'value')
-)
-def graphMSLulusan(start, end):
-    df = data.getDataFrameFromDBwithParams('''
-    select data2.*, lulusan.jumlah as 'Lulusan', terlacak.jumlah as 'Lulusan Terlacak' from
-     (
-        select tahun_lulus 'Tahun Lulus',
-        SUM(IF( waktu_tunggu = 'KURANG 6 BULAN', data.jumlah, 0)) AS '<6 BULAN',
-        SUM(IF( waktu_tunggu = '6 - 18 BULAN', data.jumlah, 0)) AS '6-18 BULAN',
-        SUM(IF( waktu_tunggu = 'LEBIH 18 BULAN', data.jumlah, 0)) AS '>18 BULAN',
-        SUM(IF( waktu_tunggu = 'LAINNYA', data.jumlah, 0)) AS 'LAINNYA'
-        from (
-            select count(*) as jumlah, ifnull(waktu_tunggu,'LAINNYA') as waktu_tunggu,tahun_lulus
-            from fact_tracer_study fact
-            inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
-            group by waktu_tunggu ,tahun_lulus
-            order by tahun_lulus desc
-        ) data
-        group by tahun_lulus
-        order by tahun_lulus
-    ) data2
-    left join (
-        select count(id_mahasiswa) as jumlah, tahun_lulus
-        from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
-        from fact_yudisium) data
-        group by tahun_lulus
-    )lulusan on lulusan.tahun_lulus = data2.`Tahun Lulus`
-    left join(
-        select count(id_mahasiswa) as jumlah, tahun_lulus
-        from dim_lulusan
-        group by tahun_lulus
-    )terlacak on terlacak.tahun_lulus = data2.`Tahun Lulus`
-    where terlacak.tahun_lulus between %(start)s and %(end)s
-    order by data2.`Tahun Lulus`;   
-    ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
-    fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Masa Tunggu')
-    return fig
-
-@app.callback(
     Output('grf_rateGol', 'figure'),
     Input('fltrMasaStart', 'value'),
     Input('fltrMasaEnd', 'value')
@@ -600,7 +625,14 @@ def graphRataMS(tglstart, tglend):
 )
 def graphLayanan(id):
     df = dfKepuasanPelayanan
-    fig = px.pie(df, values=df['Persen'], names=df['Nilai'], color=df['Nilai'])
+    fig = go.Figure(
+        go.Pie(
+            name="",
+            values=df['Persen'],
+            labels=df['Nilai'],
+            hovertemplate="Kepuasan : %{label} <br>Persentase : %{value}%"
+        )
+    )
     return fig
 
 @app.callback(
@@ -633,33 +665,44 @@ def graphSkill(id, valueDropDown, labelSkill):
               f"{df['Cukup'].iloc[-1]:,.1f}", f"{df['Kurang'].iloc[-1]:,.1f}"]
     label = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang']
     fig = go.Figure(data=[go.Pie(labels=label, values=values)])
+    fig = go.Figure(
+        data=go.Pie(
+            name="",
+            values=values,
+            labels=label,
+            hovertemplate="Skill : %{label} <br>Persentase : %{value}%"
+        )
+    )
     return fig
 
 
-@app.callback(
-    Output('grf_bidangkerja', 'figure'),
-    Input('grf_bidangkerja', 'id')
-)
-def graphBidangKerja(id):
-    df = pd.read_sql('''
-    select count(*) as Jumlah,
-    ifnull(tingkat_kesesuaian_bidang_kerja,"LAINNYA") as "Kesesuaian Bidang Kerja",
-    ifnull(lulusan.jumlah,0) as "Jumlah Lulusan", dim_lulusan.tahun_lulus as "Tahun Lulus"
-        from fact_tracer_study fact
-        inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
-    left join(
-        select count(id_mahasiswa) as jumlah, tahun_lulus
-        from (select *, if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium,6,4),substr(tahun_ajaran_yudisium,1,4)) as tahun_lulus
-        from fact_yudisium) data
-        group by tahun_lulus
-    )lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
-    group by dim_lulusan.tahun_lulus,`Kesesuaian Bidang Kerja`,`Jumlah Lulusan`
-    order by dim_lulusan.tahun_lulus asc''')
-    fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"],
-                 labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
-    fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
-                    hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
-    return fig
+# @app.callback(
+#     Output('grf_bidangkerja', 'figure'),
+#     Input('grf_bidangkerja', 'id')
+# )
+# def graphBidangKerja(id):
+#     df = pd.read_sql('''
+#     select count(*)                                           as Jumlah,
+#            ifnull(tingkat_kesesuaian_bidang_kerja, "LAINNYA") as "Kesesuaian Bidang Kerja",
+#            ifnull(lulusan.jumlah, 0)                          as "Jumlah Lulusan",
+#            dim_lulusan.tahun_lulus                            as "Tahun Lulus"
+#     from fact_tracer_study fact
+#              inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+#              left join(
+#         select count(id_mahasiswa) as jumlah, tahun_lulus
+#         from (select *,
+#                      if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium, 6, 4),
+#                         substr(tahun_ajaran_yudisium, 1, 4)) as tahun_lulus
+#               from fact_yudisium) data
+#         group by tahun_lulus
+#     ) lulusan on lulusan.tahun_lulus = dim_lulusan.tahun_lulus
+#     group by dim_lulusan.tahun_lulus, `Kesesuaian Bidang Kerja`, `Jumlah Lulusan`
+#     order by dim_lulusan.tahun_lulus asc''')
+#     fig = px.bar(df, x=df["Tahun Lulus"], y=df["Jumlah"], color=df["Kesesuaian Bidang Kerja"],
+#                  barmode="group", labels=dict(x="Tahun Lulus", y="Jumlah", color="Lulusan"))
+#     # fig.add_scatter(x=df["Tahun Lulus"], y=df["Jumlah Lulusan"], name='Lulusan', mode='lines+markers',
+#     #                 hovertemplate="Lulusan=Total Lulusan <br>Jumlah=%{y} </br> Tahun Lulus=%{x}")
+#     return fig
 
 # @app.callback(
 #     Output('grf_tempatkerja', 'figure'),
