@@ -124,67 +124,141 @@ button_style = {
     'margin': '-50px 25px 10px 10px',
 }
 
-mhsseleksi = dbc.Container([
+SeleksiPersen = dbc.Container([
     dbc.Card([
         html.H5('Seleksi Mahasiswa',
                 style=ttlgrf_style),
-        dbc.CardLink(
-            dbc.CardBody([
-                dbc.Row([
-                    dbc.Col([
-                        html.Div([
-                            html.P('Dari', style={'color': 'black'}),
-                            dcc.Dropdown(
-                                id='Fromdrpdwn_mhsseleksi',
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[0],
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='Dari',
-                            ),
-                        ]),
-                    ], width=6),
-                    dbc.Col([
-                        html.Div([
-                            html.P('Sampai', style={'color': 'black'}),
-                            dcc.Dropdown(
-                                id='Todrpdwn_mhsseleksi',
-                                options=[{'label': i, 'value': i} for i in listDropdown],
-                                value=listDropdown[len(listDropdown) - 1],
-                                style={'color': 'black'},
-                                clearable=False,
-                                placeholder='Sampai',
-                            ),
-                        ]),
-                    ], width=6),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.P('Dari', style={'color': 'black'}),
+                    dcc.Dropdown(
+                        id='Fromdrpdwn_mhsseleksi',
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[0],
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='Dari',
+                    ),
                 ]),
-                dcc.Loading([
-                    dcc.Graph(id='grf_mhsseleksi'),
-                ], type="default"),
-                dbc.Button('Lihat Semua Data', id='cll_grfseleksi',
-                           n_clicks=0, style=button_style)
-            ]),
-        ),
+            ], width=6),
+            dbc.Col([
+                html.Div([
+                    html.P('Sampai', style={'color': 'black'}),
+                    dcc.Dropdown(
+                        id='Todrpdwn_mhsseleksi',
+                        options=[{'label': i, 'value': i} for i in listDropdown],
+                        value=listDropdown[len(listDropdown) - 1],
+                        style={'color': 'black'},
+                        clearable=False,
+                        placeholder='Sampai',
+                    ),
+                ]),
+            ], width=6),
+        ], style={'padding': '15px'}),
+        dcc.Tabs([
+            dcc.Tab(label='PENDAFTAR VS LULUS SELEKSI VS REGISTRASI', value='mhsSeleksi',
+                    children=[
+                        dbc.CardBody([
+                            dcc.Loading([
+                                dcc.Graph(id='grf_mhsseleksi'),
+                            ], type="default"),
+                            dbc.Button('Lihat Semua Data', id='cll_grfseleksi',
+                                       n_clicks=0, style=button_style),
+                        ])
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Persentase Pendaftar Lulus Seleksi VS Pendaftar', value='mhsLolosPersen',
+                    children=[
+                        dbc.CardBody([
+                            dcc.Loading([
+                                dcc.Graph(id='grf_mhsLolosPersen'),
+                            ], type="default"),
+                            dbc.Button('Lihat Semua Data', id='cll_grfLolosPersen',
+                                       n_clicks=0, style=button_style),
+                        ])
+                    ],
+                    style=tab_style, selected_style=selected_style),
+            dcc.Tab(label='Persentase Pendaftar Registrasi VS Pendaftar Lulus Seleksi', value='mhsRegisPersen',
+                    children=[
+                        dbc.CardBody([
+                            dcc.Loading([
+                                dcc.Graph(id='grf_mhsRegisPersen'),
+                            ], type="default"),
+                            dbc.Button('Lihat Semua Data', id='cll_grfRegisPersen',
+                                       n_clicks=0, style=button_style),
+                        ])
+                    ],
+                    style=tab_style, selected_style=selected_style),
+        ], id='tab_mhsSeleksi', value='mhsSeleksi')
     ], style=cardgrf_style),
     dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_seleksi',
-                columns=[{"name": i, "id": i} for i in dfseleksi.columns],
-                data=dfseleksi.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                page_size=10,
-                export_format='xlsx'
-            ), style=cardtbl_style
-        ),
-        id='cll_tblseleksi',
+        id='cll_tblSeleksi',
         is_open=False
     )
 ], style=cont_style)
+
+# mhsseleksi = dbc.Container([
+#     dbc.Card([
+#         html.H5('Seleksi Mahasiswa',
+#                 style=ttlgrf_style),
+#         dbc.CardLink(
+#             dbc.CardBody([
+#                 dbc.Row([
+#                     dbc.Col([
+#                         html.Div([
+#                             html.P('Dari', style={'color': 'black'}),
+#                             dcc.Dropdown(
+#                                 id='Fromdrpdwn_mhsseleksi',
+#                                 options=[{'label': i, 'value': i} for i in listDropdown],
+#                                 value=listDropdown[0],
+#                                 style={'color': 'black'},
+#                                 clearable=False,
+#                                 placeholder='Dari',
+#                             ),
+#                         ]),
+#                     ], width=6),
+#                     dbc.Col([
+#                         html.Div([
+#                             html.P('Sampai', style={'color': 'black'}),
+#                             dcc.Dropdown(
+#                                 id='Todrpdwn_mhsseleksi',
+#                                 options=[{'label': i, 'value': i} for i in listDropdown],
+#                                 value=listDropdown[len(listDropdown) - 1],
+#                                 style={'color': 'black'},
+#                                 clearable=False,
+#                                 placeholder='Sampai',
+#                             ),
+#                         ]),
+#                     ], width=6),
+#                 ]),
+#                 dcc.Loading([
+#                     dcc.Graph(id='grf_mhsseleksi'),
+#                 ], type="default"),
+#                 dbc.Button('Lihat Semua Data', id='cll_grfseleksi',
+#                            n_clicks=0, style=button_style)
+#             ]),
+#         ),
+#     ], style=cardgrf_style),
+#     dbc.Collapse(
+#         dbc.Card(
+#             dt.DataTable(
+#                 id='tbl_seleksi',
+#                 columns=[{"name": i, "id": i} for i in dfseleksi.columns],
+#                 data=dfseleksi.to_dict('records'),
+#                 sort_action='native',
+#                 sort_mode='multi',
+#                 style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+#                 style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+#                 style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+#                 page_size=10,
+#                 export_format='xlsx'
+#             ), style=cardtbl_style
+#         ),
+#         id='cll_tblseleksi',
+#         is_open=False
+#     )
+# ], style=cont_style)
 
 mhsPersenNaik = dbc.Container([
     dbc.Card([
@@ -380,7 +454,7 @@ mhsasing = dbc.Container([
 
 mhsasmasmk = dbc.Container([
     dbc.Card([
-        html.H5('Asal Sekolah Mahasiswa Pendaftar',
+        html.H5('Jenis Sekolah Mahasiswa Pendaftar',
                 style=ttlgrf_style),
         dbc.CardBody([
             dbc.Row([
@@ -450,7 +524,7 @@ mhsprovinsi = dbc.Container([
                                 dbc.Row([
                                     dbc.Col([
                                         html.Div([
-                                            html.P('Dari', style={'color': 'black'}),
+                                            html.P(id='judulDaftar', children='Dari', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Fromdrpdwn_TAdaftar',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -506,7 +580,7 @@ mhsprovinsi = dbc.Container([
                                 dbc.Row([
                                     dbc.Col([
                                         html.Div([
-                                            html.P('Dari', style={'color': 'black'}),
+                                            html.P(id='judulLolos', children='Dari', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Fromdrpdwn_TAlolos',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -553,13 +627,13 @@ mhsprovinsi = dbc.Container([
                                 ]),
                             ], style={'padding': '10px', 'border': 'white'})
                         ], style=tab_style, selected_style=selected_style),
-                dcc.Tab(label='Registrasi Ulang', value='regis',
+                dcc.Tab(label='Registrasi', value='regis',
                         children=[
                             dbc.Card([
                                 dbc.Row([
                                     dbc.Col([
                                         html.Div([
-                                            html.P('Dari', style={'color': 'black'}),
+                                            html.P(id='judulRegis', children='Dari', style={'color': 'black'}),
                                             dcc.Dropdown(
                                                 id='Fromdrpdwn_TAregis',
                                                 options=[{'label': i, 'value': i} for i in listDropdown],
@@ -623,7 +697,8 @@ layout = html.Div([
                      )
              ),
     html.A(className='name'),
-    html.Div([mhsseleksi]),
+    # html.Div([mhsseleksi]),
+    html.Div([SeleksiPersen]),
     html.Div([mhsPersenNaik]),
     html.Div([mhsAktif]),
     html.Div([mhsasing]),
@@ -640,13 +715,34 @@ layout = html.Div([
 
 # CONTROL COLLAPSE
 @app.callback(
-    Output("cll_tblseleksi", "is_open"),
-    [Input("cll_grfseleksi", "n_clicks")],
-    [State("cll_tblseleksi", "is_open")])
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+    Output("cll_tblSeleksi", "is_open"),
+    Output("cll_tblSeleksi", "children"),
+    [Input("cll_grfseleksi", "n_clicks"),
+     Input('cll_grfRegisPersen', 'n_clicks'),
+     Input('cll_grfLolosPersen', 'n_clicks')],
+    [State("cll_tblSeleksi", "is_open")])
+def toggle_collapse(nSeleksi, nRegis, nLolos, is_open):
+    isiSeleksi = dbc.Card(
+        dt.DataTable(
+            id='tbl_seleksi',
+            columns=[{"name": i, "id": i} for i in dfseleksi.columns],
+            data=dfseleksi.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+            style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    ),
+    if nSeleksi:
+        return not is_open,isiSeleksi
+    if nLolos:
+        return not is_open,isiSeleksi
+    if nRegis:
+        return not is_open,isiSeleksi
+    return is_open, None
 
 
 @app.callback(
@@ -812,21 +908,163 @@ where tahun_ajaran between
 %(From)s and %(To)s''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Daya Tampung']) != 0):
         fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Daya Tampung'], color=px.Constant('Daya Tampung'),
-                     labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"))
-        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',
-                        hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+                     labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"), text_auto=True)
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',)
         fig.add_scatter(x=df['Tahun Ajaran'], y=df['Lolos Seleksi'], name='Lolos Seleksi',
-                        line=dict(color='rgb(225, 210, 0)'),
-                        hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+                        line=dict(color='rgb(225, 210, 0)'))
         fig.add_scatter(x=df['Tahun Ajaran'], y=df['Registrasi'], name='Registrasi',
-                        line=dict(color='green'),
-                        hovertemplate="Jenis Pendaftar=Registrasi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+                        line=dict(color='green'))
+        #as text
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',
+                        mode='text',text=df['Pendaftar'],textposition='top center')
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Lolos Seleksi'], name='Lolos Seleksi',
+                        line=dict(color='rgb(225, 210, 0)'),mode='text',text=df['Lolos Seleksi'],textposition='top center')
+        fig.add_scatter(x=df['Tahun Ajaran'], y=df['Registrasi'], name='Registrasi',
+                        line=dict(color='green'),mode='text',text=df['Registrasi'],textposition='top center')
+        fig.update_traces(hovertemplate="<br> Jumlah Pendaftar=%{y} </br> Tahun Ajaran= %{x}")
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                          yshift=10)
         return fig
+
+
+# SELEKSI MAHASISWA
+@app.callback(
+    Output('grf_mhsLolosPersen', 'figure'),
+    Input('Fromdrpdwn_mhsseleksi', 'value'),
+    Input('Todrpdwn_mhsseleksi', 'value'),
+)
+def graphSeleksiPersen(valueFrom, valueTo):
+    dfLolosPersen = data.getDataFrameFromDBwithParams('''
+    select
+        ds.tahun_ajaran as 'Tahun Ajaran', 
+        count(kode_pendaftar) AS 'Lolos Seleksi',data.Jumlah 'Pendaftar',
+        round((count(kode_pendaftar)/data.Jumlah)*100,2) "Persentase"
+    from fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+    inner join (
+    select
+        ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS Jumlah
+    from fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    where ds.tahun_ajaran between %(From)s and %(To)s
+    group by ds.tahun_ajaran
+    order by ds.tahun_ajaran) data on ds.tahun_ajaran = data.`Tahun Ajaran`
+    where (ds.tahun_ajaran between %(From)s and %(To)s) and fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
+    group by ds.tahun_ajaran, data.Jumlah
+    order by ds.tahun_ajaran
+    ''', {'From': valueFrom, 'To': valueTo})
+    x = dfLolosPersen['Tahun Ajaran']
+    fig = px.line(dfLolosPersen, x=dfLolosPersen['Tahun Ajaran'], y=dfLolosPersen['Persentase'])
+    fig.update_traces(mode='lines+markers')
+    fig.add_hrect(y0=0, y1=30, fillcolor='green', opacity=0.1)
+    fig.add_hrect(y0=30, y1=50, fillcolor='yellow', opacity=0.1)
+    fig.add_hrect(y0=50, y1=100, fillcolor='red', opacity=0.1)
+    fig.update_layout(yaxis_title="Persentase (%)")
+    fig.add_scatter(
+        x=dfLolosPersen['Tahun Ajaran'],
+        y=dfLolosPersen['Persentase'],
+        showlegend=False,
+        mode='text',
+        text=dfLolosPersen['Persentase'],
+        textposition="top center"
+    )
+    return fig
+
+
+@app.callback(
+    Output('grf_mhsRegisPersen', 'figure'),
+    Input('Fromdrpdwn_mhsseleksi', 'value'),
+    Input('Todrpdwn_mhsseleksi', 'value'),
+)
+def graphSeleksiPersen(valueFrom, valueTo):
+    dfRegisPersen = data.getDataFrameFromDBwithParams('''
+    select
+        ds.tahun_ajaran as 'Tahun Ajaran', 
+        count(kode_pendaftar) AS 'Registrasi',data.Jumlah 'Lolos Seleksi',
+        round((count(kode_pendaftar)/data.Jumlah)*100,2) "Persentase"
+    from fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+    inner join (
+    select
+        ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS Jumlah
+    from fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+    where (ds.tahun_ajaran between %(From)s and %(To)s) and fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
+    group by ds.tahun_ajaran
+    order by ds.tahun_ajaran) data on ds.tahun_ajaran = data.`Tahun Ajaran`
+    where (ds.tahun_ajaran between %(From)s and %(To)s) and fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+    group by ds.tahun_ajaran, data.Jumlah
+    order by ds.tahun_ajaran
+    ''', {'From': valueFrom, 'To': valueTo})
+    fig = px.line(dfRegisPersen, x=dfRegisPersen['Tahun Ajaran'], y=dfRegisPersen['Persentase'])
+    fig.update_traces(mode='lines+markers')
+    fig.add_hrect(y0=0, y1=50, fillcolor='red', opacity=0.1)
+    fig.add_hrect(y0=50, y1=75, fillcolor='yellow', opacity=0.1)
+    fig.add_hrect(y0=75, y1=100, fillcolor='green', opacity=0.1)
+    fig.update_layout(yaxis_title="Persentase (%)")
+    fig.add_scatter(
+        x=dfRegisPersen['Tahun Ajaran'],
+        y=dfRegisPersen['Persentase'],
+        showlegend=False,
+        mode='text',
+        text=dfRegisPersen['Persentase'],
+        textposition="top center"
+    )
+    return fig
+
+
+#     df = data.getDataFrameFromDBwithParams('''select
+# dataMahasiswa.tahun_aka as 'Tahun Ajaran', dy_tampung as 'Daya Tampung',jml_pendaftar as 'Pendaftar',
+# lolos as 'Lolos Seleksi', registrasi as 'Registrasi' from (
+#     select dataPendaftar.*, count(id_tanggal_lolos_seleksi) as lolos, count(id_tanggal_registrasi) as registrasi,count(id_mahasiswa) as baru,
+#     0 as Barutransfer
+#     from(
+#     select dy.id_semester, tahun_ajaran as tahun_aka, dy.jumlah as dy_tampung, count(fpmbDaftar.id_pmb)  as jml_pendaftar
+#     from dim_daya_tampung dy
+#     inner join dim_semester smstr on dy.id_semester = smstr.id_semester
+#     inner join dim_prodi prodi on prodi.id_prodi = dy.id_prodi
+#     left join fact_pmb fpmbDaftar on dy.id_semester = fpmbDaftar.id_semester and (fpmbDaftar.id_prodi_pilihan_1 || fpmbDaftar.id_prodi_pilihan_3 || fpmbDaftar.id_prodi_pilihan_3 = 9)
+#     where kode_prodi = '71' and dy.id_semester <= (select id_semester from dim_semester where tahun_ajaran=concat(year(now())-1,'/',year(now())) limit 1)
+#     group
+#     by tahun_aka, dy_tampung, dy.id_semester
+#     ) dataPendaftar
+#     left join fact_pmb fpmbLolos on dataPendaftar.id_semester = fpmbLolos.id_semester and fpmbLolos.id_prodi_diterima = 9
+#     group by id_semester, tahun_aka,dy_tampung, jml_pendaftar
+#     order by id_semester asc
+# )dataMahasiswa
+# left join (
+# select count(*) as jmlaktif, tahun_ajaran from fact_mahasiswa_status
+# left join dim_semester on fact_mahasiswa_status.id_semester = dim_semester.id_semester
+# where status = 'AK'
+# group by tahun_ajaran
+# )aktif on aktif.tahun_ajaran = tahun_aka
+# where tahun_ajaran between
+# %(From)s and %(To)s''', {'From': valueFrom, 'To': valueTo})
+#     if (len(df['Daya Tampung']) != 0):
+#         fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Daya Tampung'], color=px.Constant('Daya Tampung'),
+#                      labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"), text_auto=True)
+#         fig.add_trace(go.Scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar', text=df['Pendaftar'],
+#                                  textposition='middle center'))
+#         # fig.add_scatter(x=df['Tahun Ajaran'], y=df['Pendaftar'], name='Pendaftar',
+#         #                 hovertemplate="Jenis Pendaftar=Pendaftar <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}",text=df['Pendaftar'])
+#         fig.add_scatter(x=df['Tahun Ajaran'], y=df['Lolos Seleksi'], name='Lolos Seleksi',
+#                         line=dict(color='rgb(225, 210, 0)'),
+#                         hovertemplate="Jenis Pendaftar=Lolos Seleksi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+#         fig.add_scatter(x=df['Tahun Ajaran'], y=df['Registrasi'], name='Registrasi',
+#                         line=dict(color='green'),
+#                         hovertemplate="Jenis Pendaftar=Registrasi <br>Jumlah=%{y} </br> Tahun Ajaran= %{x}")
+#         return fig
+#     else:
+#         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+#                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+#                                          yshift=10)
+#         return fig
 
 
 # KENAIKAN MAHASISWA
@@ -850,10 +1088,19 @@ from
        group by tahun_ajaran) y
 order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.line(df, x=df['Tahun Ajaran'], y=df['Persentase Pertumbuhan'].apply(pd.to_numeric))
+        fig = px.line(df, x=df['Tahun Ajaran'], y=df['Persentase Pertumbuhan'].apply(pd.to_numeric),
+                      text=df['Persentase Pertumbuhan'])
         fig.update_layout(yaxis_title="Persentase Pertumbuhan (%)")
         fig.update_traces(mode='lines+markers')
         fig.update_yaxes(categoryorder='category ascending')
+        fig.add_scatter(
+            x=df['Tahun Ajaran'],
+            y=df['Persentase Pertumbuhan'],
+            showlegend=False,
+            mode='text',
+            text=df['Persentase Pertumbuhan'],
+            textposition="top center"
+        )
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -869,16 +1116,29 @@ order by tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
     Input('Todrpdwn_mhsAktif', 'value'),
 )
 def FillAktif(valueFrom, valueTo):
-    df = data.getDataFrameFromDBwithParams('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, 
-    count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
+    # year=tahunAjar,var=persentase,names=status,groups=semester
+    df = data.getDataFrameFromDBwithParams('''
+    select concat(ds.tahun_ajaran,' ',ds.semester_nama) 'Tahun Ajaran',
+    count(*) as 'Jumlah', 'Aktif' Jenis from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
-where fms.status = 'AK' and ds.tahun_ajaran between %(From)s and %(To)s
+where (fms.status != 'DO' or fms.status!='UD') and ds.tahun_ajaran between '2017/2018' and '2019/2020'
+group by `Tahun Ajaran`, ds.semester_nama
+union all
+select concat(ds.tahun_ajaran,' ',ds.semester_nama) 'Tahun Ajaran',
+    count(*) as 'Jumlah', 'Lainnya' Jenis from fact_mahasiswa_status fms
+inner join dim_semester ds on ds.id_semester = fms.id_semester
+where (fms.status!='AK' and (fms.status != 'DO' or fms.status!='UD')) and ds.tahun_ajaran between '2017/2018' and '2019/2020'
 group by ds.tahun_ajaran, ds.semester_nama
-order by ds.tahun_ajaran, ds.semester_nama
+order by 1,3
 ''', {'From': valueFrom, 'To': valueTo})
+    # dfGasal=df.loc[(df["Semester"] == 'GASAL'), ('Jumlah','Tahun Ajaran','Semester','Jenis')]
+    # dfGenap = df.loc[(df["Semester"] == 'GENAP'), ('Jumlah', 'Tahun Ajaran', 'Semester','Jenis')]
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Mahasiswa Aktif'], color=df['Semester'])
-        fig.update_layout(barmode='group')
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah'],
+                     color=df['Jenis'], text_auto=True, barmode='stack')
+        # fig.add_bar(x=dfGenap['Tahun Ajaran'], y=dfGenap['Jumlah'],
+        #             name=dfGenap['Jenis'], text_auto=True)
+        # fig.update_layout(barmode='group')
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -909,10 +1169,10 @@ where tahun_ajaran between
 order by tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Semester']) != 0):
         fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
-                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
-        fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
+                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"), text_auto=True)
+        fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',text=df['fulltime'],
                         hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
-        fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
+        fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',text=df['parttime'],
                         hovertemplate="Jenis Pendaftar=Part Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
         return fig
     else:
@@ -928,7 +1188,9 @@ order by tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
     Input('Todrpdwn_mhsasing', 'value'),
 )
 def graphMhsAsingINF(valueFrom, valueTo):
-    df = data.getDataFrameFromDBwithParams('''select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, parttime, (jumlah - parttime) as fulltime
+    df = data.getDataFrameFromDBwithParams('''
+    select data.nama_prodi,tahun_semster as "Tahun Semester", Jumlah, 
+    parttime, (jumlah - parttime) as fulltime
 from (
 select dim_prodi.nama_prodi, concat(cast(tahun_angkatan-1 as char(4)),'/',tahun_angkatan) as tahun_semster, 
 count(*) as jumlah,
@@ -938,13 +1200,12 @@ inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_pro
 where warga_negara = 'WNA'
 group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
 ) data
-inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster
-where tahun_ajaran between 
+where tahun_semster between 
 %(From)s and %(To)s
 order by nama_prodi, tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Semester']) != 0):
         fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
-                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"), text_auto=True)
         fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
                         hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
         fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
@@ -978,7 +1239,7 @@ where tahun_ajaran between
 order by nama_prodi, tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Semester']) != 0):
         fig = px.bar(df, x=df['Tahun Semester'], y=df['Jumlah'], color=px.Constant('Jumlah Total'),
-                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"))
+                     labels=dict(x="Tahun Semester", y="Jumlah", color="Jenis Mahasiswa"), text_auto=True)
         fig.add_scatter(x=df['Tahun Semester'], y=df['fulltime'], name='Full Time',
                         hovertemplate="Jenis Pendaftar=Full Time <br>Jumlah=%{y} </br> Tahun Semester= %{x}")
         fig.add_scatter(x=df['Tahun Semester'], y=df['parttime'], name='Part Time',
@@ -998,23 +1259,36 @@ order by nama_prodi, tahun_semster asc''', {'From': valueFrom, 'To': valueTo})
     Input('Todrpdwn_mhssmasmk', 'value')
 )
 def graphAsalSekolah(valueFrom, valueTo):
-    df = data.getDataFrameFromDBwithParams('''select
+    df = data.getDataFrameFromDBwithParams('''
+select
        (case
            when tipe_sekolah_asal=1 then "NEGERI"
            WHEN tipe_sekolah_asal=2 THEN "SWASTA"
            when tipe_sekolah_asal=3 then "N/A"
        END)
-           as 'Tipe Sekolah Asal', ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
+           as 'Tipe Sekolah Asal', ds.tahun_ajaran as 'Tahun Ajaran', 
+           count(kode_pendaftar) 'Pendaftar',semua.`Jumlah Pendaftar` 'Total',
+           round((count(kode_pendaftar)/semua.`Jumlah Pendaftar`)*100,2) as Persen
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join (
+select
+       ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS 'Jumlah Pendaftar'
 from fact_pmb
 inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
 where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
 and ds.tahun_ajaran between 
 %(From)s and %(To)s
-group by ds.tahun_ajaran,'Tipe Sekolah Asal'
+group by ds.tahun_ajaran
+order by ds.tahun_ajaran) semua on semua.`Tahun Ajaran`=ds.tahun_ajaran
+where fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+and ds.tahun_ajaran between 
+%(From)s and %(To)s
+group by ds.tahun_ajaran,'Tipe Sekolah Asal',semua.`Jumlah Pendaftar`
 order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Pendaftar'], color=df['Tipe Sekolah Asal'])
-        fig.update_layout(barmode='group')
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Persen'], color=df['Tipe Sekolah Asal'], text_auto=True)
+        fig.update_layout(barmode='stack')
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -1022,11 +1296,13 @@ order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
                                          yshift=10)
         return fig
 
+
 # LOKASI ASAL MAHASISWA
 @app.callback(
     Output('grf_mhsprovdaftar', 'figure'),
     Output('visiFrom_TAdaftar', 'hidden'),
     Output('visiTo_TAdaftar', 'hidden'),
+    Output('judulDaftar', 'children'),
     Input('Fromdrpdwn_TAdaftar', 'value'),
     Input('Todrpdwn_TAdaftar', 'value'),
     Input('radio_daftar', 'value')
@@ -1042,17 +1318,37 @@ where ds.tahun_ajaran between %(From)s and %(To)s
 group by ds.tahun_ajaran, dl.provinsi) hitungan
 group by provinsi
 order by provinsi''', {'From': valueFrom, 'To': valueTo})
+    dfProv = data.getDataFrameFromDBwithParams('''
+    select
+    dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', 
+    count(kode_pendaftar) AS 'Jumlah Pendaftar',data.Jumlah,
+    round((count(kode_pendaftar)/data.Jumlah)*100,2) Persen
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+inner join (
+select
+    ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS Jumlah
+from fact_pmb
+inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+where ds.tahun_ajaran = %(From)s
+group by ds.tahun_ajaran
+order by ds.tahun_ajaran) data on ds.tahun_ajaran = data.`Tahun Ajaran`
+where ds.tahun_ajaran = %(From)s
+group by ds.tahun_ajaran, dl.provinsi,data.Jumlah
+order by ds.tahun_ajaran, dl.provinsi''', {'From': valueFrom})
     if valueRadio == 'bar':
-        if (len(dfmhsprovdaftar['Tahun Ajaran']) != 0):
-            bardaftar = px.bar(dfmhsprovdaftar, x=dfmhsprovdaftar['Provinsi'], y=dfmhsprovdaftar['Jumlah Pendaftar'],
-                               color=dfmhsprovdaftar['Tahun Ajaran'], barmode='group')
+        if (len(dfProv['Tahun Ajaran']) != 0):
+            bardaftar = px.bar(dfProv, x=dfProv['Provinsi'], y=dfProv['Persen'],
+                               color=dfProv['Tahun Ajaran'], barmode='group', text_auto=True)
             bardaftar.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-            return bardaftar, True, True
+            return bardaftar, False, True, 'Tahun Ajaran'
         else:
             fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
-            return fig, True, True
+            return fig, False, True, 'Tahun Ajaran'
     else:
         if (len(dfJson['Jumlah Pendaftar']) != 0):
             jsondaftar = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
@@ -1060,19 +1356,20 @@ order by provinsi''', {'From': valueFrom, 'To': valueTo})
                                               featureidkey="properties.Propinsi",
                                               center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
                                               mapbox_style="carto-positron",
-                                              color='Jumlah Pendaftar')
-            return jsondaftar, False, False
+                                              color='Jumlah Pendaftar', )
+            return jsondaftar, False, False, 'Dari'
         else:
             fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
-            return fig, False, False
+            return fig, False, False, 'Dari'
 
 
 @app.callback(
     Output('grf_mhsprovlolos', 'figure'),
     Output('visiFrom_TAlolos', 'hidden'),
     Output('visiTo_TAlolos', 'hidden'),
+    Output('judulLolos', 'children'),
     Input('Fromdrpdwn_TAlolos', 'value'),
     Input('Todrpdwn_TAlolos', 'value'),
     Input('radio_lolos', 'value')
@@ -1090,17 +1387,37 @@ and ds.tahun_ajaran between %(From)s and %(To)s
 group by ds.tahun_ajaran, dl.provinsi) hitungan
 group by provinsi
 order by provinsi''', {'From': valueFrom, 'To': valueTo})
+    dfSelek = data.getDataFrameFromDBwithParams('''
+        select
+        dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', 
+        count(kode_pendaftar) AS 'Jumlah Pendaftar',data.Jumlah,
+        round((count(kode_pendaftar)/data.Jumlah)*100,2) Persen
+    from fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+    inner join (
+    select
+        ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS Jumlah
+    from fact_pmb
+    inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+    inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+    where ds.tahun_ajaran = %(From)s and fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
+    group by ds.tahun_ajaran
+    order by ds.tahun_ajaran) data on ds.tahun_ajaran = data.`Tahun Ajaran`
+    where ds.tahun_ajaran = %(From)s and fact_pmb.id_tanggal_lolos_seleksi is not null and fact_pmb.id_prodi_diterima = 9
+    group by ds.tahun_ajaran, dl.provinsi,data.Jumlah
+    order by ds.tahun_ajaran, dl.provinsi''', {'From': valueFrom})
     if valueRadio == 'bar':
-        if (len(dfmhsprovlolos['Tahun Ajaran']) != 0):
-            barlolos = px.bar(dfmhsprovlolos, x=dfmhsprovlolos['Provinsi'], y=dfmhsprovlolos['Pendaftar Lolos Seleksi'],
-                              color=dfmhsprovlolos['Tahun Ajaran'], barmode='group')
+        if (len(dfSelek['Tahun Ajaran']) != 0):
+            barlolos = px.bar(dfSelek, x=dfSelek['Provinsi'], y=dfSelek['Persen'],
+                              color=dfSelek['Tahun Ajaran'], barmode='group', text_auto=True)
             barlolos.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-            return barlolos, True, True
+            return barlolos, False, True, 'Tahun Ajaran'
         else:
             fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
-            return fig, True, True
+            return fig, False, True, 'Tahun Ajaran'
     else:
         if (len(dfJson['Pendaftar Lolos Seleksi']) != 0):
             jsonlolos = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
@@ -1109,18 +1426,19 @@ order by provinsi''', {'From': valueFrom, 'To': valueTo})
                                              center={"lat": -0.47399, "lon": 113.29266}, zoom=3.25,
                                              mapbox_style="carto-positron",
                                              color='Pendaftar Lolos Seleksi')
-            return jsonlolos, False, False
+            return jsonlolos, False, False, 'Dari'
         else:
             fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
-            return fig, False, False
+            return fig, False, False, 'Dari'
 
 
 @app.callback(
     Output('grf_mhsprovregis', 'figure'),
     Output('visiFrom_TAregis', 'hidden'),
     Output('visiTo_TAregis', 'hidden'),
+    Output('judulRegis', 'children'),
     Input('Fromdrpdwn_TAregis', 'value'),
     Input('Todrpdwn_TAregis', 'value'),
     Input('radio_regis', 'value')
@@ -1138,18 +1456,38 @@ and ds.tahun_ajaran between %(From)s and %(To)s
 group by ds.tahun_ajaran, dl.provinsi) hitungan
 group by provinsi
 order by provinsi''', {'From': valueFrom, 'To': valueTo})
+    dfRegis = data.getDataFrameFromDBwithParams('''
+            select
+            dl.provinsi as 'Provinsi', ds.tahun_ajaran as 'Tahun Ajaran', 
+            count(kode_pendaftar) AS 'Jumlah Pendaftar',data.Jumlah,
+            round((count(kode_pendaftar)/data.Jumlah)*100,2) Persen
+        from fact_pmb
+        inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+        inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+        inner join (
+        select
+            ds.tahun_ajaran as 'Tahun Ajaran', count(kode_pendaftar) AS Jumlah
+        from fact_pmb
+        inner join dim_semester ds on fact_pmb.id_semester = ds.id_semester
+        inner join dim_lokasi dl ON fact_pmb.id_lokasi_rumah = dl.id_lokasi
+        where ds.tahun_ajaran = %(From)s and fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+        group by ds.tahun_ajaran
+        order by ds.tahun_ajaran) data on ds.tahun_ajaran = data.`Tahun Ajaran`
+        where ds.tahun_ajaran = %(From)s and fact_pmb.id_prodi_diterima = 9 and fact_pmb.id_tanggal_registrasi is not null
+        group by ds.tahun_ajaran, dl.provinsi,data.Jumlah
+        order by ds.tahun_ajaran, dl.provinsi''', {'From': valueFrom})
     if valueRadio == 'bar':
-        if (len(dfmhsprovregis['Tahun Ajaran']) != 0):
-            barregis = px.bar(dfmhsprovregis, x=dfmhsprovregis['Provinsi'],
-                              y=dfmhsprovregis['Pendaftar Registrasi Ulang'],
-                              color=dfmhsprovregis['Tahun Ajaran'], barmode='group')
+        if (len(dfRegis['Tahun Ajaran']) != 0):
+            barregis = px.bar(dfRegis, x=dfRegis['Provinsi'],
+                              y=dfRegis['Pendaftar Registrasi Ulang'],
+                              color=dfRegis['Tahun Ajaran'], barmode='group', text_auto=True)
             barregis.update_layout(xaxis=go.layout.XAxis(tickangle=45))
-            return barregis, True, True
+            return barregis, False, True, 'Tahun Ajaran'
         else:
             fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
-            return fig, True, True
+            return fig, False, True, 'Tahun Ajaran'
     else:
         if (len(dfJson['Pendaftar Registrasi Ulang']) != 0):
             jsonregis = px.choropleth_mapbox(dfJson, geojson=province, locations="Provinsi",
@@ -1158,9 +1496,9 @@ order by provinsi''', {'From': valueFrom, 'To': valueTo})
                                              center={"lat": -0.789275, "lon": 113.921327}, zoom=3.25,
                                              mapbox_style="carto-positron",
                                              color='Pendaftar Registrasi Ulang')
-            return jsonregis, False, False
+            return jsonregis, False, False, 'Dari'
         else:
             fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                              font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                              yshift=10)
-            return fig, False, False
+            return fig, False, False, 'Dari'

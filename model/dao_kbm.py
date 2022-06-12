@@ -22,36 +22,69 @@ where ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat
 group by ds.tahun_ajaran, ds.semester_nama
 order by ds.tahun_ajaran, ds.semester_nama''', con)
 
+def getIpkAngkatan():
+    return pd.read_sql('''select 
+    concat(ds.tahun_ajaran,' ',ds.semester_nama) 'Tahun Ajaran', 
+    tahun_angkatan Angkatan,round(avg(ipk),2) as "Rata-Rata"
+    from fact_mahasiswa_status fms 
+    inner join dim_semester ds on ds.id_semester = fms.id_semester
+    inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+    where tahun_angkatan>year(now())-7 and ds.tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+     and (fms.status != 'UD' OR fms.status != 'DO')
+    group by `Tahun Ajaran`,tahun_angkatan,ds.tahun_ajaran, ds.semester_nama
+    order by ds.tahun_ajaran, tahun_angkatan''', con)
+
 def getPersentaseMahasiswaTidakAktif():
-    return pd.read_sql('''select ak.tahun_angkatan 'Tahun Angkatan', 
-    ak.tahun_ajaran, 
-    ak.jumlah 'Mahasiswa Aktif',
-    concat(if(substr(ak.kode_semester,5,1)='1','Ganjil','Genap')) Semester,
-    ifnull(ta.jumlah,0) 'Mahasiswa Tidak Aktif',IFNULL(ta.jumlah / ak.jumlah * 100,'0')"persen"
-from (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester,count(distinct (dm.nim)) jumlah
+    return pd.read_sql('''select mhs.`Tahun Ajaran`,mhs.tahun_angkatan,status,mhs.jumlah Mahasiswa,total.jumlah Total,
+       round((mhs.jumlah/total.jumlah)*100,2) Persentase
+from(select concat(ds.tahun_ajaran,' ', ds.semester_nama) 'Tahun Ajaran', dm.tahun_angkatan,
+       status,count(distinct (dm.nim)) jumlah
       from fact_mahasiswa_status fms
                inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
                inner join dim_semester ds on fms.id_semester= ds.id_semester
-      where tahun_angkatan >= year(now()) -7
-        and (status = 'AK'or status='CS')
-        and ds.tahun_ajaran between 
+      where tahun_angkatan > year(now())-7
+        and ds.tahun_ajaran between
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
         and id_prodi=9
-      group by ds.tahun_ajaran,tahun_angkatan,ds.kode_semester) ak
-    left join
-     (select ds.tahun_ajaran,tahun_angkatan, ds.kode_semester, count(distinct (dm.nim)) jumlah
+      group by `Tahun Ajaran`,dm.tahun_angkatan,status) mhs
+inner join (select concat(ds.tahun_ajaran,' ', ds.semester_nama) 'Tahun Ajaran',
+                tahun_angkatan,count(distinct (dm.nim)) jumlah
       from fact_mahasiswa_status fms
                inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
                inner join dim_semester ds on fms.id_semester= ds.id_semester
-      where tahun_angkatan >= year(now()) -7
-        and status = 'TA'
-        and ds.tahun_ajaran between 
+      where tahun_angkatan > year(now())-7
+        and ds.tahun_ajaran between
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
         and id_prodi=9
-      group by ds.tahun_ajaran,tahun_angkatan, ds.kode_semester) ta
-on ak.tahun_angkatan = ta.tahun_angkatan
-and ak.kode_semester=ta.kode_semester
-order by ak.tahun_angkatan desc, Semester asc''', con)
+      group by `Tahun Ajaran`,tahun_angkatan) total on total.`Tahun Ajaran`=mhs.`Tahun Ajaran`
+order by `Tahun Ajaran`, tahun_angkatan
+''', con)
+
+def getPersentaseMahasiswaDO():
+    return pd.read_sql('''
+    select mhs.`Tahun Ajaran`,status,mhs.jumlah Mahasiswa,total.jumlah Total,
+       round((mhs.jumlah/total.jumlah)*100,2) Persentase
+from(select concat(ds.tahun_ajaran,' ', ds.semester_nama) 'Tahun Ajaran',
+       status,count(distinct (dm.nim)) jumlah
+      from fact_mahasiswa_status fms
+               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+               inner join dim_semester ds on fms.id_semester= ds.id_semester
+      where (status='DO' or status='UD')
+        and ds.tahun_ajaran between
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+        and id_prodi=9
+      group by `Tahun Ajaran`,status) mhs
+inner join (select concat(ds.tahun_ajaran,' ', ds.semester_nama) 'Tahun Ajaran',
+                count(distinct (dm.nim)) jumlah
+      from fact_mahasiswa_status fms
+               inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
+               inner join dim_semester ds on fms.id_semester= ds.id_semester
+      where ds.tahun_ajaran between
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
+        and id_prodi=9
+      group by `Tahun Ajaran`) total on total.`Tahun Ajaran`=mhs.`Tahun Ajaran`
+order by `Tahun Ajaran`
+''', con)
 
 def getDosenMengajar():
     return pd.read_sql('''
@@ -370,4 +403,5 @@ union all
     group by Semester,ds.kode_semester) batal    
     )data
     group by data.kode_semester,data.Tipe,data.Semester
+order by 1,4
     ''',con,params={'From': tahun, 'To': smt})

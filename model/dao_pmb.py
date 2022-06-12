@@ -41,6 +41,9 @@ group by tahun_ajaran
 )aktif on aktif.tahun_ajaran = tahun_aka
 where tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)''',con)
 
+def getSeleksiPersentase():
+    return pd.read_sql('''''')
+
 def getMahasiswaAktif():
     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
@@ -57,7 +60,7 @@ SUM(if(substr(nim,3,3)= 'ASG', 1, 0)) AS parttime
 from dim_mahasiswa
 inner join dim_prodi on dim_mahasiswa.id_prodi = dim_prodi.id_prodi AND (dim_prodi.id_prodi = 9 || 10)
 where warga_negara = 'WNA'
-group by dim_prodi.nama_prodi,tahun_semster, tahun_angkatan
+group by nama_prodi,tahun_semster, tahun_angkatan
 ) data
 inner join dim_semester on dim_semester.tahun_ajaran = data.tahun_semster AND semester = 1 
 where tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
