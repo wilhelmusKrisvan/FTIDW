@@ -745,7 +745,7 @@ group by ds.tahun_ajaran, ds.semester_nama
 order by ds.tahun_ajaran, ds.semester_nama
 ''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Semester'])
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Semester'],text_auto=True,)
         fig.update_layout(barmode='group')
         fig.add_hrect(y0=0, y1=2, fillcolor='red', opacity=0.1)
         fig.add_hrect(y0=2, y1=3.15, fillcolor='yellow', opacity=0.1)
@@ -775,7 +775,7 @@ def FillIpkAngkatan(valueFrom, valueTo):
     group by `Tahun Ajaran`,tahun_angkatan,ds.tahun_ajaran, ds.semester_nama
     order by ds.tahun_ajaran, tahun_angkatan''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'])
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'],text_auto=True,)
         fig.update_layout(barmode='group')
         fig.add_hrect(y0=0, y1=2, fillcolor='red', opacity=0.1)
         fig.add_hrect(y0=2, y1=3.15, fillcolor='yellow', opacity=0.1)
@@ -819,7 +819,7 @@ concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1
       group by `Tahun Ajaran`,tahun_angkatan) total on total.`Tahun Ajaran`=mhs.`Tahun Ajaran`
 order by `Tahun Ajaran`''', {'TA': valueAngkatan})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'], barmode='stack', )
+        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'], barmode='stack',text_auto=True, )
         fig.update_yaxes(categoryorder='category ascending')
         fig.update_layout(xaxis_title="Tahun Ajaran",
                           yaxis_title="Persentase (%)", legend_title='Status')
@@ -862,7 +862,7 @@ concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1
       group by `Tahun Ajaran`) total on total.`Tahun Ajaran`=mhs.`Tahun Ajaran`
 order by `Tahun Ajaran`''', {'TA': valueAngkatan})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'], barmode='group', )
+        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'],text_auto=True, barmode='group', )
         fig.update_yaxes(categoryorder='category ascending')
         fig.add_hrect(y0=0, y1=10, fillcolor='green', opacity=0.1)
         fig.add_hrect(y0=10, y1=15, fillcolor='yellow', opacity=0.1)
@@ -912,7 +912,7 @@ group by tahun_ajaran, semester_nama,'Tahun Ajaran')total on total.`Tahun Ajaran
 order by data.`Tahun Ajaran`,data.Prodi
 ''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Persentase'], color=df['Prodi'], barmode='stack')
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Persentase'], color=df['Prodi'], text_auto=True,barmode='stack')
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -930,7 +930,7 @@ order by data.`Tahun Ajaran`,data.Prodi
 def DosenNon(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''
     select semua.`Tahun Ajaran`,
-       tetap.jumlah 'Dosen Tidak Tetap',semua.jumlah 'Semua Dosen Mengajar',(tetap.jumlah/semua.jumlah)*100 as 'Persentase' from
+       tetap.jumlah 'Dosen Tidak Tetap',semua.jumlah 'Jumlah Dosen',(tetap.jumlah/semua.jumlah)*100 as 'Persentase' from
 (select concat(tahun_ajaran,' ',semester_nama) 'Tahun Ajaran', count(distinct fdm.id_dosen) jumlah from fact_dosen_mengajar fdm
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
@@ -944,10 +944,19 @@ group by `Tahun Ajaran`) semua
 where semua.`Tahun Ajaran`=tetap.`Tahun Ajaran`
 order by semua.`Tahun Ajaran` asc''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Semua Dosen Mengajar'], color=px.Constant('Semua Dosen Mengajar'),
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Dosen'], color=px.Constant('Semua Dosen Mengajar'),
+                     text_auto=True,
                      labels=dict(x='Tahun Ajaran', y='Jumlah Dosen', color='Jenis Dosen'))
         # fig.update_traces(mode='lines+markers')
-        fig.add_bar(x=df['Tahun Ajaran'], y=df['Dosen Tidak Tetap'], name='Dosen Tidak Tetap', )
+        fig.add_bar(x=df['Tahun Ajaran'], y=df['Dosen Tidak Tetap'], name='Dosen Tidak Tetap',)
+        fig.add_scatter(
+            x=df['Tahun Ajaran'],
+            y=df['Jumlah Dosen'],
+            showlegend=False,
+            mode='text',
+            text=df['Dosen Tidak Tetap'],
+            textposition="top center"
+        )
         fig.update_traces(hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun Ajaran= %{x}")
         return fig
     else:
@@ -1002,6 +1011,14 @@ order by `Tahun Ajaran`
     if (len(df['Tahun Ajaran']) != 0):
         fig = px.line(df, x=df['Tahun Ajaran'], y=df['Rasio'])
         fig.update_traces(mode='lines+markers')
+        fig.add_scatter(
+            x=df['Tahun Ajaran'],
+            y=df['Rasio'],
+            showlegend=False,
+            mode='text',
+            text=df['Rasio'],
+            textposition="top center"
+        )
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -1086,6 +1103,14 @@ def graphDosen(valueFrom, valueTo):
     if (len(df['Tahun Ajaran']) != 0):
         fig = px.line(df, x=df['Tahun Ajaran'], y=df['Rasio'], )
         fig.update_traces(mode='lines+markers')
+        fig.add_scatter(
+            x=df['Tahun Ajaran'],
+            y=df['Rasio'],
+            showlegend=False,
+            mode='text',
+            text=df['Rasio'],
+            textposition="top center"
+        )
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -1123,7 +1148,7 @@ where kepuasan.tahun_ajaran=%(TA)s and kepuasan.semester_nama LIKE %(Smt)s
 order by Rata2 asc,tahun_ajaran asc, semester_nama asc''', {'TA': thnAjar, 'Smt': Smt})
     if (len(df['Rata-rata']) != 0):
         fig = px.bar(df, x=df['Rata-rata'], y=df['Nama Dosen'], color=df['Predikat'], orientation='h',
-                     hover_name=df['Nama Dosen'],
+                     hover_name=df['Nama Dosen'],text_auto=True,
                      color_discrete_map={
                          'SANGAT BAIK': 'rgb(0, 130, 10)',
                          'BAIK': 'rgb(225, 210, 0)',
@@ -1163,7 +1188,7 @@ order by kode_kurikulum,kelompok_matakuliah desc
     ''')
     if (len(df['Jumlah Matakuliah']) != 0):
         fig = px.bar(df, y=df['Jumlah Matakuliah'], x=df['Kurikulum'],
-                     color=df['Kelompok Matakuliah'].replace(np.nan, '-'), barmode='stack')
+                     color=df['Kelompok Matakuliah'].replace(np.nan, '-'), text_auto=True,barmode='stack')
         # fig = px.line(df, x=df['Kelompok Matakuliah'], y=df['Jumlah Matakuliah'])
         # fig.update_traces(mode='lines+markers')
         fig.update_layout(xaxis_title="Kurikulum",
@@ -1185,7 +1210,7 @@ def graphBatalTawar(valueFrom, valueTo):
     dfBatal = data.dfBatalTawar(valueFrom, valueTo)
     if (len(dfBatal['Semester']) != 0):
         fig = px.bar(dfBatal, x=dfBatal['Semester'], y=dfBatal['Jumlah Matakuliah Yang Ditawarkan'],
-                     color=dfBatal['Tipe'], barmode='stack')
+                     color=dfBatal['Tipe'],text_auto=True, barmode='stack')
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -1215,7 +1240,7 @@ group by ds.tahun_ajaran, ds.semester_nama, dd.nama, Semester
 order by  count(dm.nama_matakuliah) asc
     ''', {'year': valueTA, 'smt': valueSmt})
     if (len(df['Jumlah Matakuliah']) != 0):
-        fig = px.bar(df, x=df['Jumlah Matakuliah'], y=df['Nama'], color=df['semester_nama'], barmode='group')
+        fig = px.bar(df, x=df['Jumlah Matakuliah'], y=df['Nama'], color=df['semester_nama'], text_auto=True,barmode='group')
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
