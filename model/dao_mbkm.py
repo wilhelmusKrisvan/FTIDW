@@ -80,26 +80,27 @@ def getRerataSKSMBKMperSemester():
 
 def getTableMitraInternal():
     return pd.read_sql('''
-    select CONCAT(semester_nama,' ',tahun_ajaran) Semester,
-       nama_matakuliah,
-       mitra
-from mbkm_matkul_monev mmm
-inner join dim_semester ds on mmm.kode_semester = ds.kode_semester
-inner join dim_matakuliah mm on mmm.kode_matakuliah = mm.kode_matakuliah
-where mmm.mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika');''', con)
+    select mitra 'Top Mitra',count(distinct kode_matakuliah) 'Jumlah Kerjasama Mitra',
+       concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+where mitra in
+          (select distinct mitra from mbkm_matkul_monev
+              where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'))
+group by mitra,semester
+order by 'Jumlah Kerjasama Mitra' desc;''', con)
 
 def getTableMitraEksternal():
     return pd.read_sql('''
-    select CONCAT(semester_nama,' ',tahun_ajaran) Semester,
-       nama_matakuliah,
-       mitra
-from mbkm_matkul_monev mmm
-inner join dim_semester ds on mmm.kode_semester = ds.kode_semester
-inner join dim_matakuliah mm on mmm.kode_matakuliah = mm.kode_matakuliah
-where mmm.mitra not in
+    select mitra 'Top Mitra',count(distinct kode_matakuliah) 'Jumlah Kerjasama Mitra',
+       concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+where mitra not in
           (select distinct mitra from mbkm_matkul_monev
               where mitra LIKE 'Prodi%%' or mitra in('MKH','Informatika'))
-order by semester ASC''', con)
+group by mitra,semester
+order by 'Jumlah Kerjasama Mitra' desc''', con)
 
 
 def getTotalMhsMbkm():
@@ -165,3 +166,53 @@ def getRawDataRerataMBKM():
     '2019/2020' and '2021/2022'
     group by mbm.kode_semester, Semester,mbm.kode_matakuliah,sks,mitra,id_mahasiswa
     order by mbm.kode_semester''', con)
+
+
+def getRawListMitraMatkulMBKM():
+    return pd.read_sql('''select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+       mitra 'Mitra',
+       nama_matakuliah
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+inner join dim_matakuliah dm on mbkm_matkul_monev.kode_matakuliah = dm.kode_matakuliah
+group by mitra,semester,nama_matakuliah''', con)
+
+def getRawKhs():
+    return pd.read_sql('''select distinct dm.id_matakuliah,
+                kode_matakuliah,
+                sks,
+                kode_semester
+from fact_khs
+inner join dim_semester ds on fact_khs.id_semester = ds.id_semester
+inner join dim_matakuliah dm on fact_khs.id_matakuliah = dm.id_matakuliah''', con)
+
+def getRawSksMbkm():
+    return pd.read_sql('''select distinct concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+                mbkm_matkul_monev.kode_semester,
+                mbkm_matkul_monev.kode_matakuliah,
+                sks,
+                nama_matakuliah
+from mbkm_matkul_monev
+inner join dim_semester ds on mbkm_matkul_monev.kode_semester = ds.kode_semester
+left join dim_matakuliah dm on mbkm_matkul_monev.kode_matakuliah = dm.kode_matakuliah
+group by mbkm_matkul_monev.kode_semester, semester,tahun_ajaran,kode_matakuliah,sks,nama_matakuliah
+order by kode_semester asc''', con)
+
+def getDosenMengajarUkdw():
+    return pd.read_sql('''select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+       kode_semester,
+       count(distinct id_dosen) as 'Total_Dosen'
+from fact_dosen_mengajar
+inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
+group by Semester,kode_semester''', con)
+
+def getDosenMengajarFti():
+    return pd.read_sql('''select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester,
+       kode_semester,
+       count(distinct fact_dosen_mengajar.id_dosen) as 'Total_Dosen'
+from fact_dosen_mengajar
+inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
+inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
+where id_prodi = 9
+group by Semester,kode_semester''', con)
+
