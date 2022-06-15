@@ -775,7 +775,8 @@ def FillIpkAngkatan(valueFrom, valueTo):
     group by `Tahun Ajaran`,tahun_angkatan,ds.tahun_ajaran, ds.semester_nama
     order by ds.tahun_ajaran, tahun_angkatan''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'],text_auto=True,)
+        #fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'],text_auto=True,)
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'], text_auto=True, )
         fig.update_layout(barmode='group')
         fig.add_hrect(y0=0, y1=2, fillcolor='red', opacity=0.1)
         fig.add_hrect(y0=2, y1=3.15, fillcolor='yellow', opacity=0.1)

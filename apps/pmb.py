@@ -1121,13 +1121,13 @@ def FillAktif(valueFrom, valueTo):
     select concat(ds.tahun_ajaran,' ',ds.semester_nama) 'Tahun Ajaran',
     count(*) as 'Jumlah', 'Aktif' Jenis from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
-where (fms.status != 'DO' or fms.status!='UD') and ds.tahun_ajaran between '2017/2018' and '2019/2020'
+where fms.status = 'AK' and ds.tahun_ajaran between '2017/2018' and '2019/2020'
 group by `Tahun Ajaran`, ds.semester_nama
 union all
 select concat(ds.tahun_ajaran,' ',ds.semester_nama) 'Tahun Ajaran',
     count(*) as 'Jumlah', 'Lainnya' Jenis from fact_mahasiswa_status fms
 inner join dim_semester ds on ds.id_semester = fms.id_semester
-where (fms.status!='AK' and (fms.status != 'DO' or fms.status!='UD')) and ds.tahun_ajaran between '2017/2018' and '2019/2020'
+where fms.status not in('AK','LS','UD','DO') and ds.tahun_ajaran between '2017/2018' and '2019/2020'
 group by ds.tahun_ajaran, ds.semester_nama
 order by 1,3
 ''', {'From': valueFrom, 'To': valueTo})

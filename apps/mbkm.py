@@ -704,7 +704,7 @@ mahasiswaMBKM = dbc.Container([
 # +grafcollapse
 reratasksMBKM = dbc.Container([
     dbc.Card([
-        html.H5('Rata - rata Konversi SKS MBKM',
+        html.H5('Persentase SKS Mata Kuliah Dalam Bentuk MBKM',
                 style=ttlgrf_style),
         html.Br(),
         dbc.Row([
