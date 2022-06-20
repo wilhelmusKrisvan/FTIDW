@@ -41,8 +41,6 @@ group by tahun_ajaran
 )aktif on aktif.tahun_ajaran = tahun_aka
 where tahun_ajaran between concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)''',con)
 
-def getSeleksiPersentase():
-    return pd.read_sql('''''')
 
 def getMahasiswaAktif():
     return pd.read_sql('''select ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, count(*) as 'Jumlah Mahasiswa Aktif' from fact_mahasiswa_status fms

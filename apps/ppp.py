@@ -1355,7 +1355,7 @@ ppkm = dbc.Container([
 ])
 
 layout = html.Div([
-    html.Div(html.H1('Penelitian, Pengabdian, Publikasi, dan Luaran',
+    html.Div(html.H1('Analisis Penelitian, Pengabdian, Publikasi, dan Luaran',
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
@@ -1570,6 +1570,7 @@ def graphPKMDosen(namads):
     figpkm.update_traces(hovertemplate='Tahun: %{x}<br>Jumlah :%{value}')
     return figpkm
 
+#Penelitian Dosen yang Melibatkan Mahasiswa
 @app.callback(
     Output('grf_PenDM','figure'),
     Input('fltrPenDMStart','value'),
@@ -1649,11 +1650,13 @@ def PKMDM(start, end, radiopkmdm):
         dfjumlpkmdm = data.getDataFrameFromDBwithParams(f'''
         select tahun Tahun,
                count(distinct id_pkm) 'Jumlah PKM'
-        from fact_pkm fp
-        inner join dim_penelitian_pkm dpp on fp.id_tanggal_mulai = dpp.id_tanggal_mulai
-        inner join br_pp_mahasiswa bpm on dpp.id_penelitian_pkm = bpm.id_penelitian_pkm
-        inner join dim_mahasiswa dm on bpm.id_mahasiswa = dm.id_mahasiswa
-        inner join dim_date dd on dd.id_date = dpp.id_tanggal_mulai
+        from fact_pkm fact
+        inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
+                 inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
+                 inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
+                 inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+                 inner join br_pp_mahasiswa on fact.id_pkm = br_pp_mahasiswa.id_penelitian_pkm
+                 inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa
         where tahun between %(start)s and %(end)s
         group by tahun
         order by tahun
@@ -1665,6 +1668,7 @@ def PKMDM(start, end, radiopkmdm):
     elif radiopkmdm == 'rata':
         dfratapkmdm = data.getDataFrameFromDBwithParams(f'''
         select Tahun,
+               count(distinct id_pkm) "Jumlah Judul",
                round(avg(jumlah_Dosen))     "Dosen",
                round(avg(jumlah_mahasiswa)) "Mahasiswa"
         from fact_pkm fact
@@ -2971,6 +2975,107 @@ def MitraPen(start, end, radiopkmdana):
         figasal.update_layout(yaxis_title='Jumlah PKM', xaxis_title='Tahun, Asal Sumber Dana',
                               legend_title='Asal Sumber Dana')
         return figasal
+
+@app.callback(
+    Output('cll_PKMDM','is_open'),
+    Output('cll_PKMDM','children'),
+    Input('cll_grfpkmDM','n_clicks'),
+    [State('cll_PKMDM','is_open')]
+)
+def toogle_collapse(PKMDM, is_open):
+    df = data.getDataFrameFromDB('''select Tahun,
+               count(distinct id_pkm) "Jumlah Judul",
+               round(avg(jumlah_Dosen))     "Dosen",
+               round(avg(jumlah_mahasiswa)) "Mahasiswa"
+        from fact_pkm fact
+                 inner join dim_penelitian_pkm on fact.id_pkm = dim_penelitian_pkm.id_penelitian_pkm
+                 inner join br_pp_dosen on fact.id_pkm = br_pp_dosen.id_penelitian_pkm
+                 inner join dim_dosen on br_pp_dosen.id_Dosen = dim_dosen.id_dosen
+                 inner join dim_date on dim_date.id_date = dim_penelitian_pkm.id_tanggal_mulai
+                 inner join br_pp_mahasiswa on fact.id_pkm = br_pp_mahasiswa.id_penelitian_pkm
+                 inner join dim_mahasiswa on br_pp_mahasiswa.id_mahasiswa = dim_mahasiswa.id_mahasiswa
+        where tahun between year(now())-5 and year(now())
+        group by tahun
+        order by tahun''')
+    isi = dbc.Card(
+        dt.DataTable(
+            id='tbl_PKMDM',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if PKMDM:
+        return not is_open, isi
+    return is_open, None
+
+
+@app.callback(
+    Output('cll_pkmMitra','is_open'),
+    Output('cll_pkmMitra','children'),
+    Input('cll_grfpkmMitra','n_clicks'),
+    [State('cll_pkmMitra','is_open')]
+)
+def toogle_collapse(pkmMitra, is_open):
+    df=data.getDataFrameFromDB('''select ddselesai.tahun Tahun,
+                 case
+                   when jenis_mitra = 'ORGANISASI' then 'ORGANISASI'
+                   when jenis_mitra = 'PEMERINTAH' then 'PEMERINTAH'
+                   when jenis_mitra = 'BISNIS' then 'BISNIS'
+                   when jenis_mitra = 'GEREJA' then 'GEREJA'
+                   when jenis_mitra = 'PENDIDIKAN' then 'PENDIDIKAN'
+                   else 'LAINNYA'
+                   end as 'Jenis Mitra',
+               case
+                   when dm.wilayah = '1' then 'LOKAL'
+                   when dm.wilayah = '2' then 'REGIONAL'
+                   when dm.wilayah = '3' then 'NASIONAL'
+                   when dm.wilayah = '4' then 'INTERNASIONAL'
+                   else 'NONE' end as 'Wilayah Mitra',
+               judul
+        from br_pp_perjanjian bpp
+                 inner join dim_penelitian_pkm dpp on bpp.id_penelitian_pkm = dpp.id_penelitian_pkm
+                 inner join dim_perjanjian dp on bpp.id_perjanjian = dp.id_perjanjian
+                 inner join br_mitra_perjanjian bmp on dp.id_perjanjian = bmp.id_perjanjian
+                 inner join dim_mitra dm on bmp.id_mitra = dm.id_mitra
+                 inner join dim_date ddselesai on ddselesai.id_date = dpp.id_tanggal_selesai
+                 inner join dim_date ddmulai on ddmulai.id_date = dpp.id_tanggal_mulai
+        where bpp.jenis = 'PKM'
+            and ddselesai.tahun between %(start)s and %(end)s
+        group by ddselesai.tahun, `Wilayah Mitra`,`Jenis Mitra`,judul
+        order by Tahun, `Wilayah Mitra`''')
+    isi = dbc.Card(
+        dt.DataTable(
+            id='tbl_pkmMitra',
+            columns=[
+                {'name': i, 'id': i} for i in df.columns
+            ],
+            data=df.to_dict('records'),
+            sort_action='native',
+            sort_mode='multi',
+            style_table={'padding': '10px', 'overflowX': 'auto'},
+            style_header={'textAlign': 'center'},
+            style_data={'font-size': '80%', 'textAlign': 'center'},
+            style_cell={'width': 95},
+            page_size=10,
+            export_format='xlsx'
+        ), style=cardtbl_style
+    )
+    if pkmMitra:
+        return not is_open, isi
+    return is_open, None
+
+
+
 
 @app.callback(
     Output('cll_rerataPen', 'is_open'),

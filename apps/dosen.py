@@ -385,7 +385,7 @@ def graphDosenInfInduk(id):
     group by tipe_nomor_induk
     ''')
     if (len(df['Jumlah']) != 0):
-        fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Nomor Induk'], color=df['Tipe Nomor Induk'])
+        fig = px.pie(df, values=df['Jumlah'], names=df['Tipe Nomor Induk'])
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
@@ -411,7 +411,7 @@ def graphDosenInfSertif(id):
     and no_sertifikat is null
     ''')
     if (len(df['Jumlah']) != 0):
-        fig = px.bar(df, y=df['Jumlah'], x=df['Tipe Sertifikat'], color=df['Tipe Sertifikat'])
+        fig = px.pie(df, values=df['Jumlah'], names=df['Tipe Sertifikat'])
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
