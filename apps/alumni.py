@@ -120,7 +120,7 @@ masatunggu = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Dari :', style={'marginBottom': 0}),
+                    html.P('Tahun Lulus dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMasaStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -131,7 +131,7 @@ masatunggu = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('Sampai :', style={'marginBottom': 0}),
+                    html.P('Tahun Lulus sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrMasaEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -184,7 +184,7 @@ lulusan = dbc.Container([
         html.Div([
             dbc.Row([
                 dbc.Col([
-                    html.P('Dari :', style={'marginBottom': 0}),
+                    html.P('Tahun Lulus dari :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrLulusanStart',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -195,7 +195,7 @@ lulusan = dbc.Container([
                     )
                 ]),
                 dbc.Col([
-                    html.P('Sampai :', style={'marginBottom': 0}),
+                    html.P('Tahun Lulus sampai :', style={'marginBottom': 0}),
                     dcc.Dropdown(
                         id='fltrLulusanEnd',
                         options=[{'label': i, 'value': i} for i in listDropdownTh],
@@ -423,6 +423,7 @@ def graphMSLulusan(start, end):
                       select count(*) as jumlah, ifnull(waktu_tunggu, 'LAINNYA') as waktu_tunggu, tahun_lulus
                       from fact_tracer_study fact
                                inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+                      where tahun_lulus between %(start)s and  %(end)s
                       group by waktu_tunggu, tahun_lulus
                       order by tahun_lulus desc
                   ) data
@@ -435,6 +436,7 @@ def graphMSLulusan(start, end):
                      if(semester_yudisium = 'GENAP', substr(tahun_ajaran_yudisium, 6, 4),
                         substr(tahun_ajaran_yudisium, 1, 4)) as tahun_lulus
               from fact_yudisium) data
+              where tahun_lulus between %(start)s and  %(end)s
         group by tahun_lulus
     ) lulusan on lulusan.tahun_lulus = data2.`Tahun Lulus`
              left join(
@@ -442,7 +444,7 @@ def graphMSLulusan(start, end):
         from dim_lulusan
         group by tahun_lulus
     ) terlacak on terlacak.tahun_lulus = data2.`Tahun Lulus`
-    where terlacak.tahun_lulus between %(start)s and %(end)s
+    
     order by data2.`Tahun Lulus`;   
     ''', {'start': start, 'end': end})
     fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
@@ -500,7 +502,7 @@ def graphBidKerja(start, end):
     order by data2.tahun_lulus
     ''',{'start':start,'end':end})
     fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
-    fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
+    fig.update_layout(yaxis_title='Persentase Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
     fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
     # fig.add_hrect(y0=0, y1=20,
     #               fillcolor="red", opacity=0.15, line_width=0)
