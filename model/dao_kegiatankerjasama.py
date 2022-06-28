@@ -311,3 +311,39 @@ where jenis_kegiatan = 'KULIAH UMUM' and tahun between '2017' and '2021'
 group by tahun,dk.id_kegiatan
 order by tahun asc
     ''', con)
+
+def getRawPrestasiNonAkdemikMhs():
+    return pd.read_sql('''select distinct tahun as 'Tahun', fact.wilayah_nama as 'Wilayah',fact.jenis_partisipasi,nama_kegiatan
+    from fact_kegiatan_mahasiswa fact
+    inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
+    inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
+    where sifat_partisipasi = 'PM' and is_akademis = 0
+group by fact.wilayah_nama,tahun,jenis_partisipasi,nama_kegiatan
+order by tahun asc
+    ''', con)
+
+def getRawPrestasiAkdemikMhs():
+    return pd.read_sql('''select distinct tahun as 'Tahun', fact.wilayah_nama as 'Wilayah',fact.jenis_partisipasi,nama_kegiatan
+    from fact_kegiatan_mahasiswa fact
+    inner join dim_kegiatan keg on keg.id_kegiatan = fact.id_kegiatan
+    inner join dim_date dat on keg.id_tanggal_mulai = dat.id_date
+    where sifat_partisipasi = 'PM' and is_akademis = 1
+group by fact.wilayah_nama,tahun,jenis_partisipasi,nama_kegiatan
+order by tahun asc
+    ''', con)
+
+def getRawRekognisiDosen():
+    return pd.read_sql('''select tahun as 'Tahun',judul_rekognisi,jenis_rekognisi,wilayah
+from fact_rekognisi_dosen frd
+inner join dim_date dd on dd.id_date=frd.id_tanggal_mulai
+inner join dim_dosen d on frd.id_dosen = d.id_dosen
+where d.id_prodi = 9
+group by tahun,judul_rekognisi,jenis_rekognisi,wilayah
+order by tahun asc
+    ''', con)
+
+def getFactKegiatanMhs():
+    return pd.read_sql('''select * from fact_kegiatan_mahasiswa''', con)
+def getFactRekognisiDosen():
+    return pd.read_sql('''select * from fact_rekognisi_dosen''', con)
+
