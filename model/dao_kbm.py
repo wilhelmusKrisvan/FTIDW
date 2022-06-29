@@ -366,7 +366,7 @@ select data.Semester, kode_semester, sum(Jumlah) 'Jumlah Matakuliah Yang Ditawar
     (select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester,
     ds.kode_semester,
     count(dm.kode_matakuliah) Jumlah,
-    'Matakuliah Yang Diambil Mahasiswa' Tipe
+    'Kelas Yang Diambil Mahasiswa' Tipe
     from fact_registrasi_matakuliah
     inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
     inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
@@ -379,7 +379,7 @@ union all
     select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester,
     ds.kode_semester,
     count(distinct dm.kode_matakuliah) Jumlah,
-    'Matakuliah Yang Diambil Mahasiswa' Tipe
+    'Kelas Yang Diambil Mahasiswa' Tipe
     from fact_registrasi_matakuliah
     inner join dim_matakuliah dm on fact_registrasi_matakuliah.id_matakuliah = dm.id_matakuliah
     inner join dim_semester ds on fact_registrasi_matakuliah.id_semester = ds.id_semester
@@ -392,7 +392,7 @@ union all
     (select concat(ds.semester_nama, ' ',ds.tahun_ajaran) Semester, 
     ds.kode_semester,
     count(dm.kode_matakuliah) Jumlah, 
-    'Matakuliah Yang Dibatalkan' Tipe
+    'Kelas Yang Dibatalkan' Tipe
     from fact_dosen_mengajar
     inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
     inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester

@@ -253,7 +253,7 @@ mahasiswaTA = dbc.Container([
 
 jumlahDosen = dbc.Container([
     dbc.Card([
-        html.H5('Rasio Dosen',
+        html.H5('Dosen Mengajar',
                 style=ttlgrf_style),
         dbc.Row([
             dbc.Col([
@@ -314,11 +314,11 @@ jumlahDosen = dbc.Container([
 
 rasioDosen = dbc.Container([
     dbc.Card([
-        html.H5('Rasio Dosen Terhadap Mahasiswa',
+        html.H5('Rasio Dosen DTPS',
                 style=ttlgrf_style),
         html.Div([
             dcc.Tabs([
-                dcc.Tab(label='Rasio Dosen : Mahasiswa', value='dosen',
+                dcc.Tab(label='Rasio Dosen Tetap Program Studi (DTPS) : Mahasiswa', value='dosen',
                         children=[
                             dbc.CardBody([
                                 dbc.Row([
@@ -504,11 +504,11 @@ matkulKurikulum = dbc.Container([
 
 matkulBatalTawar = dbc.Container([
     dbc.Card([
-        html.H5('Matakuliah yang Dibatalkan',
+        html.H5('Kelas yang Dibatalkan',
                 style=ttlgrf_style),
         html.Div([
             dcc.Tabs([
-                dcc.Tab(label='Rasio Matakuliah Batal : Kelas Ditawarkan', value='matkulBtlTawar',
+                dcc.Tab(label='Rasio Kelas yang Dibatal : Kelas Ditawarkan', value='matkulBtlTawar',
                         children=[
                             dbc.CardBody([
                                 dbc.Row([
@@ -737,15 +737,15 @@ def toggle_collapse(nBanding, nDosen, tab, is_open):
 )
 def FillIpkMahasiswa(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''select 
-    ds.tahun_ajaran 'Tahun Ajaran', ds.semester_nama Semester, round(avg(ipk),2) as "Rata-Rata"
+    concat(ds.tahun_ajaran,' ', ds.semester_nama ) 'Tahun Ajaran', round(avg(ipk),2) as "Rata-Rata"
 from fact_mahasiswa_status fms 
 inner join dim_semester ds on ds.id_semester = fms.id_semester
 where ds.tahun_ajaran between %(From)s and %(To)s and (fms.status != 'UD' OR fms.status != 'DO')
-group by ds.tahun_ajaran, ds.semester_nama
-order by ds.tahun_ajaran, ds.semester_nama
+group by `Tahun Ajaran`, ds.semester_nama
+order by `Tahun Ajaran`, ds.semester_nama
 ''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Semester'],text_auto=True,)
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'],text_auto=True,)
         fig.update_layout(barmode='group')
         fig.add_hrect(y0=0, y1=2, fillcolor='red', opacity=0.1)
         fig.add_hrect(y0=2, y1=3.15, fillcolor='yellow', opacity=0.1)
@@ -767,16 +767,18 @@ def FillIpkAngkatan(valueFrom, valueTo):
     df = data.getDataFrameFromDBwithParams('''
     select 
     concat(ds.tahun_ajaran,' ',ds.semester_nama) 'Tahun Ajaran', 
-    tahun_angkatan Angkatan,avg(ipk) as "Rata-Rata"
+    tahun_angkatan Angkatan,round(avg(ipk),2) as "Rata-Rata"
     from fact_mahasiswa_status fms 
     inner join dim_semester ds on ds.id_semester = fms.id_semester
     inner join dim_mahasiswa dm on fms.id_mahasiswa = dm.id_mahasiswa
     where ds.tahun_ajaran between %(From)s and %(To)s and (fms.status != 'UD' OR fms.status != 'DO')
+    and tahun_angkatan>=year(now())-5
     group by `Tahun Ajaran`,tahun_angkatan,ds.tahun_ajaran, ds.semester_nama
-    order by ds.tahun_ajaran, tahun_angkatan''', {'From': valueFrom, 'To': valueTo})
+    order by `Tahun Ajaran`, tahun_angkatan''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
         #fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'],text_auto=True,)
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Rata-Rata'], color=df['Angkatan'], text_auto=True, )
+        fig = px.bar(df, x=df['Angkatan'], y=df['Rata-Rata'], color=df['Tahun Ajaran'], text_auto=True,
+                     color_discrete_sequence=['#FF400D','#E80CA7','#6000FF','#1566EB','#17FFDE','#FF24A3','#FFE430','#B617FF'])
         fig.update_layout(barmode='group')
         fig.add_hrect(y0=0, y1=2, fillcolor='red', opacity=0.1)
         fig.add_hrect(y0=2, y1=3.15, fillcolor='yellow', opacity=0.1)
@@ -797,7 +799,15 @@ def FillIpkAngkatan(valueFrom, valueTo):
 def MhsTA(valueAngkatan):
     df = data.getDataFrameFromDBwithParams('''
     select mhs.`Tahun Ajaran`,mhs.tahun_angkatan,status,mhs.jumlah Mahasiswa,total.jumlah Total,
-       round((mhs.jumlah/total.jumlah)*100,2) Persentase
+       round((mhs.jumlah/total.jumlah)*100,2) Persentase,
+       case
+        when status='AK' then 1
+        when status='LS' then 2
+        when status='TA' then 3
+        when status='CS' then 4
+        when status='UD' then 5
+        when status='DO' then 6
+       END AS urutan
 from(select concat(ds.tahun_ajaran,' ', ds.semester_nama) 'Tahun Ajaran', dm.tahun_angkatan,
        status,count(distinct (dm.nim)) jumlah
       from fact_mahasiswa_status fms
@@ -818,9 +828,17 @@ inner join (select concat(ds.tahun_ajaran,' ', ds.semester_nama) 'Tahun Ajaran',
 concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1)
         and id_prodi=9
       group by `Tahun Ajaran`,tahun_angkatan) total on total.`Tahun Ajaran`=mhs.`Tahun Ajaran`
-order by `Tahun Ajaran`''', {'TA': valueAngkatan})
+order by `Tahun Ajaran`,urutan''', {'TA': valueAngkatan})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'], barmode='stack',text_auto=True, )
+        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'], barmode='stack'
+                     ,text_auto=True,color_discrete_map={
+                'AK':'#06FF00',
+                'LS':'#B2EA70',
+                'TA':'#FFE400',
+                'CS':'#ffc800',
+                'UD':'#FF8E00',
+                'DO':'#FF1700',
+            } )
         fig.update_yaxes(categoryorder='category ascending')
         fig.update_layout(xaxis_title="Tahun Ajaran",
                           yaxis_title="Persentase (%)", legend_title='Status')
@@ -863,7 +881,8 @@ concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1
       group by `Tahun Ajaran`) total on total.`Tahun Ajaran`=mhs.`Tahun Ajaran`
 order by `Tahun Ajaran`''', {'TA': valueAngkatan})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'],text_auto=True, barmode='group', )
+        fig = px.bar(x=df['Tahun Ajaran'], y=df['Persentase'], color=df['status'],
+                     text_auto=True, barmode='group', color_discrete_sequence=['#FF8E00','#FF1700'])
         fig.update_yaxes(categoryorder='category ascending')
         fig.add_hrect(y0=0, y1=10, fillcolor='green', opacity=0.1)
         fig.add_hrect(y0=10, y1=15, fillcolor='yellow', opacity=0.1)
@@ -880,7 +899,7 @@ order by `Tahun Ajaran`''', {'TA': valueAngkatan})
         return fig
 
 
-# Rasio Dosen
+# Dosen Mengajar
 @app.callback(
     Output('grf_dosenAjar', 'figure'),
     Input('Fromdrpdwn_Jmldosen', 'value'),
@@ -922,30 +941,33 @@ order by data.`Tahun Ajaran`,data.Prodi
         return fig
 
 
-# Rasio Dosen
+# Dosen Mengajar
 @app.callback(
     Output('grf_dosenNon', 'figure'),
     Input('Fromdrpdwn_Jmldosen', 'value'),
     Input('Todrpdwn_Jmldosen', 'value'),
 )
 def DosenNon(valueFrom, valueTo):
+    #and tanggal_keluar is null
     df = data.getDataFrameFromDBwithParams('''
     select semua.`Tahun Ajaran`,
-       tetap.jumlah 'Dosen Tidak Tetap',semua.jumlah 'Jumlah Dosen',(tetap.jumlah/semua.jumlah)*100 as 'Persentase' from
-(select concat(tahun_ajaran,' ',semester_nama) 'Tahun Ajaran', count(distinct fdm.id_dosen) jumlah from fact_dosen_mengajar fdm
+       tetap.jumlah 'Dosen Tidak Tetap yang Mengajar',semua.jumlah 'Jumlah Dosen',(tetap.jumlah/semua.jumlah)*100 as 'Persentase' from
+(select concat(tahun_ajaran,' ',semester_nama) 'Tahun Ajaran', count(distinct fdm.id_dosen) jumlah 
+from fact_dosen_mengajar fdm
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
 where tahun_ajaran between %(From)s and %(To)s and status_dosen='Kontrak'
 group by `Tahun Ajaran`) tetap,
-(select concat(tahun_ajaran,' ',semester_nama) 'Tahun Ajaran',count(distinct fdm.id_dosen) jumlah from fact_dosen_mengajar fdm
+(select concat(tahun_ajaran,' ',semester_nama) 'Tahun Ajaran',count(distinct fdm.id_dosen) jumlah 
+from fact_dosen_mengajar fdm
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
-where tahun_ajaran between %(From)s and %(To)s 
+where (tahun_ajaran between %(From)s and %(To)s) and status_dosen='Tetap' and tanggal_keluar is null 
 group by `Tahun Ajaran`) semua
 where semua.`Tahun Ajaran`=tetap.`Tahun Ajaran`
 order by semua.`Tahun Ajaran` asc''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Dosen'], color=px.Constant('Semua Dosen Mengajar'),
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Jumlah Dosen'], color=px.Constant('Semua Dosen Informatika yang Mengajar'),
                      text_auto=True,
                      labels=dict(x='Tahun Ajaran', y='Jumlah Dosen', color='Jenis Dosen'))
         # fig.update_traces(mode='lines+markers')
@@ -967,7 +989,7 @@ order by semua.`Tahun Ajaran` asc''', {'From': valueFrom, 'To': valueTo})
         return fig
 
 
-# Rasio Dosen Terhadap Mahasiswa
+# Rasio Dosen DTPS
 @app.callback(
     Output('grf_dosenMengajar', 'figure'),
     # Output('rasio_dosenMengajar', 'style'),
@@ -1028,7 +1050,7 @@ order by `Tahun Ajaran`
         return fig
 
 
-# Rasio Dosen Terhadap Mahasiswa
+# Rasio Dosen DTPS
 @app.callback(
     Output('grf_dosen', 'figure'),
     # Output('rasio_dosen', 'style'),
@@ -1141,9 +1163,11 @@ from
        avg(q7)+avg(q8)+avg(q9)+avg(q10)+avg(q11)+avg(q12))/12) Rata2
 from fact_dosen_mengajar fdm
 inner join dim_semester ds on fdm.id_semester = ds.id_semester
+inner join dim_matakuliah dm on dm.id_matakuliah=fdm.id_matakuliah
 inner join dim_dosen dd on fdm.id_dosen = dd.id_dosen
 where ds.tahun_ajaran between 
-concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) and id_prodi=9
+concat(year(now())-5,'/',year(now())-4) and concat(year(now()),'/',year(now())+1) 
+and dd.id_prodi=9 and is_batal=0 and dm.id_matakuliah not in (281,449,279,448,58,125,280,316,14,245,3,445,278,314,163,184,124)
 group by tahun_ajaran,semester_nama,nama) kepuasan
 where kepuasan.tahun_ajaran=%(TA)s and kepuasan.semester_nama LIKE %(Smt)s
 order by Rata2 asc,tahun_ajaran asc, semester_nama asc''', {'TA': thnAjar, 'Smt': Smt})
@@ -1151,10 +1175,16 @@ order by Rata2 asc,tahun_ajaran asc, semester_nama asc''', {'TA': thnAjar, 'Smt'
         fig = px.bar(df, x=df['Rata-rata'], y=df['Nama Dosen'], color=df['Predikat'], orientation='h',
                      hover_name=df['Nama Dosen'],text_auto=True,
                      color_discrete_map={
-                         'SANGAT BAIK': 'rgb(0, 130, 10)',
-                         'BAIK': 'rgb(225, 210, 0)',
-                         'CUKUP BAIK': 'orange',
-                         'KURANG BAIK': 'red'
+                         'AK': '#06FF00',
+                         'LS': '#B2EA70',
+                         'TA': '#FFE400',
+                         'CS': '#ffbb00',
+                         'UD': '#FF8E00',
+                         'DO': '#FF1700',
+                         'SANGAT BAIK': '#06FF00',
+                         'BAIK': 'B2EA70',
+                         'CUKUP BAIK': '#FFE400',
+                         'KURANG BAIK': '#FF1700'
                      })
         fig.add_vrect(x0=0, x1=25, fillcolor='red', opacity=0.1)
         fig.add_vrect(x0=25, x1=50, fillcolor='orange', opacity=0.1)
@@ -1189,7 +1219,8 @@ order by kode_kurikulum,kelompok_matakuliah desc
     ''')
     if (len(df['Jumlah Matakuliah']) != 0):
         fig = px.bar(df, y=df['Jumlah Matakuliah'], x=df['Kurikulum'],
-                     color=df['Kelompok Matakuliah'].replace(np.nan, '-'), text_auto=True,barmode='stack')
+                     color=df['Kelompok Matakuliah'].replace(np.nan, 'Lainnya'),
+                     text_auto=True,barmode='stack',color_discrete_sequence=['#FF400D','#E80CA7','#6000FF','#1566EB','#17FFDE'])
         # fig = px.line(df, x=df['Kelompok Matakuliah'], y=df['Jumlah Matakuliah'])
         # fig.update_traces(mode='lines+markers')
         fig.update_layout(xaxis_title="Kurikulum",
@@ -1201,7 +1232,7 @@ order by kode_kurikulum,kelompok_matakuliah desc
                                          yshift=10)
         return fig, None, None
 
-
+#Kelas yang Dibatalkan
 @app.callback(
     Output('grf_matkulBtlTawar', 'figure'),
     Input('Fromdrpdwn_matkulBtlTawar', 'value'),
@@ -1227,21 +1258,21 @@ def graphBatalTawar(valueFrom, valueTo):
 )
 def graphDosenBatal(valueTA, valueSmt):
     df = data.getDataFrameFromDBwithParams('''
-    select concat(ds.semester_nama,' ',ds.tahun_ajaran) Semester, 
-    dd.nama Nama, count(dm.nama_matakuliah) 'Jumlah Matakuliah',ds.semester_nama
+    select concat(ds.semester_nama,' ',ds.tahun_ajaran) 'Tahun Ajaran', 
+    dd.nama Nama, count(dm.nama_matakuliah) 'Jumlah Matakuliah',ds.semester_nama Semester
 from fact_dosen_mengajar
 inner join dim_dosen dd on fact_dosen_mengajar.id_dosen = dd.id_dosen
 inner join dim_semester ds on fact_dosen_mengajar.id_semester = ds.id_semester
 inner join dim_matakuliah dm on dm.id_matakuliah = fact_dosen_mengajar.id_matakuliah
 where is_batal = 1 
 and dm.id_prodi=9
-and ds.tahun_ajaran=%(year)s and ds.semester_nama=%(smt)s
+and ds.tahun_ajaran=%(year)s
 and dm.id_matakuliah not in (242,245,5,3,189,188,371,513,512,514,516,283,523,525,519,520,522,524,216)
-group by ds.tahun_ajaran, ds.semester_nama, dd.nama, Semester
-order by  count(dm.nama_matakuliah) asc
-    ''', {'year': valueTA, 'smt': valueSmt})
+group by 'Tahun Ajaran', ds.semester_nama, dd.nama, Semester
+order by  count(dm.nama_matakuliah) asc, Nama, semester_nama
+    ''', {'year': valueTA})
     if (len(df['Jumlah Matakuliah']) != 0):
-        fig = px.bar(df, x=df['Jumlah Matakuliah'], y=df['Nama'], color=df['semester_nama'], text_auto=True,barmode='group')
+        fig = px.bar(df, x=df['Jumlah Matakuliah'], y=df['Nama'], color=df['Semester'], text_auto=True,barmode='group')
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",

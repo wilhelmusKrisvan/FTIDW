@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from appConfig import app, server
 from dash import html, dcc
 import model.dao_dosen as data
+from datetime import date
 
 dfpersendosens3 = data.getDosenS3()
 
@@ -17,6 +18,13 @@ dfpersenjabfungAkumulasi = data.getPersenJabfungAkumulasiperTahun()
 dfpersenjabfung = data.getPersenJabfungperTahun()
 dfdosentetapinf = data.getDosenTetapINF()
 dfdosenindustri = data.getDosenIndustriPraktisi()
+
+listDropdown = []
+for x in range(0, 5):
+    tahun = 5
+    yearnow = date.today().strftime('%Y')
+    listDropdown.append(
+        str(int(yearnow) - tahun + x))
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -124,7 +132,7 @@ DosenInduk = dbc.Container([
 
 DosenSertif = dbc.Container([
     dbc.Card([
-        html.H5('Dosen Informatika Bersertifikat',
+        html.H5('Dosen Informatika Tersertifikasi',
                 style=ttlgrf_style),
         dbc.CardBody([
             dcc.Loading([
@@ -140,6 +148,39 @@ DosenSertif = dbc.Container([
     )
 ], style=cont_style)
 
+dosens3 = dbc.Container([
+    dbc.Card([
+        html.H5('Dosen S3',
+                style=ttlgrf_style),
+        dbc.CardBody([
+            dcc.Loading([
+                dcc.Graph(id='grf_dosens3'),
+            ], type='default'),
+            dbc.Button('Lihat Semua Data',
+                       id='cll_grfdosens3',
+                       n_clicks=0, style=button_style
+                       ),
+        ]),
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_dosens3',
+                columns=[{"name": i, "id": i} for i in dfpersendosens3.columns],
+                data=dfpersendosens3.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardgrf_style
+        ),
+        id='cll_tbldosens3',
+        is_open=False
+    )
+], style=cont_style)
 
 dosentetapindustri = dbc.Container([
     dbc.Card([
@@ -167,6 +208,34 @@ jumljabfungDosen = dbc.Container([
         html.H5('Perbandingan Dosen Jabatan Fungsi dengan Dosen Non Jabatan Fungsi per Tahun',
                 style=ttlgrf_style),
         dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.P('Dari', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Fromdrpdwn_dosenJabfung',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[0],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Dari',
+                        ),
+                    ]),
+                ], width=6),
+                dbc.Col([
+                    html.Div([
+                        html.P('Sampai', style={'color': 'black'}),
+                        dcc.Dropdown(
+                            id='Todrpdwn_dosenJabfung',
+                            options=[{'label': i, 'value': i} for i in listDropdown],
+                            value=listDropdown[len(listDropdown) - 1],
+                            style={'color': 'black'},
+                            clearable=False,
+                            placeholder='Sampai',
+                        ),
+                    ]),
+                ], width=6),
+            ]),
             dcc.Loading([
                 dcc.Graph(id='grf_jabfungth'),
             ], type='default'),
@@ -230,55 +299,30 @@ persenjabfungthDosen = dbc.Container([
     )
 ], style=cont_style)
 
-dosens3 = dbc.Container([
-    dbc.Card([
-        html.H5('Dosen S3',
-                style=ttlgrf_style),
-        dbc.CardBody([
-            dcc.Loading([
-                dcc.Graph(id='grf_dosens3'),
-            ], type='default'),
-            dbc.Button('Lihat Semua Data',
-                       id='cll_grfdosens3',
-                       n_clicks=0, style=button_style
-                       ),
-        ]),
-    ], style=cardgrf_style),
-    dbc.Collapse(
-        dbc.Card(
-            dt.DataTable(
-                id='tbl_dosens3',
-                columns=[{"name": i, "id": i} for i in dfpersendosens3.columns],
-                data=dfpersendosens3.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                page_size=10,
-                export_format='xlsx'
-            ), style=cardgrf_style
-        ),
-        id='cll_tbldosens3',
-        is_open=False
-    )
-], style=cont_style)
-
-
-
-
 layout = html.Div([
     html.Div(html.H1('Analisis Profil Dosen Prodi Informatika',
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
     html.A(className='name'),
-    html.Div([DosenInduk]),
-    html.Div([DosenSertif]),
+    dbc.Container([
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    DosenInduk,
+                ], width=4),
+                dbc.Col([
+                    DosenSertif,
+                ], width=4),
+                dbc.Col([
+                    dosens3,
+                ], width=4)
+            ]),
+        ])
+    ]),
     html.Div([dosentetapindustri]),
     html.Div([jumljabfungDosen]),
-    html.Div([persenjabfungthDosen]),
-    html.Div([dosens3], style={'margin-bottom': '50px'}),
+    html.Div([persenjabfungthDosen], style={'margin-bottom': '50px'}),
     dbc.Container([
         dcc.Link([
             dbc.Button('^', style=buttonLink_style),
@@ -343,6 +387,7 @@ def toggle_collapse(nsertif, is_open):
         return not is_open, isiDosenTetap
     return is_open, None
 
+
 @app.callback(
     Output("cll_tbljabfungth", "is_open"),
     [Input("cll_grfjabfungth", "n_clicks")],
@@ -371,6 +416,7 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
 
 # GRAPH COLLAPSE
 @app.callback(
@@ -419,49 +465,6 @@ def graphDosenInfSertif(id):
                                          yshift=10)
         return fig
 
-# Jumlah Jabfung L LK per Tahun
-@app.callback(
-    Output('grf_jabfungth', 'figure'),
-    Input('grf_jabfungth', 'id')
-)
-def grafJumlJabfungth(id):
-    df = dfpersenjabfungAkumulasi
-    count =df['Jumlah Non Jabatan'].value_counts().reset_index()
-    if (len(df['Tahun']) != 0):
-        fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Jabatan'], color=px.Constant('Jabatan'),
-                     labels=dict(x='Tahun', y='Jumlah Dosen', color='Jenis Jabatan'),
-                     )
-        # fig.update_traces(mode='lines+markers')
-        fig.add_bar(x=df['Tahun'], y=df['Jumlah Non Jabatan'], name='Non Jabatan',
-                    )
-        fig.update_traces(hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
-        return fig
-    else:
-        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
-                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
-                                         yshift=10)
-        return fig
-
-
-# Persentase Jabfung L LK per Tahun
-@app.callback(
-    Output('grf_persenjabfungth', 'figure'),
-    Input('grf_persenjabfungth', 'id')
-)
-def grafPersenJabfungth(id):
-    df = dfpersenjabfung
-    if (len(df['Tahun']) != 0):
-        fig = px.bar(df, x=df['Tahun'], y=df['persentase'], color=df['Jabatan'],
-                     barmode='stack',)
-        fig.update_xaxes(categoryorder='category ascending')
-        fig.update_layout(yaxis_title="Persentase (%)")
-        fig.update_traces(hovertemplate="<br> Persentase=%{y} </br> Tahun= %{x}")
-        return fig
-    else:
-        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
-                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
-                                         yshift=10)
-        return fig
 
 @app.callback(
     Output('grf_dosens3', 'figure'),
@@ -480,6 +483,98 @@ def grafDosenS3(id):
         ''')
     if (len(df['Jumlah']) != 0):
         fig = px.pie(df, values=df['Jumlah'], names=df['Tingkat Pendidikan'])
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
+
+
+# Jumlah Jabfung L LK per Tahun
+@app.callback(
+    Output('grf_jabfungth', 'figure'),
+    Input('Fromdrpdwn_dosenJabfung', 'value'),
+    Input('Todrpdwn_dosenJabfung', 'value'),
+)
+def grafJmlJabfungth(dari,sampai):
+    #df = dfpersenjabfungAkumulasi
+    df=data.getDataFrameFromDBwithParams('''
+    select jabatan.tahun Tahun,jabatan.Jumlah 'Jumlah Jabatan', 
+    dosen.Jumlah 'Jumlah Dosen',dosen.Jumlah-jabatan.Jumlah 'Jumlah Non Jabatan',(jabatan.Jumlah/dosen.Jumlah)*100 'persentase' from
+    (select sum(Jumlah) as Jumlah,cast(2021 as char) as tahun from
+        (select count(*) as Jumlah,year(tanggal_masuk) as tahun
+        from dim_dosen
+        where id_prodi=9 and status_dosen='Tetap' and tanggal_keluar is null
+        group by tahun) data
+        where data.tahun<=2021
+        union all
+        select sum(Jumlah) as Jumlah,cast(2020 as char) as tahun from
+        (select count(*) as Jumlah,year(tanggal_masuk) as tahun
+        from dim_dosen
+        where id_prodi=9 and status_dosen='Tetap' and tanggal_keluar is null
+        group by tahun) data
+        where data.tahun<=2020
+        union all
+        select sum(Jumlah) as Jumlah,cast(2019 as char) as tahun from
+        (select count(*) as Jumlah,year(tanggal_masuk) as tahun
+        from dim_dosen
+        where id_prodi=9 and status_dosen='Tetap' and tanggal_keluar is null
+        group by tahun) data
+        where data.tahun<=2019) dosen,
+    (select count(jabatan_dosen) Jumlah, tahun from dosen_jabfung_monev
+    inner join dim_dosen dd on dd.id_dosen=dosen_jabfung_monev.id_dosen
+    where jabatan_dosen not like 'KONTRAK' and tahun>=2019 and id_prodi=9
+    group by tahun) jabatan
+    where jabatan.tahun=dosen.tahun
+    and jabatan.tahun between %(From)s and %(To)s
+    order by tahun asc''',{'From': dari, 'To': sampai})
+    count = df['Jumlah Non Jabatan'].value_counts().reset_index()
+    if (len(df['Tahun']) != 0):
+        fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Jabatan'], color=px.Constant('Jabatan'), text_auto=True,
+                     labels=dict(x='Tahun', y='Jumlah Dosen', color='Jenis Jabatan'),
+                     )
+        # fig.update_traces(mode='lines+markers')
+        fig.add_bar(x=df['Tahun'], y=df['Jumlah Non Jabatan'], name='Non Jabatan',
+                    )
+        fig.add_scatter(
+            x=df['Tahun'],
+            y=df['Jumlah Jabatan'],
+            showlegend=False,
+            mode='text',
+            text=df['Jumlah Non Jabatan'],
+            textposition="top center"
+        )
+        fig.update_traces(hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
+
+
+# Persentase Jabfung L LK per Tahun
+@app.callback(
+    Output('grf_persenjabfungth', 'figure'),
+    Input('grf_persenjabfungth', 'id')
+)
+def grafPersenJabfungth(id):
+    df = dfpersenjabfung
+    if (len(df['Tahun']) != 0):
+        fig = px.bar(df, x=df['Tahun'], y=df['persentase'], color=df['Jabatan'],
+                     barmode='stack', text_auto=True,
+                     color_discrete_map={
+                         'LK700': '#06FF00',
+                         'LK550': '#B2EA70',
+                         'LK400': '#FFE400',
+                         'LT300': '#ffd900',
+                         'LT200': '#ffc800',
+                         'AA150': '#FF8E00',
+                         'AA100': '#FF1700', })
+        fig.update_xaxes(categoryorder='category ascending')
+        fig.update_layout(yaxis_title="Persentase (%)")
+        fig.update_traces(hovertemplate="<br> Persentase=%{y} </br> Tahun= %{x}")
         return fig
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",

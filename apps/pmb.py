@@ -899,7 +899,8 @@ lolos as 'Lolos Seleksi', registrasi as 'Registrasi' from (
     order by id_semester asc
 )dataMahasiswa
 where tahun_aka between 
-%(From)s and %(To)s''', {'From': valueFrom, 'To': valueTo})
+%(From)s and %(To)s
+''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Daya Tampung']) != 0):
         fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Daya Tampung'], color=px.Constant('Daya Tampung'),
                      labels=dict(x="Tahun Ajaran", y="Jumlah", color="Jenis Pendaftar"), text_auto=True)
@@ -1233,7 +1234,8 @@ and ds.tahun_ajaran between
 group by ds.tahun_ajaran,'Tipe Sekolah Asal',semua.`Jumlah Pendaftar`
 order by ds.tahun_ajaran''', {'From': valueFrom, 'To': valueTo})
     if (len(df['Tahun Ajaran']) != 0):
-        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Persen'], color=df['Tipe Sekolah Asal'], text_auto=True)
+        fig = px.bar(df, x=df['Tahun Ajaran'], y=df['Persen'], color=df['Tipe Sekolah Asal'], text_auto=True,
+                     color_discrete_sequence=['#FF400D','#E80CA7','#6000FF'])
         fig.update_layout(barmode='stack')
         return fig
     else:

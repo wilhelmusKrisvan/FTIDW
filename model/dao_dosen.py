@@ -116,6 +116,7 @@ def getPersenJabfungperTahun():
     return pd.read_sql('''
     select jabatan.tahun                         Tahun,
        jabatan.jabatan_dosen                 'Jabatan',
+       substr(jabatan.jabatan_dosen,3,3)               'Urutan',
        jabatan.Jumlah                        'Jumlah Jabatan',
        dosen.Jumlah                          'Jumlah Dosen',
        (jabatan.Jumlah / dosen.Jumlah) * 100 'persentase'
@@ -152,8 +153,8 @@ def getPersenJabfungperTahun():
             and id_prodi = 9
           group by jabatan_dosen,tahun) jabatan
     where jabatan.tahun = dosen.tahun
-    group by Tahun, Jabatan, `Jumlah Jabatan`, `Jumlah Dosen`, `persentase`
-    order by Tahun desc,Jabatan;
+    group by Tahun, Jabatan, `Jumlah Jabatan`, `Jumlah Dosen`, `persentase`,`Urutan`
+    order by Tahun asc,`Urutan`;
     ''',con)
 
 def getDosenS3():
