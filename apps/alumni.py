@@ -117,7 +117,7 @@ for x in range(0, 5):
 
 masatunggu = dbc.Container([
     dbc.Card([
-        html.H5('Jumlah Lulusan Berdasarkan Masa Tunggu',
+        html.H5('Persentase Lulusan Berdasarkan Masa Tunggu',
                 style=ttlgrf_style),
         html.Div([
             dbc.Row([
@@ -659,10 +659,16 @@ def graphMSLulusan(start, end):
     
     order by data2.`Tahun Lulus`;   
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
-    fig.update_layout(yaxis_title='Jumlah Lulusan', xaxis_title='Tahun Lulus', legend_title='Masa Tunggu')
-    fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
-    return fig
+    if(len(df['Tahun Lulus']) !=0):
+        fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5], text_auto=True)
+        fig.update_layout(yaxis_title='Persentase Lulusan', xaxis_title='Tahun Lulus', legend_title='Masa Tunggu')
+        fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 # Jumlah Isian Pengguna Lulusan Terhadap Jumlah Lulusan
@@ -682,20 +688,27 @@ inner join (select tahun_lulus,count(id_mahasiswa) Jumlah from dim_lulusan
     where lulus.tahun_lulus between %(start)s and %(end)s
     order by lulus.tahun_lulus
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Lulus'], y=df['Jumlah Lulusan Tracer Studi'], text=df['Jumlah Lulusan Tracer Studi'],
-                 color=px.Constant('Lulusan yang Mengisi Tracer Studi'), )
-    fig.add_bar(x=df['Tahun Lulus'], y=df['Jumlah Total Lulusan'], name='Total Lulusan')
-    fig.add_scatter(
-        x=df['Tahun Lulus'],
-        y=df['Jumlah Total Lulusan'],
-        showlegend=False,
-        mode='text',
-        text=df['Jumlah Total Lulusan'],
-        textposition='middle center'
-    )
-    fig.update_layout(barmode='group')
-    fig.update_traces(hovertemplate="<br> Jumlah Lulusan=%{y} </br> Tahun Lulus= %{x}",)
-    return fig
+    if(len(df['Tahun Lulus']) !=0):
+        fig = px.bar(df, x=df['Tahun Lulus'], y=df['Jumlah Lulusan Tracer Studi'], text=df['Jumlah Lulusan Tracer Studi'],
+                     color=px.Constant('Lulusan yang Mengisi Tracer Studi'),
+                     labels=dict(x='Tahun Lulus', y='Jumlah Lulusan', color='Jenis Lulusan'))
+        fig.add_bar(x=df['Tahun Lulus'], y=df['Jumlah Total Lulusan'], name='Total Lulusan')
+        fig.add_scatter(
+            x=df['Tahun Lulus'],
+            y=df['Jumlah Total Lulusan'],
+            showlegend=False,
+            mode='text',
+            text=df['Jumlah Total Lulusan'],
+            textposition='middle right'
+        )
+        fig.update_layout(barmode='group')
+        fig.update_traces(hovertemplate="<br> Jumlah Lulusan=%{y} </br> Tahun Lulus= %{x}", )
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 # Jumlah Isian Pengguna Lulusan Terhadap Jumlah Lulusan
@@ -715,20 +728,27 @@ def graphIsiLulusan(start, end):
         where lulus.tahun_lulus between %(start)s and %(end)s
         order by lulus.tahun_lulus
         ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Lulus'], y=df['Jumlah Pengguna Lulusan'], text=df['Jumlah Pengguna Lulusan'],
-                 color=px.Constant('Pengguna Lulusan yang Mengisi Kepuasan Pengguna'), )
-    fig.add_bar(x=df['Tahun Lulus'], y=df['Jumlah Total Lulusan'], name='Total Lulusan')
-    fig.add_scatter(
-        x=df['Tahun Lulus'],
-        y=df['Jumlah Total Lulusan'],
-        showlegend=False,
-        mode='text',
-        text=df['Jumlah Total Lulusan'],
-        textposition="middle center"
-    )
-    fig.update_layout(barmode='group')
-    fig.update_traces(hovertemplate="<br> Jumlah Lulusan=%{y} </br> Tahun Lulus= %{x}")
-    return fig
+    if (len(df['Tahun Lulus']) != 0):
+        fig = px.bar(df, x=df['Tahun Lulus'], y=df['Jumlah Pengguna Lulusan'], text=df['Jumlah Pengguna Lulusan'],
+                     color=px.Constant('Pengguna Lulusan yang Mengisi Kepuasan Pengguna'),
+                     labels=dict(x='Tahun Lulus', y='Jumlah Lulusan', color='Jenis Lulusan'))
+        fig.add_bar(x=df['Tahun Lulus'], y=df['Jumlah Total Lulusan'], name='Total Lulusan',)
+        fig.add_scatter(
+            x=df['Tahun Lulus'],
+            y=df['Jumlah Total Lulusan'],
+            showlegend=False,
+            mode='text',
+            text=df['Jumlah Total Lulusan'],
+            textposition="middle right"
+        )
+        fig.update_layout(barmode='group')
+        fig.update_traces(hovertemplate="<br> Jumlah Lulusan=%{y} </br> Tahun Lulus= %{x}")
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -779,16 +799,23 @@ def graphBidKerja(start, end):
     where data2.tahun_lulus between %(start)s and %(end)s
     order by data2.tahun_lulus
     ''', {'start': start, 'end': end})
-    fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
-    fig.update_layout(yaxis_title='Persentase Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
-    fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
-    # fig.add_hrect(y0=0, y1=20,
-    #               fillcolor="red", opacity=0.15, line_width=0)
-    # fig.add_hrect(y0=20, y1=70,
-    #               fillcolor="yellow", opacity=0.15, line_width=0)
-    # fig.add_hrect(y0=70, y1=100,
-    #               fillcolor="green", opacity=0.15, line_width=0)
-    return fig
+    if (len(df['Tahun Lulus']) != 0):
+        fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5], text_auto=True)
+        fig.update_layout(yaxis_title='Persentase Lulusan', xaxis_title='Tahun Lulus',
+                          legend_title='Tingkat Kesesuaian')
+        fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
+        # fig.add_hrect(y0=0, y1=20,
+        #               fillcolor="red", opacity=0.15, line_width=0)
+        # fig.add_hrect(y0=20, y1=70,
+        #               fillcolor="yellow", opacity=0.15, line_width=0)
+        # fig.add_hrect(y0=70, y1=100,
+        #               fillcolor="green", opacity=0.15, line_width=0)
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -808,11 +835,24 @@ def graphWirausaha(start, end):
     group by tahun_lulus
     order by tahun_lulus;
     ''', {'start': start, 'end': end})
-    fig = px.line(df, x=df['Tahun Lulus'], y=df['Jumlah Lulusan Berwirausaha'])
-    fig.update_traces(mode='lines+markers')
-    fig.update_layout(yaxis=dict(tickformat=",d"))
-    return fig
-
+    if (len(df['Tahun Lulus']) != 0):
+        fig = px.line(df, x=df['Tahun Lulus'], y=df['Jumlah Lulusan Berwirausaha'])
+        fig.update_traces(mode='lines+markers')
+        fig.update_layout(yaxis=dict(tickformat=",d"))
+        fig.add_scatter(
+            x=df['Tahun Lulus'],
+            y=df['Jumlah Lulusan Berwirausaha'],
+            showlegend=False,
+            mode='text',
+            text=df['Jumlah Lulusan Berwirausaha'],
+            textposition="top center"
+        )
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 @app.callback(
     Output('grf_gaji', 'figure'),
@@ -829,11 +869,25 @@ def graphGaji(start, end):
     group by tahun_lulus
     order by tahun_lulus
     ''', {'start': start, 'end': end})
-    fig = px.line(df, x=df['Tahun Lulus'], y=df['Rata-rata Pendapatan (Jutaan)'])
-    fig.update_traces(mode='lines+markers')
-    fig.update_layout(yaxis=dict(tickformat=".2f"))
-    # fig.update_layout(yaxis_tickformat = "%d")
-    return fig
+    if (len(df['Tahun Lulus']) != 0):
+        fig = px.line(df, x=df['Tahun Lulus'], y=df['Rata-rata Pendapatan (Jutaan)'])
+        fig.update_traces(mode='lines+markers')
+        fig.update_layout(yaxis=dict(tickformat=".2f"))
+        # fig.update_layout(yaxis_tickformat = "%d")
+        fig.add_scatter(
+            x=df['Tahun Lulus'],
+            y=df['Rata-rata Pendapatan (Jutaan)'],
+            showlegend=False,
+            mode='text',
+            text=df['Rata-rata Pendapatan (Jutaan)'],
+            textposition="top center"
+        )
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -892,14 +946,22 @@ def toggle_collapse(nlayanan, nskill, puas, is_open):
 )
 def graphRataMS(tglstart, tglend):
     df = data.getDataFrameFromDBwithParams('''
-    select count(waktu_tunggu) Jumlah, waktu_tunggu Waktu,tahun_lulus Tahun from fact_tracer_study fts
+    select count(waktu_tunggu) Jumlah, waktu_tunggu Waktu,tahun_lulus 'Tahun Lulus' from fact_tracer_study fts
         inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
         where waktu_tunggu is not null and (tahun_lulus between %(start)s and %(end)s)
         group by waktu_tunggu,tahun_lulus
         order by tahun_lulus asc
     ''', {'start': tglstart, 'end': tglend})
-    fig = px.line(df, x=df['Tahun'], y=df['Jumlah'], color=df['Waktu'])
+    fig = px.line(df, x=df['Tahun Lulus'], y=df['Jumlah'], color=df['Waktu'])
     fig.update_traces(mode='lines+markers')
+    fig.add_scatter(
+        x=df['Tahun Lulus'],
+        y=df['Jumlah'],
+        showlegend=False,
+        mode='text',
+        text=df['Jumlah'],
+        textposition="top center"
+    )
     return fig
 
 
@@ -909,15 +971,21 @@ def graphRataMS(tglstart, tglend):
 )
 def graphLayanan(th):
     df = data.getKepuasanLayanan(th)
-    fig = go.Figure(
-        go.Pie(
-            name="",
-            values=df['Persen'],
-            labels=df['Nilai'],
-            hovertemplate="Kepuasan : %{label} <br>Persentase : %{value}%"
+    if (len(df['Persen']) != 0):
+        fig = go.Figure(
+            go.Pie(
+                name="",
+                values=df['Persen'],
+                labels=df['Nilai'],
+                hovertemplate="Kepuasan : %{label} <br>Persentase : %{value}%"
+            )
         )
-    )
-    return fig
+        return fig
+    else:
+        fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                         font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                         yshift=10)
+        return fig
 
 
 @app.callback(
@@ -955,19 +1023,25 @@ def graphSkill(valueDropDown):
         return df
 
     def graphOutput(df):
-        values = [f"{df['Sangat Baik'].iloc[-1]:,.1f}", f"{df['Baik'].iloc[-1]:,.1f}",
-                  f"{df['Cukup'].iloc[-1]:,.1f}", f"{df['Kurang'].iloc[-1]:,.1f}"]
-        label = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang']
-        # fig = go.Figure(data=[go.Pie(labels=label, values=values)])
-        fig = go.Figure(
-            data=go.Pie(
-                name="",
-                values=values,
-                labels=label,
-                hovertemplate="Skill : %{label} <br>Persentase : %{value}%"
+        if (len(df['Baik']) != 0):
+            values = [f"{df['Sangat Baik'].iloc[-1]:,.1f}", f"{df['Baik'].iloc[-1]:,.1f}",
+                      f"{df['Cukup'].iloc[-1]:,.1f}", f"{df['Kurang'].iloc[-1]:,.1f}"]
+            label = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang']
+            # fig = go.Figure(data=[go.Pie(labels=label, values=values)])
+            fig = go.Figure(
+                data=go.Pie(
+                    name="",
+                    values=values,
+                    labels=label,
+                    hovertemplate="Skill : %{label} <br>Persentase : %{value}%"
+                )
             )
-        )
-        return fig
+            return fig
+        else:
+            fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
+                                             font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
+                                             yshift=10)
+            return fig
 
     dfIntegritas = dataKepuasan('integritas', valueDropDown)
     dfKeahlian = dataKepuasan('keahlian_bidang_ilmu', valueDropDown)

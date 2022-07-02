@@ -971,13 +971,13 @@ order by semua.`Tahun Ajaran` asc''', {'From': valueFrom, 'To': valueTo})
                      text_auto=True,
                      labels=dict(x='Tahun Ajaran', y='Jumlah Dosen', color='Jenis Dosen'))
         # fig.update_traces(mode='lines+markers')
-        fig.add_bar(x=df['Tahun Ajaran'], y=df['Dosen Tidak Tetap'], name='Dosen Tidak Tetap',)
+        fig.add_bar(x=df['Tahun Ajaran'], y=df['Dosen Tidak Tetap yang Mengajar'], name='Dosen Tidak Tetap yang Mengajar',)
         fig.add_scatter(
             x=df['Tahun Ajaran'],
             y=df['Jumlah Dosen'],
             showlegend=False,
             mode='text',
-            text=df['Dosen Tidak Tetap'],
+            text=df['Dosen Tidak Tetap yang Mengajar'],
             textposition="top center"
         )
         fig.update_traces(hovertemplate="<br> Jumlah Dosen=%{y} </br> Tahun Ajaran= %{x}")
@@ -1175,14 +1175,8 @@ order by Rata2 asc,tahun_ajaran asc, semester_nama asc''', {'TA': thnAjar, 'Smt'
         fig = px.bar(df, x=df['Rata-rata'], y=df['Nama Dosen'], color=df['Predikat'], orientation='h',
                      hover_name=df['Nama Dosen'],text_auto=True,
                      color_discrete_map={
-                         'AK': '#06FF00',
-                         'LS': '#B2EA70',
-                         'TA': '#FFE400',
-                         'CS': '#ffbb00',
-                         'UD': '#FF8E00',
-                         'DO': '#FF1700',
                          'SANGAT BAIK': '#06FF00',
-                         'BAIK': 'B2EA70',
+                         'BAIK': '#B2EA70',
                          'CUKUP BAIK': '#FFE400',
                          'KURANG BAIK': '#FF1700'
                      })
