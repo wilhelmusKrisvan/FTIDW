@@ -159,8 +159,13 @@ def getPersenJabfungperTahun():
 
 def getDosenS3():
     return pd.read_sql('''
-    select dim_dosen.id_dosen, nama, max(tingkat_pendidikan) tingkat_pendidikan from fact_pendidikan_dosen
-        inner join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
+    select dim_dosen.id_dosen, dim_dosen.nama,max(didik.tingkat_pendidikan) tingkat_pendidikan, 
+    dim_dosen.tipe_nomor_induk, dim_dosen.no_sertifikat from dim_dosen
+        left join (select dim_dosen.id_dosen, nama,max(tingkat_pendidikan) tingkat_pendidikan, tipe_nomor_induk,no_sertifikat from dim_dosen
+        inner join fact_pendidikan_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
         where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null
-        group by dim_dosen.id_dosen, nama
+        group by dim_dosen.id_dosen, nama,tipe_nomor_induk,no_sertifikat
+        order by nama) didik on dim_dosen.id_dosen = didik.id_dosen
+        where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null
+        group by dim_dosen.id_dosen, nama,tipe_nomor_induk,no_sertifikat
         order by nama''',con)

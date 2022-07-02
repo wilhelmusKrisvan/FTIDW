@@ -18,9 +18,11 @@ dfbidangkerja = data.getBidangKerja()
 dfwirausaha = data.getWirausaha()
 dfGaji = data.getGajiLulusan()
 dfGajii = data.getGajiLulusanTab()
+dfTracer = data.getTracerStudiIsian()
+dfLulusan = data.getPenggunaLulusanIsian()
 
 dfskill = data.getSkill()
-dfKepuasanPelayanan = data.getKepuasanLayanan()
+dfKepuasanPelayanan = data.getKepuasanLayananNonTh()
 
 tabs_styles = {
     'background': '#FFFFFF',
@@ -177,6 +179,134 @@ masatunggu = dbc.Container([
     )
 ], style=cont_style)
 
+jumlahTracer = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah Isian Tracer Studi Terhadap Jumlah Lulusan',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Tahun Lulus dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrTracerStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Awal',
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Tahun Lulus sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrTracerEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Akhir',
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        dbc.CardBody([
+            html.Div([
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_Tracer')),
+                dbc.Button('Lihat Semua Data', id='cll_Tracer', n_clicks=0,
+                           style=button_style)
+            ])
+        ], style=tabs_styles)
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_tracer',
+                columns=[
+                    {'name': i, 'id': i} for i in dfTracer.columns
+                ],
+                data=dfTracer.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'padding': '10px', 'overflowX': 'auto'},
+                style_header={'textAlign': 'center'},
+                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 95},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardtbl_style
+        ),
+        id='cll_tblTracer',
+        is_open=False
+    )
+], style=cont_style)
+
+jumlahPengguna = dbc.Container([
+    dbc.Card([
+        html.H5('Jumlah Isian Pengguna Lulusan Terhadap Jumlah Lulusan',
+                style=ttlgrf_style),
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.P('Tahun Lulus dari :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrLulusStart',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[0],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Awal',
+                        clearable=False
+                    )
+                ]),
+                dbc.Col([
+                    html.P('Tahun Lulus sampai :', style={'marginBottom': 0}),
+                    dcc.Dropdown(
+                        id='fltrLulusEnd',
+                        options=[{'label': i, 'value': i} for i in listDropdownTh],
+                        value=listDropdownTh[3],
+                        style={'color': 'black'},
+                        placeholder='Pilih Tahun Akhir',
+                        clearable=False
+                    )
+                ])
+            ])
+        ]),
+        dbc.CardBody([
+            html.Div([
+                dcc.Loading(
+                    id='loading-1',
+                    type="default",
+                    children=dcc.Graph(id='grf_Lulusan')),
+                dbc.Button('Lihat Semua Data', id='cll_Lulusan', n_clicks=0,
+                           style=button_style)
+            ])
+        ], style=tabs_styles)
+    ], style=cardgrf_style),
+    dbc.Collapse(
+        dbc.Card(
+            dt.DataTable(
+                id='tbl_Lulusan',
+                columns=[
+                    {'name': i, 'id': i} for i in dfLulusan.columns
+                ],
+                data=dfLulusan.to_dict('records'),
+                sort_action='native',
+                sort_mode='multi',
+                style_table={'padding': '10px', 'overflowX': 'auto'},
+                style_header={'textAlign': 'center'},
+                style_data={'font-size': '80%', 'textAlign': 'center'},
+                style_cell={'width': 95},
+                page_size=10,
+                export_format='xlsx'
+            ), style=cardtbl_style
+        ),
+        id='cll_tblLulusan',
+        is_open=False
+    )
+], style=cont_style)
+
 lulusan = dbc.Container([
     dbc.Card([
         html.H5('Analisis Lulusan & Pekerjaan',
@@ -258,6 +388,15 @@ kepuasan = dbc.Container([
                 dcc.Tab(label='Kepuasan Lulusan Terhadap Layanan UKDW', value='layananukdw',
                         children=[
                             html.Div([
+                                html.P('Tahun Lulus :', style={'marginBottom': 0}),
+                                dcc.Dropdown(
+                                    id='drpdwn_thn',
+                                    options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                    value=listDropdownTh[0],
+                                    style={'color': 'black'},
+                                    placeholder='Pilih Tahun',
+                                    clearable=False
+                                ),
                                 dcc.Loading(
                                     id='loading-1',
                                     type="default",
@@ -269,25 +408,76 @@ kepuasan = dbc.Container([
                         style=tab_style, selected_style=selected_style),
                 dcc.Tab(label='Kepuasan Pengguna Terhadap Jenis Kemampuan Lulusan', value='skill',
                         children=[
-                            html.P('Jenis Kemampuan : ', style={'margin-bottom': '0', 'margin-top': '10px'}),
+                            html.P('Tahun Lulus :', style={'marginBottom': 0}),
                             dcc.Dropdown(
-                                id='drpdwn_skill',
-                                options=[{'label': 'INTEGRITAS', 'value': 'integritas'},
-                                         {'label': 'KEAHLIAN BIDANG ILMU', 'value': 'keahlian_bidang_ilmu'},
-                                         {'label': 'KEMAMPUAN BAHASA ASING', 'value': 'kemampuan_bahasa_asing'},
-                                         {'label': 'PENGGUNAAN TEKNOLOGI INFORMASI', 'value': 'penggunaan_teknologi'},
-                                         {'label': 'KOMUNIKASI', 'value': 'komunikasi'},
-                                         {'label': 'KERJASAMA TIM', 'value': 'kerjasama_tim'},
-                                         {'label': 'PENGEMBANGAN DIRI', 'value': 'pengembangan_diri'}, ],
-                                value='integritas',
+                                id='drpdwn_th',
+                                options=[{'label': i, 'value': i} for i in listDropdownTh],
+                                value=listDropdownTh[0],
                                 style={'color': 'black'},
-                                clearable=False,
+                                placeholder='Pilih Tahun',
+                                clearable=False
                             ),
                             html.Div([
-                                dcc.Loading(
-                                    id='loading-1',
-                                    type="default",
-                                    children=dcc.Graph(id='grf_skill')),
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.H5('INTEGRITAS',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillIntegritas')),
+                                    ]),
+                                    dbc.Col([
+                                        html.H5('KEAHLIAN BIDANG ILMU',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillKeahlian')),
+                                    ]),
+                                    dbc.Col([
+                                        html.H5('KEMAMPUAN BAHASA ASING',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillBhsAsing')),
+                                    ])
+                                ]),
+                                dbc.Row([
+                                    dbc.Col([
+                                        html.H5('PENGGUNAAN TEKNOLOGI INFORMASI',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillTeknologi')),
+                                    ]),
+                                    dbc.Col([
+                                        html.H5('KOMUNIKASI',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillKomunikasi')),
+                                    ]),
+                                    dbc.Col([
+                                        html.H5('KERJASAMA TIM',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillKerjasama')),
+                                    ]),
+                                    dbc.Col([
+                                        html.H5('PENGEMBANGAN DIRI',
+                                                style=ttlgrf_style),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            type="default",
+                                            children=dcc.Graph(id='grf_skillPengembangan')),
+                                    ])
+                                ]),
                                 dbc.Button('Lihat Semua Data', id='cll_grfSkill', n_clicks=0,
                                            style=button_style)
                             ]),
@@ -307,9 +497,11 @@ layout = html.Div([
                      style={'margin-top': '30px', 'textAlign': 'center'}
                      )
              ),
+    html.Div([kepuasan]),
     html.Div([masatunggu]),
-    html.Div([lulusan]),
-    html.Div([kepuasan], style={'margin-bottom': '50px'}),
+    html.Div([jumlahTracer]),
+    html.Div([jumlahPengguna]),
+    html.Div([lulusan], style={'margin-bottom': '50px'}),
     dbc.Container([
         dcc.Link([
             dbc.Button('^', style=buttonLink_style),
@@ -323,6 +515,26 @@ layout = html.Div([
     Output("cll_tblmasatunggu", "is_open"),
     [Input("cll_MsTgglulusan", "n_clicks")],
     [State("cll_tblmasatunggu", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblTracer", "is_open"),
+    [Input("cll_Tracer", "n_clicks")],
+    [State("cll_tblTracer", "is_open")])
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+@app.callback(
+    Output("cll_tblLulusan", "is_open"),
+    [Input("cll_Lulusan", "n_clicks")],
+    [State("cll_tblLulusan", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
@@ -354,7 +566,7 @@ def toggle_collapse(bidker, wira, gaji, lulusan, is_open):
             style_cell={'width': 95},
             page_size=10,
             export_format='xlsx'
-        ),style=cardtbl_style
+        ), style=cardtbl_style
     )
     isiWirausaha = dbc.Card(
         dt.DataTable(
@@ -371,7 +583,7 @@ def toggle_collapse(bidker, wira, gaji, lulusan, is_open):
             style_cell={'width': 95},
             page_size=10,
             export_format='xlsx'
-        ),style=cardtbl_style
+        ), style=cardtbl_style
     )
     isiGaji = dbc.Card(
         dt.DataTable(
@@ -388,7 +600,7 @@ def toggle_collapse(bidker, wira, gaji, lulusan, is_open):
             style_cell={'width': 95},
             page_size=10,
             export_format='xlsx'
-        ),style=cardtbl_style
+        ), style=cardtbl_style
     )
     if bidker and lulusan == 'bidkerja':
         return not is_open, isiBidKer
@@ -453,6 +665,72 @@ def graphMSLulusan(start, end):
     return fig
 
 
+# Jumlah Isian Pengguna Lulusan Terhadap Jumlah Lulusan
+@app.callback(
+    Output('grf_Tracer', 'figure'),
+    Input('fltrTracerStart', 'value'),
+    Input('fltrTracerEnd', 'value')
+)
+def graphIsiTracer(start, end):
+    df = data.getDataFrameFromDBwithParams('''
+    select lulus.tahun_lulus 'Tahun Lulus',lulus.Jumlah 'Jumlah Lulusan Tracer Studi',tot.Jumlah 'Jumlah Total Lulusan'
+from (select dl.tahun_lulus,count(*) Jumlah from fact_tracer_study fts
+inner join dim_lulusan dl on fts.id_lulusan = dl.id_lulusan
+group by dl.tahun_lulus) lulus
+inner join (select tahun_lulus,count(id_mahasiswa) Jumlah from dim_lulusan
+    group by tahun_lulus) tot on tot.tahun_lulus=lulus.tahun_lulus
+    where lulus.tahun_lulus between %(start)s and %(end)s
+    order by lulus.tahun_lulus
+    ''', {'start': start, 'end': end})
+    fig = px.bar(df, x=df['Tahun Lulus'], y=df['Jumlah Lulusan Tracer Studi'], text=df['Jumlah Lulusan Tracer Studi'],
+                 color=px.Constant('Lulusan yang Mengisi Tracer Studi'), )
+    fig.add_bar(x=df['Tahun Lulus'], y=df['Jumlah Total Lulusan'], name='Total Lulusan')
+    fig.add_scatter(
+        x=df['Tahun Lulus'],
+        y=df['Jumlah Total Lulusan'],
+        showlegend=False,
+        mode='text',
+        text=df['Jumlah Total Lulusan'],
+        textposition='middle center'
+    )
+    fig.update_layout(barmode='group')
+    fig.update_traces(hovertemplate="<br> Jumlah Lulusan=%{y} </br> Tahun Lulus= %{x}",)
+    return fig
+
+
+# Jumlah Isian Pengguna Lulusan Terhadap Jumlah Lulusan
+@app.callback(
+    Output('grf_Lulusan', 'figure'),
+    Input('fltrLulusStart', 'value'),
+    Input('fltrLulusEnd', 'value')
+)
+def graphIsiLulusan(start, end):
+    df = data.getDataFrameFromDBwithParams('''
+        select lulus.tahun_lulus 'Tahun Lulus',lulus.Jumlah 'Jumlah Pengguna Lulusan',tot.Jumlah 'Jumlah Total Lulusan'
+    from (select dl.tahun_lulus,count(*) Jumlah from fact_kepuasan_pengguna_lulusan fpl
+    inner join dim_lulusan dl on fpl.id_lulusan = dl.id_lulusan
+    group by dl.tahun_lulus) lulus
+    inner join (select tahun_lulus,count(id_mahasiswa) Jumlah from dim_lulusan
+        group by tahun_lulus) tot on tot.tahun_lulus=lulus.tahun_lulus
+        where lulus.tahun_lulus between %(start)s and %(end)s
+        order by lulus.tahun_lulus
+        ''', {'start': start, 'end': end})
+    fig = px.bar(df, x=df['Tahun Lulus'], y=df['Jumlah Pengguna Lulusan'], text=df['Jumlah Pengguna Lulusan'],
+                 color=px.Constant('Pengguna Lulusan yang Mengisi Kepuasan Pengguna'), )
+    fig.add_bar(x=df['Tahun Lulus'], y=df['Jumlah Total Lulusan'], name='Total Lulusan')
+    fig.add_scatter(
+        x=df['Tahun Lulus'],
+        y=df['Jumlah Total Lulusan'],
+        showlegend=False,
+        mode='text',
+        text=df['Jumlah Total Lulusan'],
+        textposition="middle center"
+    )
+    fig.update_layout(barmode='group')
+    fig.update_traces(hovertemplate="<br> Jumlah Lulusan=%{y} </br> Tahun Lulus= %{x}")
+    return fig
+
+
 @app.callback(
     Output('grf_bidangKerja', 'figure'),
     Input('fltrLulusanStart', 'value'),
@@ -500,7 +778,7 @@ def graphBidKerja(start, end):
     ) terlacak on terlacak.tahun_lulus = data2.tahun_lulus
     where data2.tahun_lulus between %(start)s and %(end)s
     order by data2.tahun_lulus
-    ''',{'start':start,'end':end})
+    ''', {'start': start, 'end': end})
     fig = px.bar(df, x=df['Tahun Lulus'], y=df.columns[1:5])
     fig.update_layout(yaxis_title='Persentase Lulusan', xaxis_title='Tahun Lulus', legend_title='Tingkat Kesesuaian')
     fig.update_traces(hovertemplate='Tahun Lulus : %{x} <br>Jumlah Lulusan : %{value}%')
@@ -511,6 +789,7 @@ def graphBidKerja(start, end):
     # fig.add_hrect(y0=70, y1=100,
     #               fillcolor="green", opacity=0.15, line_width=0)
     return fig
+
 
 @app.callback(
     Output('grf_alumniWirausaha', 'figure'),
@@ -528,11 +807,12 @@ def graphWirausaha(start, end):
       and tahun_lulus between %(start)s and %(end)s
     group by tahun_lulus
     order by tahun_lulus;
-    ''',{'start':start,'end':end})
-    fig = px.line(df, x=df['Tahun Lulus'],y=df['Jumlah Lulusan Berwirausaha'])
+    ''', {'start': start, 'end': end})
+    fig = px.line(df, x=df['Tahun Lulus'], y=df['Jumlah Lulusan Berwirausaha'])
     fig.update_traces(mode='lines+markers')
     fig.update_layout(yaxis=dict(tickformat=",d"))
     return fig
+
 
 @app.callback(
     Output('grf_gaji', 'figure'),
@@ -548,12 +828,13 @@ def graphGaji(start, end):
         and tahun_lulus between %(start)s and %(end)s
     group by tahun_lulus
     order by tahun_lulus
-    ''',{'start':start,'end':end})
-    fig = px.line(df, x=df['Tahun Lulus'],y=df['Rata-rata Pendapatan (Jutaan)'])
+    ''', {'start': start, 'end': end})
+    fig = px.line(df, x=df['Tahun Lulus'], y=df['Rata-rata Pendapatan (Jutaan)'])
     fig.update_traces(mode='lines+markers')
     fig.update_layout(yaxis=dict(tickformat=".2f"))
     # fig.update_layout(yaxis_tickformat = "%d")
     return fig
+
 
 @app.callback(
     Output('cll_kepuasan', 'is_open'),
@@ -621,12 +902,13 @@ def graphRataMS(tglstart, tglend):
     fig.update_traces(mode='lines+markers')
     return fig
 
+
 @app.callback(
     Output('grf_layananukdw', 'figure'),
-    Input('grf_layananukdw', 'id')
+    Input('drpdwn_thn', 'value'),
 )
-def graphLayanan(id):
-    df = dfKepuasanPelayanan
+def graphLayanan(th):
+    df = data.getKepuasanLayanan(th)
     fig = go.Figure(
         go.Pie(
             name="",
@@ -637,46 +919,65 @@ def graphLayanan(id):
     )
     return fig
 
-@app.callback(
-    Output('grf_skill', 'figure'),
-    Input('grf_skill', 'id'),
-    Input('drpdwn_skill', 'value'),
-    Input('drpdwn_skill', 'label')
-)
-def graphSkill(id, valueDropDown, labelSkill):
-    df = data.getDataFrameFromDB('''
-    select  kriteria as Kriteria,
-            round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Sangat Baik",
-            round(BAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Baik",
-            round(CUKUP/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Cukup",
-            round(IF(KURANG=NULL,0,KURANG)/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Kurang"
-    from (
-    select 'KRITERIA' as kriteria,
-        sum(case when {kolom} = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
-        sum(case when {kolom} = "BAIK" then jumlah end) as "BAIK",
-        sum(case when {kolom} = "CUKUP" then jumlah end) as "CUKUP",
-        sum(if({kolom}="KURANG",jumlah,0)) as "KURANG"
-        from(
-            select ifnull({kolom}, 'LAINNYA') as {kolom}, count(*) jumlah
-            from fact_kepuasan_pengguna_lulusan fact
-            inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
-            group by {kolom}
-        ) as data
-    ) dataJumlah'''.format(kolom=valueDropDown))
-    values = [f"{df['Sangat Baik'].iloc[-1]:,.1f}", f"{df['Baik'].iloc[-1]:,.1f}",
-              f"{df['Cukup'].iloc[-1]:,.1f}", f"{df['Kurang'].iloc[-1]:,.1f}"]
-    label = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang']
-    fig = go.Figure(data=[go.Pie(labels=label, values=values)])
-    fig = go.Figure(
-        data=go.Pie(
-            name="",
-            values=values,
-            labels=label,
-            hovertemplate="Skill : %{label} <br>Persentase : %{value}%"
-        )
-    )
-    return fig
 
+@app.callback(
+    Output('grf_skillIntegritas', 'figure'),
+    Output('grf_skillKeahlian', 'figure'),
+    Output('grf_skillBhsAsing', 'figure'),
+    Output('grf_skillTeknologi', 'figure'),
+    Output('grf_skillKomunikasi', 'figure'),
+    Output('grf_skillKerjasama', 'figure'),
+    Output('grf_skillPengembangan', 'figure'),
+    Input('drpdwn_th', 'value'),
+)
+def graphSkill(valueDropDown):
+    def dataKepuasan(kolom, value):
+        df = data.getDataFrameFromDBwithParams('''
+            select  kriteria as Kriteria,
+                    round(SANGATBAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Sangat Baik",
+                    round(BAIK/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Baik",
+                    round(CUKUP/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Cukup",
+                    round(IF(KURANG=NULL,0,KURANG)/(SANGATBAIK+BAIK+CUKUP+IF(KURANG=NULL,0,KURANG))*100,2) as "Kurang"
+            from (
+            select 'KRITERIA' as kriteria,
+                sum(case when {kolom} = "SANGAT BAIK" then jumlah end) as "SANGATBAIK",
+                sum(case when {kolom} = "BAIK" then jumlah end) as "BAIK",
+                sum(case when {kolom} = "CUKUP" then jumlah end) as "CUKUP",
+                sum(if({kolom}="KURANG",jumlah,0)) as "KURANG"
+                from(
+                    select ifnull({kolom}, 'LAINNYA') as {kolom}, count(*) jumlah
+                    from fact_kepuasan_pengguna_lulusan fact
+                    inner join dim_lulusan on dim_lulusan.id_lulusan = fact.id_lulusan
+                    where tahun_lulus<=%(value)s
+                    group by {kolom}
+                ) as data
+            ) dataJumlah'''.format(kolom=kolom), {'value': value})
+        return df
+
+    def graphOutput(df):
+        values = [f"{df['Sangat Baik'].iloc[-1]:,.1f}", f"{df['Baik'].iloc[-1]:,.1f}",
+                  f"{df['Cukup'].iloc[-1]:,.1f}", f"{df['Kurang'].iloc[-1]:,.1f}"]
+        label = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang']
+        # fig = go.Figure(data=[go.Pie(labels=label, values=values)])
+        fig = go.Figure(
+            data=go.Pie(
+                name="",
+                values=values,
+                labels=label,
+                hovertemplate="Skill : %{label} <br>Persentase : %{value}%"
+            )
+        )
+        return fig
+
+    dfIntegritas = dataKepuasan('integritas', valueDropDown)
+    dfKeahlian = dataKepuasan('keahlian_bidang_ilmu', valueDropDown)
+    dfBhsAsing = dataKepuasan('kemampuan_bahasa_asing', valueDropDown)
+    dfTeknologi = dataKepuasan('penggunaan_teknologi', valueDropDown)
+    dfKomunikasi = dataKepuasan('komunikasi', valueDropDown)
+    dfKerjasama = dataKepuasan('kerjasama_tim', valueDropDown)
+    dfPengembangan = dataKepuasan('pengembangan_diri', valueDropDown)
+    return graphOutput(dfIntegritas), graphOutput(dfKeahlian), graphOutput(dfBhsAsing), graphOutput(
+        dfTeknologi), graphOutput(dfKomunikasi), graphOutput(dfKerjasama), graphOutput(dfPengembangan)
 
 # @app.callback(
 #     Output('grf_bidangkerja', 'figure'),

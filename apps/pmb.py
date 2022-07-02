@@ -168,7 +168,7 @@ SeleksiPersen = dbc.Container([
                         ])
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Persentase Upaya Peningkatan Animo', value='mhsLolosPersen',
+            dcc.Tab(label='Persentase Pendaftar vs Pendaftar Lolos Seleksi', value='mhsLolosPersen',
                     children=[
                         dbc.CardBody([
                             dcc.Loading([
@@ -179,7 +179,7 @@ SeleksiPersen = dbc.Container([
                         ])
                     ],
                     style=tab_style, selected_style=selected_style),
-            dcc.Tab(label='Persentase Pendaftar Lolos Seleksi vs Pendaftar Registrasi', value='mhsRegisPersen',
+            dcc.Tab(label='Persentase Upaya Peningkatan Animo', value='mhsRegisPersen',
                     children=[
                         dbc.CardBody([
                             dcc.Loading([

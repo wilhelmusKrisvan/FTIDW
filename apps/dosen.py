@@ -11,9 +11,9 @@ from appConfig import app, server
 from dash import html, dcc
 import model.dao_dosen as data
 from datetime import date
+import numpy as np
 
-dfpersendosens3 = data.getDosenS3()
-
+dfpersendosen = data.getDosenS3()
 dfpersenjabfungAkumulasi = data.getPersenJabfungAkumulasiperTahun()
 dfpersenjabfung = data.getPersenJabfungperTahun()
 dfdosentetapinf = data.getDosenTetapINF()
@@ -117,17 +117,41 @@ DosenInduk = dbc.Container([
         html.H5('Dosen Informatika Nomor Induk',
                 style=ttlgrf_style),
         dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card(
+                        dbc.CardBody([
+                            html.P('Dosen dengan NIDN', className='card-title',
+                                   style={'textAlign': 'center', 'fontSize': 20, 'color': 'black'}),
+                            html.P(id='dosen_nidn',
+                                   className='card-text',
+                                   style={'textAlign': 'center', 'fontSize': 30, 'color': 'black'})
+                        ]),
+                        style={'margin-top': '25px'}),
+                ]),
+                dbc.Col([
+                    dbc.Card(
+                        dbc.CardBody([
+                            html.P('Dosen dengan NIDK', className='card-title',
+                                   style={'textAlign': 'center', 'fontSize': 20, 'color': 'black'}),
+                            html.P(id='dosen_nidk',
+                                   className='card-text',
+                                   style={'textAlign': 'center', 'fontSize': 30, 'color': 'black'})
+                        ]),
+                        style={'margin-top': '25px'}),
+                ]),
+            ]),
             dcc.Loading([
                 dcc.Graph(id='grf_DosenTetapInfInduk'),
             ], type='default'),
-            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfInduk', n_clicks=0,
-                       style=button_style),
+            # dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfInduk', n_clicks=0,
+            #            style=button_style),
         ]),
     ], style=cardgrf_style),
-    dbc.Collapse(
-        id='cll_tblDosenTetapInfInduk',
-        is_open=False,
-    )
+    # dbc.Collapse(
+    #     id='cll_tblDosenTetapInfInduk',
+    #     is_open=False,
+    # )
 ], style=cont_style)
 
 DosenSertif = dbc.Container([
@@ -135,17 +159,41 @@ DosenSertif = dbc.Container([
         html.H5('Dosen Informatika Tersertifikasi',
                 style=ttlgrf_style),
         dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card(
+                        dbc.CardBody([
+                            html.P('Dosen Tersertifikasi', className='card-title',
+                                   style={'textAlign': 'center', 'fontSize': 20, 'color': 'black'}),
+                            html.P(id='dosen_sertif',
+                                   className='card-text',
+                                   style={'textAlign': 'center', 'fontSize': 30, 'color': 'black'})
+                        ]),
+                        style={'margin-top': '25px'}),
+                ]),
+                dbc.Col([
+                    dbc.Card(
+                        dbc.CardBody([
+                            html.P('Dosen belum Tersertifikasi', className='card-title',
+                                   style={'textAlign': 'center', 'fontSize': 20, 'color': 'black'}),
+                            html.P(id='dosen_nonSertif',
+                                   className='card-text',
+                                   style={'textAlign': 'center', 'fontSize': 30, 'color': 'black'})
+                        ]),
+                        style={'margin-top': '25px'}),
+                ]),
+            ]),
             dcc.Loading([
                 dcc.Graph(id='grf_DosenTetapInfSertif'),
             ], type='default'),
-            dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfSertif', n_clicks=0,
-                       style=button_style),
+            # dbc.Button('Lihat Semua Data', id='cll_grfDosenTetapInfSertif', n_clicks=0,
+            #            style=button_style),
         ]),
     ], style=cardgrf_style),
-    dbc.Collapse(
-        id='cll_tblDosenTetapInfSertif',
-        is_open=False,
-    )
+    # dbc.Collapse(
+    #     id='cll_tblDosenTetapInfSertif',
+    #     is_open=False,
+    # )
 ], style=cont_style)
 
 dosens3 = dbc.Container([
@@ -153,21 +201,77 @@ dosens3 = dbc.Container([
         html.H5('Dosen S3',
                 style=ttlgrf_style),
         dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card(
+                        dbc.CardBody([
+                            html.P('Dosen Berpendidikan S3', className='card-title',
+                                   style={'textAlign': 'center', 'fontSize': 17, 'color': 'black'}),
+                            html.P(id='dosen_s3',
+                                   className='card-text',
+                                   style={'textAlign': 'center', 'fontSize': 30, 'color': 'black'})
+                        ]),
+                        style={'margin-top': '25px'}),
+                ]),
+                dbc.Col([
+                    dbc.Card(
+                        dbc.CardBody([
+                            html.P('Dosen Berpendidikan S2', className='card-title',
+                                   style={'textAlign': 'center', 'fontSize': 17, 'color': 'black'}),
+                            html.P(id='dosen_nonS3',
+                                   className='card-text',
+                                   style={'textAlign': 'center', 'fontSize': 30, 'color': 'black'})
+                        ]),
+                        style={'margin-top': '25px'}),
+                ]),
+            ]),
             dcc.Loading([
                 dcc.Graph(id='grf_dosens3'),
             ], type='default'),
-            dbc.Button('Lihat Semua Data',
-                       id='cll_grfdosens3',
-                       n_clicks=0, style=button_style
-                       ),
         ]),
     ], style=cardgrf_style),
+], style=cont_style)
+
+allDosen = dbc.Container([
+    dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    DosenInduk,
+                ], width=4),
+                dbc.Col([
+                    DosenSertif,
+                ], width=4),
+                dbc.Col([
+                    dosens3,
+                ], width=4)
+            ]),
+            dbc.Button('Lihat Semua Data', id='cll_grfDosen', n_clicks=0,
+                       style={
+                           'width': '120px',
+                           'height': '50px',
+                           'border-radius': '10px',
+                           'box-shadow': '5px 10px 20px #ebedeb',
+                           'border': '1px solid #fafafa',
+                           'color': 'white',
+                           'background-color': '#2780e3',
+                           'right': '0',
+                           'position': 'absolute',
+                           'margin': '50px 25px 10px 10px',
+                       }),
+        ]),
+    ], style={
+        'border': '1px solid #fafafa',
+        'border-radius': '10px',
+        'padding-bottom': '100px',
+        'box-shadow': '5px 10px 30px #ebedeb'
+    }),
     dbc.Collapse(
         dbc.Card(
             dt.DataTable(
-                id='tbl_dosens3',
-                columns=[{"name": i, "id": i} for i in dfpersendosens3.columns],
-                data=dfpersendosens3.to_dict('records'),
+                id='tbl_dosen',
+                columns=[{"name": i, "id": i} for i in dfpersendosen.columns],
+                data=dfpersendosen.to_dict('records'),
                 sort_action='native',
                 sort_mode='multi',
                 style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
@@ -177,7 +281,7 @@ dosens3 = dbc.Container([
                 export_format='xlsx'
             ), style=cardgrf_style
         ),
-        id='cll_tbldosens3',
+        id='cll_tbldosen',
         is_open=False
     )
 ], style=cont_style)
@@ -187,18 +291,48 @@ dosentetapindustri = dbc.Container([
         html.H5('Daftar Dosen Industri Praktisi',
                 style=ttlgrf_style),
         dbc.Card([
-            dt.DataTable(
-                id='tbl_dosenindustriinf',
-                columns=[{"name": i, "id": i} for i in dfdosenindustri.columns],
-                data=dfdosenindustri.to_dict('records'),
-                sort_action='native',
-                sort_mode='multi',
-                style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
-                style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
-                page_size=10,
-                export_format='xlsx'
-            ),
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                        html.Div([
+                            html.P('Dari', style={'color': 'black'}),
+                            dcc.Dropdown(
+                                id='Fromdrpdwn_dosenPraktisi',
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[0],
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='Dari',
+                            ),
+                        ]),
+                    ], width=6),
+                    dbc.Col([
+                        html.Div([
+                            html.P('Sampai', style={'color': 'black'}),
+                            dcc.Dropdown(
+                                id='Todrpdwn_dosenPraktisi',
+                                options=[{'label': i, 'value': i} for i in listDropdown],
+                                value=listDropdown[len(listDropdown) - 1],
+                                style={'color': 'black'},
+                                clearable=False,
+                                placeholder='Sampai',
+                            ),
+                        ]),
+                    ], width=6),
+                ]),
+                dt.DataTable(
+                    id='tbl_dosenindustriinf',
+                    columns=[{"name": i, "id": i} for i in dfdosenindustri.columns],
+                    data=dfdosenindustri.to_dict('records'),
+                    sort_action='native',
+                    sort_mode='multi',
+                    style_table={'width': '100%', 'padding': '10px', 'overflowX': 'auto', 'margin-top': '25px'},
+                    style_header={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    style_data={'border': 'none', 'font-size': '80%', 'textAlign': 'center'},
+                    page_size=10,
+                    export_format='xlsx'
+                ),
+            ])
         ], style=cardtbl_style),
     ], style=cardgrf_style),
 ], style=cont_style)
@@ -305,20 +439,8 @@ layout = html.Div([
                      )
              ),
     html.A(className='name'),
-    dbc.Container([
-        dbc.CardBody([
-            dbc.Row([
-                dbc.Col([
-                    DosenInduk,
-                ], width=4),
-                dbc.Col([
-                    DosenSertif,
-                ], width=4),
-                dbc.Col([
-                    dosens3,
-                ], width=4)
-            ]),
-        ])
+    html.Div([
+        allDosen
     ]),
     html.Div([dosentetapindustri]),
     html.Div([jumljabfungDosen]),
@@ -332,60 +454,60 @@ layout = html.Div([
 
 
 # CONTROL COLLAPSE
-@app.callback(
-    Output("cll_tblDosenTetapInfInduk", "is_open"),
-    Output("cll_tblDosenTetapInfInduk", "children"),
-    [Input("cll_grfDosenTetapInfInduk", "n_clicks"), ],
-    [State("cll_tblDosenTetapInfInduk", "is_open")])
-def toggle_collapse(ninduk, is_open):
-    isiDosenTetap = dbc.Card(
-        dt.DataTable(
-            id='tbl_dosentetapinf',
-            columns=[
-                {'name': i, 'id': i} for i in dfdosentetapinf.columns
-            ],
-            data=dfdosentetapinf.to_dict('records'),
-            sort_action='native',
-            sort_mode='multi',
-            style_table={'padding': '10px', 'overflowX': 'auto'},
-            style_header={'textAlign': 'center'},
-            style_data={'font-size': '80%', 'textAlign': 'center'},
-            style_cell={'width': 95},
-            page_size=10,
-            export_format='xlsx'
-        ), style=cardtbl_style
-    )
-    if ninduk:
-        return not is_open, isiDosenTetap
-    return is_open, None
+# @app.callback(
+#     Output("cll_tblDosenTetapInfInduk", "is_open"),
+#     Output("cll_tblDosenTetapInfInduk", "children"),
+#     [Input("cll_grfDosenTetapInfInduk", "n_clicks"), ],
+#     [State("cll_tblDosenTetapInfInduk", "is_open")])
+# def toggle_collapse(ninduk, is_open):
+#     isiDosenTetap = dbc.Card(
+#         dt.DataTable(
+#             id='tbl_dosentetapinf',
+#             columns=[
+#                 {'name': i, 'id': i} for i in dfdosentetapinf.columns
+#             ],
+#             data=dfdosentetapinf.to_dict('records'),
+#             sort_action='native',
+#             sort_mode='multi',
+#             style_table={'padding': '10px', 'overflowX': 'auto'},
+#             style_header={'textAlign': 'center'},
+#             style_data={'font-size': '80%', 'textAlign': 'center'},
+#             style_cell={'width': 95},
+#             page_size=10,
+#             export_format='xlsx'
+#         ), style=cardtbl_style
+#     )
+#     if ninduk:
+#         return not is_open, isiDosenTetap
+#     return is_open, None
 
 
-@app.callback(
-    Output("cll_tblDosenTetapInfSertif", "is_open"),
-    Output("cll_tblDosenTetapInfSertif", "children"),
-    Input("cll_grfDosenTetapInfSertif", "n_clicks"),
-    [State("cll_tblDosenTetapInfSertif", "is_open")])
-def toggle_collapse(nsertif, is_open):
-    isiDosenTetap = dbc.Card(
-        dt.DataTable(
-            id='tbl_dosentetapinf',
-            columns=[
-                {'name': i, 'id': i} for i in dfdosentetapinf.columns
-            ],
-            data=dfdosentetapinf.to_dict('records'),
-            sort_action='native',
-            sort_mode='multi',
-            style_table={'padding': '10px', 'overflowX': 'auto'},
-            style_header={'textAlign': 'center'},
-            style_data={'font-size': '80%', 'textAlign': 'center'},
-            style_cell={'width': 95},
-            page_size=10,
-            export_format='xlsx'
-        ), style=cardtbl_style
-    )
-    if nsertif:
-        return not is_open, isiDosenTetap
-    return is_open, None
+# @app.callback(
+#     Output("cll_tblDosenTetapInfSertif", "is_open"),
+#     Output("cll_tblDosenTetapInfSertif", "children"),
+#     Input("cll_grfDosenTetapInfSertif", "n_clicks"),
+#     [State("cll_tblDosenTetapInfSertif", "is_open")])
+# def toggle_collapse(nsertif, is_open):
+#     isiDosenTetap = dbc.Card(
+#         dt.DataTable(
+#             id='tbl_dosentetapinf',
+#             columns=[
+#                 {'name': i, 'id': i} for i in dfdosentetapinf.columns
+#             ],
+#             data=dfdosentetapinf.to_dict('records'),
+#             sort_action='native',
+#             sort_mode='multi',
+#             style_table={'padding': '10px', 'overflowX': 'auto'},
+#             style_header={'textAlign': 'center'},
+#             style_data={'font-size': '80%', 'textAlign': 'center'},
+#             style_cell={'width': 95},
+#             page_size=10,
+#             export_format='xlsx'
+#         ), style=cardtbl_style
+#     )
+#     if nsertif:
+#         return not is_open, isiDosenTetap
+#     return is_open, None
 
 
 @app.callback(
@@ -409,9 +531,9 @@ def toggle_collapse(n, is_open):
 
 
 @app.callback(
-    Output("cll_tbldosens3", "is_open"),
-    [Input("cll_grfdosens3", "n_clicks")],
-    [State("cll_tbldosens3", "is_open")])
+    Output("cll_tbldosen", "is_open"),
+    [Input("cll_grfDosen", "n_clicks")],
+    [State("cll_tbldosen", "is_open")])
 def toggle_collapse(n, is_open):
     if n:
         return not is_open
@@ -421,6 +543,8 @@ def toggle_collapse(n, is_open):
 # GRAPH COLLAPSE
 @app.callback(
     Output('grf_DosenTetapInfInduk', 'figure'),
+    Output('dosen_nidn', 'children'),
+    Output('dosen_nidk', 'children'),
     Input('grf_DosenTetapInfInduk', 'id')
 )
 def graphDosenInfInduk(id):
@@ -432,16 +556,20 @@ def graphDosenInfInduk(id):
     ''')
     if (len(df['Jumlah']) != 0):
         fig = px.pie(df, values=df['Jumlah'], names=df['Tipe Nomor Induk'])
-        return fig
+        txtInduk = df.loc[(df['Tipe Nomor Induk'] == 'NIDN'), ('Jumlah')].agg({'Jumlah': np.sum})
+        txtKaryawan = df.loc[(df['Tipe Nomor Induk'] == 'NIDK'), ('Jumlah')].agg({'Jumlah': np.sum})
+        return fig, txtInduk, txtKaryawan
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                          yshift=10)
-        return fig
+        return fig, None, None
 
 
 @app.callback(
     Output('grf_DosenTetapInfSertif', 'figure'),
+    Output('dosen_sertif', 'children'),
+    Output('dosen_nonSertif', 'children'),
     Input('grf_DosenTetapInfSertif', 'id')
 )
 def graphDosenInfSertif(id):
@@ -458,37 +586,64 @@ def graphDosenInfSertif(id):
     ''')
     if (len(df['Jumlah']) != 0):
         fig = px.pie(df, values=df['Jumlah'], names=df['Tipe Sertifikat'])
-        return fig
+        txtSertif = df.loc[(df['Tipe Sertifikat'] == 'Sertifikat'), ('Jumlah')].agg({'Jumlah': np.sum})
+        txtNonSertif = df.loc[(df['Tipe Sertifikat'] == 'Non Sertifikat'), ('Jumlah')].agg({'Jumlah': np.sum})
+        return fig, txtSertif, txtNonSertif
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                          yshift=10)
-        return fig
+        return fig, None, None
 
 
 @app.callback(
     Output('grf_dosens3', 'figure'),
+    Output('dosen_s3', 'children'),
+    Output('dosen_nonS3', 'children'),
     Input('grf_dosens3', 'id')
 )
 def grafDosenS3(id):
     df = data.getDataFrameFromDB('''
-    select count(data.id_dosen) Jumlah, data.tingkat_pendidikan "Tingkat Pendidikan" from
+    select count(data.id_dosen) Jumlah, if(data.tingkat_pendidikan is null, 'Lainnya', data.tingkat_pendidikan) "Tingkat Pendidikan" from
     (select dim_dosen.id_dosen,nama, max(tingkat_pendidikan) tingkat_pendidikan from fact_pendidikan_dosen
-        inner join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
+        right join dim_dosen on dim_dosen.id_dosen = fact_pendidikan_dosen.id_dosen
         where id_prodi = 9 and status_Dosen = 'Tetap' and tanggal_keluar is null 
         and year(tanggal_masuk)<=year(now())
         group by dim_dosen.id_dosen, nama
         order by nama) data
-        group by tingkat_pendidikan
+        group by `Tingkat Pendidikan`
         ''')
     if (len(df['Jumlah']) != 0):
         fig = px.pie(df, values=df['Jumlah'], names=df['Tingkat Pendidikan'])
-        return fig
+        txtS3 = df.loc[(df['Tingkat Pendidikan'] == 'S3'), ('Jumlah')].agg({'Jumlah': np.sum})
+        txtNonS3 = df.loc[(df['Tingkat Pendidikan'] != 'S3'), ('Jumlah')].agg({'Jumlah': np.sum})
+        return fig, txtS3, txtNonS3
     else:
         fig = go.Figure().add_annotation(x=2.5, y=2, text="Tidak Ada Data yang Ditampilkan",
                                          font=dict(family="sans serif", size=25, color="crimson"), showarrow=False,
                                          yshift=10)
-        return fig
+        return fig, None, None
+
+
+# @app.callback(
+#     Output('tbl_dosenindustriinf', 'columns'),
+#     Output('tbl_dosenindustriinf', 'data'),
+#     Input('Fromdrpdwn_dosenPraktisi', 'value'),
+#     Input('Todrpdwn_dosenPraktisi', 'value'),
+# )
+# def dosenPraktisi(dari,sampai):
+#     df = data.getDataFrameFromDBwithParams('''
+#     select nama, nik, kode_dosen,
+#     jenis_kelamin,no_sertifikat,status_dosen,
+#     status_dikti,status_yayasan,tanggal_masuk
+#     from dim_dosen
+#     where is_praktisi="1"
+#     and year(tanggal_masuk) between %(From)s and %(To)s
+#     order by nama
+#     ''',{'From':dari,'To':sampai})
+#     # columns = [{"name": i, "id": i} for i in df.columns],
+#     # isi = df.to_dict('records'),
+#     return [{"name": i, "id": i} for i in df.columns],df.to_dict('records')
 
 
 # Jumlah Jabfung L LK per Tahun
@@ -497,9 +652,9 @@ def grafDosenS3(id):
     Input('Fromdrpdwn_dosenJabfung', 'value'),
     Input('Todrpdwn_dosenJabfung', 'value'),
 )
-def grafJmlJabfungth(dari,sampai):
-    #df = dfpersenjabfungAkumulasi
-    df=data.getDataFrameFromDBwithParams('''
+def grafJmlJabfungth(dari, sampai):
+    # df = dfpersenjabfungAkumulasi
+    df = data.getDataFrameFromDBwithParams('''
     select jabatan.tahun Tahun,jabatan.Jumlah 'Jumlah Jabatan', 
     dosen.Jumlah 'Jumlah Dosen',dosen.Jumlah-jabatan.Jumlah 'Jumlah Non Jabatan',(jabatan.Jumlah/dosen.Jumlah)*100 'persentase' from
     (select sum(Jumlah) as Jumlah,cast(2021 as char) as tahun from
@@ -528,7 +683,7 @@ def grafJmlJabfungth(dari,sampai):
     group by tahun) jabatan
     where jabatan.tahun=dosen.tahun
     and jabatan.tahun between %(From)s and %(To)s
-    order by tahun asc''',{'From': dari, 'To': sampai})
+    order by tahun asc''', {'From': dari, 'To': sampai})
     count = df['Jumlah Non Jabatan'].value_counts().reset_index()
     if (len(df['Tahun']) != 0):
         fig = px.bar(df, x=df['Tahun'], y=df['Jumlah Jabatan'], color=px.Constant('Jabatan'), text_auto=True,
